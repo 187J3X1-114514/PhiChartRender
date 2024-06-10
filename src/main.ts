@@ -106,4 +106,3 @@ sbtn.addEventListener("click", async () => {
 })
 
 document.body.append(c)
-

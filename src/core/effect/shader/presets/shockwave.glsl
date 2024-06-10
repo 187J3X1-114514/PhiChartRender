@@ -1,6 +1,6 @@
 precision mediump float;
 
-varying lowp vec2 uv;
+varying lowp vec2 vTextureCoord;
 uniform vec2 screenSize;
 uniform sampler2D uTexture;
 

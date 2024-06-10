@@ -11,7 +11,6 @@ import { GameParams, GameSettings, SizerData } from '../types/params';
 import WAudio from '../audio';
 import { ResourceManger } from '../resource/resource_manger';
 import { printImage } from '../utils';
-import { ChartInfo } from '../chart/chartinfo';
 
 //PIXISettings.RENDER_OPTIONS.hello = true;
 
@@ -159,7 +158,8 @@ export default class Game {
             autoDensity: verify.bool(params.render.autoDensity, true),
             antialias: verify.bool(params.render.antialias, true),
             canvas: params.render.view ? params.render.view : undefined,
-            backgroundAlpha: 1
+            backgroundAlpha: 1,
+            preference:"webgpu"
         })
         this.renders.parentNode = (params.render.resizeTo ? params.render.resizeTo : (params.render.view ? params.render.view.parentNode : this.render.view.parentNode))! as HTMLElement;
         this.render.stage.width

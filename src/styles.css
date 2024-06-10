@@ -4,3 +4,6 @@ canvas.canvas-game {
     left: 0;
     z-index: 114514;
 }
+body{
+    font-family: 'Font';
+}
