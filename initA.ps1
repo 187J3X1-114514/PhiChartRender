@@ -1,0 +1,7 @@
+$env:OPENSSL_INCLUDE_DIR="N:/openssl-3.3.0/include"
+$env:OPENSSL_LIB_DIR="N:\openssl-3.3.0"
+$env:OPENSSL_DIR="N:\openssl-3.3.0"
+$env:Path += ";D:\Android\SDK\ndk\25.2.9519653\toolchains\llvm\prebuilt\windows-x86_64\bin"
+echo "OPENSSL_INCLUDE_DIR:${OPENSSL_INCLUDE_DIR}"
+echo "OPENSSL_LIB_DIR:${OPENSSL_LIB_DIR}"
+echo "OPENSSL_DIR:${OPENSSL_DIR}"

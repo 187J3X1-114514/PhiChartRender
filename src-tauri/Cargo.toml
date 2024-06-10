@@ -1,0 +1,41 @@
+cargo-features = ["profile-rustflags", "trim-paths"]
+[package]
+
+name = "phigros_sim_m"
+version = "0.0.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "phigros_sim_m_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.0-beta.17", features = [] }
+
+
+[dependencies]
+tauri = { version = "2.0.0-beta.22", features = [] }
+tauri-plugin-shell = "2.0.0-beta.7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+lazy_static = "1.4"
+tauri-plugin-dialog = "2.0.0-beta.9"
+
+
+[profile.dev]
+incremental = true           # Compile your binary in smaller steps.
+rustflags = ["-Zthreads=8"]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
+trim-paths = "all"
+rustflags = ["-Zthreads=8"]

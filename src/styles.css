@@ -1,0 +1,6 @@
+canvas.canvas-game {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 114514;
+}
