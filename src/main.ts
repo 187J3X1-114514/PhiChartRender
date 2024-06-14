@@ -75,7 +75,7 @@ var app
 sbtn.addEventListener("click", async () => {
     game = new Game()
     app = new Application()
-    await ress.charts[s.value as string]!.blur(9)
+    await ress.charts[s.value as string]!.blur(25)
     await app.init({
         width: document.documentElement.clientWidth,
         height: document.documentElement.clientHeight,
@@ -97,7 +97,7 @@ sbtn.addEventListener("click", async () => {
         assets: res.Assets,
         zipFiles: ress,
         settings: {
-            autoPlay: true, shader: true
+            autoPlay: false, shader: true
         }
     })
     //(game.render.view as HTMLCanvasElement).style.width = "100%";
