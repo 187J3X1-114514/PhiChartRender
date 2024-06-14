@@ -3,7 +3,7 @@ import Judgement from '../judgement';
 import { PhiAssets } from "../resource"
 //import * as CallbackFunc from './callback';
 import Shader from '../effect/shader/index'
-import { Application, Container, Texture, Sprite, Graphics, Text, Rectangle, BlurFilter, Filter } from 'pixi.js';
+import { Application, Container, Texture, Sprite, Graphics, Text, Rectangle, Filter } from 'pixi.js';
 import * as font from '../font'
 import Chart from '../chart';
 import Effect from '../effect';
@@ -150,17 +150,7 @@ export default class Game {
         }
 
         /* ===== 创建 render ===== */
-        this.render = new Application();
-        await this.render.init({
-            width: verify.number(params.render.width, document.documentElement.clientWidth, 0),
-            height: verify.number(params.render.height, document.documentElement.clientHeight, 0),
-            resolution: verify.number(params.render.resolution, window.devicePixelRatio, 1),
-            autoDensity: verify.bool(params.render.autoDensity, true),
-            antialias: verify.bool(params.render.antialias, true),
-            canvas: params.render.view ? params.render.view : undefined,
-            backgroundAlpha: 1,
-            preference:"webgpu"
-        })
+        this.render = params.app
         this.renders.parentNode = (params.render.resizeTo ? params.render.resizeTo : (params.render.view ? params.render.view.parentNode : this.render.view.parentNode))! as HTMLElement;
         this.render.stage.width
         // 创建舞台主渲染区
@@ -268,9 +258,6 @@ export default class Game {
             this.renders.mainContainerCover.zIndex = 1;
             this.renders.mainContainerCover.addChild(bgCover);
             this.renders.bg.anchor.set(0.5);
-            this.renders.mainContainerCover.filters = [new BlurFilter({
-                strength: 15, quality: 10
-            })]
             this.renders.mainContainerCover.addChild(this.renders.bg)
             this.renders.mainContainerCover.blendMode = "none"
             this.render.stage.addChild(this.renders.mainContainerCover);
@@ -674,6 +661,7 @@ export default class Game {
     }
 
     calcTick() {
+        console.log(this.render.stage.filters,this.renders.gameContainer.filters)
         { // 为暂停按钮计算渐变
             let pauseButton = this.sprites.pauseButton;
             if (pauseButton.clickCount === 1) {

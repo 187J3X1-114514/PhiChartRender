@@ -1,10 +1,11 @@
+import { Application } from "pixi.js"
 import { ChartInfo } from "../chart/chartinfo"
 import Effect from "../effect"
 import { ResourceManger } from "../resource"
 import { PhiAssets } from "../resource/resource_pack"
 
 export interface GameParams {
-
+    app: Application
     render: {
         width?: number,
         height?: number,
@@ -15,23 +16,23 @@ export interface GameParams {
         resizeTo?: HTMLElement
     },
     chart: ChartInfo,
-    assets:PhiAssets,
-    effects?:Effect[],
-    zipFiles?:ResourceManger,
+    assets: PhiAssets,
+    effects?: Effect[],
+    zipFiles?: ResourceManger,
     settings: {
-        audioOffset?:number,
-        hitsound?:boolean,
-        hitsoundVolume?:number,
-        speed?:number,
-        noteScale?:number,
-        bgDim?:number,
-        multiNoteHL?:boolean,
-        showInputPoint?:boolean,
-        challengeMode?:boolean,
-        autoPlay?:boolean,
-        showFPS?:boolean,
-        showAPStatus?:boolean,
-        shader?:boolean
+        audioOffset?: number,
+        hitsound?: boolean,
+        hitsoundVolume?: number,
+        speed?: number,
+        noteScale?: number,
+        bgDim?: number,
+        multiNoteHL?: boolean,
+        showInputPoint?: boolean,
+        challengeMode?: boolean,
+        autoPlay?: boolean,
+        showFPS?: boolean,
+        showAPStatus?: boolean,
+        shader?: boolean
     }
 
 }

@@ -41,6 +41,9 @@ dependencies:
   pixi.js:
     specifier: ^8.1.6
     version: 8.1.6
+  stackblur-canvas:
+    specifier: ^2.7.0
+    version: 2.7.0
   tslog:
     specifier: ^4.9.2
     version: 4.9.2
@@ -1127,6 +1130,11 @@ packages:
 
   /ssr-window@4.0.2:
     resolution: {integrity: sha512-ISv/Ch+ig7SOtw7G2+qkwfVASzazUnvlDTwypdLoPoySv+6MqlOV10VwPSE6EWkGjhW50lUmghPmpYZXMu/+AQ==}
+    dev: false
+
+  /stackblur-canvas@2.7.0:
+    resolution: {integrity: sha512-yf7OENo23AGJhBriGx0QivY5JP6Y1HbrrDI6WLt6C5auYZXlQrheoY8hD4ibekFKz1HOfE48Ww8kMWMnJD/zcQ==}
+    engines: {node: '>=0.1.14'}
     dev: false
 
   /string_decoder@1.1.1:

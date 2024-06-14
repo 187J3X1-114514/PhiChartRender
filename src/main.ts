@@ -71,9 +71,24 @@ fbtn.addEventListener("click", () => {
         }
     }, undefined, true)
 })
+var app
 sbtn.addEventListener("click", async () => {
     game = new Game()
+    app = new Application()
+    await ress.charts[s.value as string]!.blur(9)
+    await app.init({
+        width: document.documentElement.clientWidth,
+        height: document.documentElement.clientHeight,
+        resolution: 1,
+        autoDensity: true,
+        antialias: true,
+        //canvas: params.render.view ? params.render.view : undefined,
+        backgroundAlpha: 1,
+        preference: "webgl",
+        preferWebGLVersion: 2
+    })
     await game.init({
+        app: app,
         render: {
             resizeTo: document.documentElement
             , resolution: window.devicePixelRatio
@@ -82,7 +97,7 @@ sbtn.addEventListener("click", async () => {
         assets: res.Assets,
         zipFiles: ress,
         settings: {
-            autoPlay: false, shader: true
+            autoPlay: true, shader: true
         }
     })
     //(game.render.view as HTMLCanvasElement).style.width = "100%";
@@ -91,13 +106,13 @@ sbtn.addEventListener("click", async () => {
 
         let [width, height] = [document.documentElement.clientWidth, document.documentElement.clientHeight];
         (game.render.canvas as HTMLCanvasElement).style.width = `${document.documentElement.clientWidth}px`;
-        (game.render.view as HTMLCanvasElement).style.height = `${document.documentElement.clientHeight}px`;
+        (game.render.canvas as HTMLCanvasElement).style.height = `${document.documentElement.clientHeight}px`;
         //stage.scale.set(ratio);
         application.renderer.resize(width, height);
     }
     window.addEventListener("resize", () => { rendererResize(game.render); game.resize(true) });
     (game.render.canvas as HTMLCanvasElement).classList.add('canvas-game');
-    await (game.render.canvas as HTMLCanvasElement).requestFullscreen()
+    //await (game.render.canvas as HTMLCanvasElement).requestFullscreen()
     game.createSprites()
     game.start()
     game.on('pause', () => {

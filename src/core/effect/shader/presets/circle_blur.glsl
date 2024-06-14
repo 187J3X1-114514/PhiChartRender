@@ -11,7 +11,7 @@ void main() {
     vec3 color = texture2D(uTexture, vTextureCoord).rgb;
     float size_new = size / 1.1;
     float totalBlurFactor = 0.0;
-    const int numSamples = 32;
+    const int numSamples = 8;
 
     for (int i = 0; i < numSamples; i++) {
         float angle = float(i) * 6.28 / float(numSamples);

@@ -1,7 +1,7 @@
 import { number as verifyNum } from '../verify';
 import * as Convert from './convert';
 import md5Hash from 'md5-js';
-import { Sprite, Graphics, Text, Texture, BlurFilter } from 'pixi.js';
+import { Sprite, Graphics, Text, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import Note from './note';
 import { bpmEvent } from './baseEvents';
@@ -182,9 +182,6 @@ export default class Chart {
             this.bgCover.zIndex = -1
             this.sprites.bg.anchor.set(0.5);
             this.sprites.bg.blendMode = "none"
-            this.sprites.bg.filters = [new BlurFilter({
-                strength:15,quality:10
-            })]
             stage.addChild(this.sprites.bg);
         }
 

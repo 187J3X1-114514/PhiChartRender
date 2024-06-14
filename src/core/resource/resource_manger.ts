@@ -9,8 +9,8 @@ import { ChartInfo } from "../chart/chartinfo"
 const log = newLogger("Resource Manger")
 
 export class ResourceManger {
-    private files: { [key: string]: Texture | WAudio | Chart | Effect[] | undefined }
-    private srcFiles: { [key: string]: File | undefined }
+    public files: { [key: string]: Texture | WAudio | Chart | Effect[] | undefined }
+    public srcFiles: { [key: string]: File | undefined }
     public charts: { [key: string]: ChartInfo | undefined }
     constructor() {
         this.files = {}
@@ -37,7 +37,7 @@ export class ResourceManger {
                 } else {
                     try {
                         let yes = true
-                        let info = await ChartInfo.fromRPE(file)
+                        let info = await ChartInfo.from(file,this)
                         //for (let key in this.charts) {
                         //    if (((this.charts[key]!.chart.endsWith(info.chart) || info.chart.endsWith(this.charts[key]!.chart)) && yes)) { yes = false }
                         //    if (((this.charts[key]!.illustration.endsWith(info.illustration) || info.illustration.endsWith(this.charts[key]!.illustration)) && yes)) { yes = false }
@@ -63,7 +63,7 @@ export class ResourceManger {
             case FileType.CHARTINFO:
                 if (file.extension == "yml") {
                     let yes = true
-                    let info = await ChartInfo.fromYAML(file)
+                    let info = await ChartInfo.from(file,this)
                     //for (let key in this.charts) {
                     //    if (((this.charts[key]!.chart.endsWith(info.chart) || info.chart.endsWith(this.charts[key]!.chart)) && yes)) { yes = false }
                     //    if (((this.charts[key]!.illustration.endsWith(info.illustration) || info.illustration.endsWith(this.charts[key]!.illustration)) && yes)) { yes = false }

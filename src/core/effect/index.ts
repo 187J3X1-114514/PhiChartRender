@@ -38,6 +38,7 @@ export default class Effect {
 
         if (typeof json === 'object') {
             const effects = Reader.PrprEffectReader(json);
+            console.log(effects)
             if (effects && effects.length > 0) {
                 result = effects;
             } else {

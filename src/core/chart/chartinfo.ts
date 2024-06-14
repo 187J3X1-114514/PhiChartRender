@@ -5,6 +5,7 @@ import { ResourceManger } from "../resource"
 import * as yaml from 'js-yaml'
 import { File } from "../file"
 import Effect from "../effect"
+import * as StackBlur from 'stackblur-canvas';
 
 interface PhiraChartInfo extends BaseChartInfo {
     id: number
@@ -49,8 +50,9 @@ export class ChartInfo {
     public chart: string
     public prpr: Effect[]
     public src: PhiraChartInfo | RPEChartInfo
-    public type:string = "rpe"
+    public type: string = "rpe"
     private dir: string = ""
+    private resManger?: ResourceManger
     private constructor(c: string, m: string, i: string, src: PhiraChartInfo | RPEChartInfo, p: Effect[] = []) {
         this.chart = c
         this.illustration = i
@@ -68,37 +70,52 @@ export class ChartInfo {
         }
 
     }
-    static async from(file: File) {
-        const data = yaml.load(await file.async("text")) as PhiraChartInfo
-        return new this(data.chart, data.music, data.illustration, data)
-    }
-    static async fromYAML(file: File) {
-        const data = yaml.load(await file.async("text")) as PhiraChartInfo
-        let t = new this(data.chart, data.music, data.illustration, data)
-        t.type = "phira"
-        return t
-    }
-    static async fromRPE(file: File) {
-        const data = JSON.parse(await file.async("text")).META
-        const newData = {
-            RPEVersion: data.RPEVersion,
-            charter: data.charter,
-            composer: data.composer,
-            level: data.level,
-            offset: data.offset,
-            name: data.name,
-            music: data.song,
-            illustration: data.background,
-            chart: file.name,
-        } as RPEChartInfo
-        let t = new this(newData.chart, newData.music, newData.illustration, newData)
-        t.type = "rpe"
-        return t
+    static async from(file: File, resManger: ResourceManger) {
+        var data: any
+        var t: ChartInfo
+        switch (file.extension) {
+            case "yml":
+                data = (yaml.load(await file.async("text")) as PhiraChartInfo) as any
+                t = new this(data.chart, data.music, data.illustration, data)
+                t.resManger = resManger
+                t.type = "phira"
+                return t
+            case "json":
+                data = JSON.parse(await file.async("text")).META
+                const newData = {
+                    RPEVersion: data.RPEVersion,
+                    charter: data.charter,
+                    composer: data.composer,
+                    level: data.level,
+                    offset: data.offset,
+                    name: data.name,
+                    music: data.song,
+                    illustration: data.background,
+                    chart: file.name,
+                } as RPEChartInfo
+                t = new this(newData.chart, newData.music, newData.illustration, newData)
+                t.resManger = resManger
+                t.type = "rpe"
+                return t
+            default:
+                return new this("", "", "", (undefined as unknown) as any)
+        }
     }
     setRoot(path: string) {
         if (!this.chart.startsWith(path)) this.chart = path + "/" + this.chart
         if (!this.illustration.startsWith(path)) this.illustration = path + "/" + this.illustration
         if (!this.music.startsWith(path)) this.music = path + "/" + this.music
         this.dir = path
+    }
+    async blur(r: number) {
+        const img = (this.resManger!.get(this.illustration) as Texture)._source.resource as ImageBitmap
+        const c = document.createElement("canvas")
+        const ctx = c.getContext("2d")!
+        c.width = img.width
+        c.height = img.height
+        ctx.drawImage(img,0,0)
+        StackBlur.canvasRGB(c,0,0,img.width,img.height,r)
+        const newImg = Texture.from(await createImageBitmap(c))
+        this.resManger!.files[this.illustration] = newImg
     }
 }

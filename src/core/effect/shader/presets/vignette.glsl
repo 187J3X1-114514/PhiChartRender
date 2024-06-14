@@ -5,7 +5,7 @@ uniform vec2 screenSize;
 uniform sampler2D uTexture;
 
 uniform vec4 color; // %0.0, 0.0, 0.0, 1.0%
-uniform float extend; // %0.25% 0..1
+uniform float extend; // %0.25%
 uniform float radius; // %15.0%
 
 void main() {

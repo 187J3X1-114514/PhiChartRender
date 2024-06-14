@@ -22,6 +22,7 @@
     "mdui": "^2.1.1",
     "oggmented": "1.0.1",
     "pixi.js": "^8.1.6",
+    "stackblur-canvas": "^2.7.0",
     "tslog": "^4.9.2",
     "unify-mp3-timing": "1.0.3",
     "vite-plugin-top-level-await": "^1.4.1"

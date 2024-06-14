@@ -20,6 +20,8 @@ export default class Shader {
         let shaderTextList: string[]
         if ((presets as any)[name]) {
             shaderTextList = _shaderText.split("\n")
+        } else if (_shaderText.includes("screenTexture")) {
+            shaderTextList = _shaderText.split("\n")
         } else {
             shaderTextList = (_shaderText as any).replaceAll('uv', 'vTextureCoord').replaceAll('screenTexture', 'uTexture').split("\n")
         }
@@ -84,13 +86,16 @@ export default class Shader {
                 uniforms[name] = this.uniformsAll[name].value
             }
             this.filter.resources.my.uniforms[name] = uniforms[name]
-        };
+        }
         for (const name in this.filter.resources.my.uniforms) {
             if (this.filter.resources.my.uniforms[name].value) {
                 this.filter.resources.my.uniforms[name] = this.filter.resources.my.uniforms[name].value
             }
-        };
-        if (this.name == "glitch"){
+            if (Number.isNaN(this.filter.resources.my.uniforms[name])) {
+                this.filter.resources.my.uniforms[name] = Number.isNaN(this.uniformsAll[name].value) ? (this.uniforms2[name]?this.uniforms2[name].value:NaN) : this.uniformsAll[name].value
+            }
+        }
+        if (this.name == "glitch") {
             console.log(this)
         }
 
