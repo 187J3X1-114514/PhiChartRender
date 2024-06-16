@@ -6,6 +6,17 @@ on:
       - main
 
 jobs:
+  clone-main:
+    name: Clone to CF
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+    
+      - name: Create and checkout main-cf branch
+        run: |
+          git checkout -b main-cf
+          git push origin main-cf
   build:
     name: Build
     runs-on: ubuntu-latest
