@@ -44,7 +44,6 @@ export class PhiraAPI {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-                // 如果需要授权，还可以添加 'Authorization': 'Bearer token'
             },
             body: JSON.stringify({
                 email: email, password: password
@@ -114,12 +113,49 @@ export class PhiraAPI {
             url,
             { method: method, headers: { ...headers, 'Authorization': 'Bearer ' + this.userToken }, body: body })
     }
-    async getRedirecturl(url: string) {
-        return new Promise<string>(async (r) => {
-            var xhr = await fetch(url, { method: "GET", headers: { 'Authorization': 'Bearer ' + this.userToken } })
-            console.log(xhr, xhr.headers, xhr.url)
-
-
+    async reLogin() {
+        let r: { [key: string]: any } = {}
+        let loginJson
+        let fetchResult
+        let fetchJSON
+        let meJson
+        fetchResult = await fetch(API_URL.PHIRA_API_URL_LOGIN, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: this.email, password: this.password
+            })
         })
+        fetchJSON = await fetchResult.json()
+        if (!fetchResult.ok) {
+            r["api"] = undefined
+            r["status"] = fetchResult.status
+            r["error"] = fetchJSON["error"]
+            r["ok"] = false
+            return r as loginResult
+        }
+        loginJson = fetchJSON
+        fetchResult = await fetch(API_URL.PHIRA_API_URL_ME, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + loginJson["token"]
+            }
+        })
+        fetchJSON = await fetchResult.json()
+        if (!fetchResult.ok) {
+            r["api"] = undefined
+            r["status"] = fetchResult.status
+            r["error"] = fetchJSON["error"]
+            r["ok"] = false
+            return r as loginResult
+        }
+        meJson = fetchJSON
+        this.userID = loginJson["id"]
+        this.userRefreshToken = loginJson["refreshToken"]
+        this.userToken = loginJson["token"]
+        this.userInfo = meJson
     }
 }
