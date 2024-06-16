@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@mdui/icons':
+    specifier: ^1.0.2
+    version: 1.0.2
   '@tauri-apps/api':
     specifier: '>=2.0.0-beta.13'
     version: 2.0.0-beta.13
@@ -285,6 +288,14 @@ packages:
 
   /@material/material-color-utilities@0.2.7:
     resolution: {integrity: sha512-0FCeqG6WvK4/Cc06F/xXMd/pv4FeisI0c1tUpBbfhA2n9Y8eZEv4Karjbmf2ZqQCPUWMrGp8A571tCjizxoTiQ==}
+    dev: false
+
+  /@mdui/icons@1.0.2:
+    resolution: {integrity: sha512-2Ffhka9dbJIq0wQo+daUjG2CGLRStRE4ngf3Me8PVurQCQEd4QI2Qb9nblACOFoK0/ZYy+u77uYM9yuoDSvxXA==}
+    dependencies:
+      '@mdui/shared': 1.0.5
+      lit: 3.1.4
+      tslib: 2.6.3
     dev: false
 
   /@mdui/jq@3.0.1:

@@ -1,7 +1,6 @@
 import * as verify from '../verify';
 import Judgement from '../judgement';
 import { PhiAssets } from "../resource"
-//import * as CallbackFunc from './callback';
 import Shader from '../effect/shader/index'
 import { Application, Container, Texture, Sprite, Graphics, Text, Rectangle, Filter } from 'pixi.js';
 import * as font from '../font'
@@ -12,7 +11,6 @@ import WAudio from '../audio';
 import { ResourceManger } from '../resource/resource_manger';
 import { printImage } from '../utils';
 
-//PIXISettings.RENDER_OPTIONS.hello = true;
 
 const ProgressBarCache = (() => {
     const canvas = document.createElement('canvas');
@@ -27,7 +25,6 @@ const ProgressBarCache = (() => {
     ctx.fillRect(1917, 0, 3, 12);
 
     const result = Texture.from(canvas);
-    //Texture.addToCache(result, 'progressBar');
 
     return result;
 })();
@@ -45,42 +42,10 @@ const pauseButton = (() => {
     ctx.fillRect(width - buttonWidth, 0, buttonWidth, height);
 
     const result = Texture.from(canvas);
-    //Texture.addToCache(result, 'pauseButton');
 
     return result;
 })();
 
-/**
-  * {
-  *     render: {
-  *         width?,
-  *         height?,
-  *         resolution?,
-  *         autoDensity?,
-  *         antialias?,
-  *         view?,
-  *         resizeTo?
-  *     },
-  *     chart,
-  *     assets,
-  *     effects?,
-  *     zipFiles?,
-  *     watermark?,
-  *     settings: {
-  *         audioOffset?,
-  *         hitsound?,
-  *         hitsoundVolume?,
-  *         speed?,
-  *         noteScale?,
-  *         bgDim?,
-  *         multiNoteHL?,
-  *         showInputPoint?,
-  *         challengeMode?,
-  *         autoPlay?,
-  *         debug?
-  *     }
-  * }
- **/
 const uk = (undefined as unknown) as any
 export default class Game {
     sprites: any//{ [key: string]: Sprite }
@@ -245,21 +210,13 @@ export default class Game {
     createSprites() {
 
         if (this.chart.bg) { // 创建超宽屏舞台覆盖
-            this.renders.mainContainerCover = new Container(this.chart.bg);
-            let bgCover = new Graphics(this.chart.bg);
-            this.renders.bg = new Sprite()
-            bgCover.rect(0, 0, this.renders.bg.texture.width, this.renders.bg.texture.height);
-            bgCover.fill({ color: 0x000000 });
-
-            bgCover.position.x = -this.renders.bg.width / 2;
-            bgCover.position.y = -this.renders.bg.height / 2;
-            bgCover.alpha = 0.5;
-
+            this.renders.mainContainerCover = new Container();
+            this.renders.bg = new Sprite(this.chart.bg)
             this.renders.mainContainerCover.zIndex = 1;
-            this.renders.mainContainerCover.addChild(bgCover);
             this.renders.bg.anchor.set(0.5);
             this.renders.mainContainerCover.addChild(this.renders.bg)
             this.renders.mainContainerCover.blendMode = "none"
+            this.renders.bg.alpha = this._settings.bgDim
             this.render.stage.addChild(this.renders.mainContainerCover);
         }
 
@@ -277,7 +234,7 @@ export default class Game {
         if (this._settings.showAPStatus) {
             for (const judgeline of this.chart.judgelines) {
                 if (!judgeline.sprite) continue;
-                judgeline.sprite.tint = (judgeline.texture == null || !judgeline.isText) ? 0xFFECA0 : 0xFFFFFF;
+                judgeline.setColor(0xFFECA0)
             };
         }
 
@@ -296,7 +253,7 @@ export default class Game {
         this.sprites.pauseButton.eventMode = 'static';
         this.sprites.pauseButton.buttonMode = true;
         this.sprites.pauseButton.cursor = 'pointer';
-        this.sprites.pauseButton.on('pointerdown', () => { this.pauseBtnClickCallback });
+        this.sprites.pauseButton.on('pointerdown', () => { console.log(114511);this.pauseBtnClickCallback });
 
         this.sprites.pauseButton.hitArea = new Rectangle(
             -(this.sprites.pauseButton.texture.width * 1.5),
@@ -360,7 +317,7 @@ export default class Game {
         }
 
         this.chart.music.speed = this._settings.speed;
-        this.chart.music.onend = () => this.gameEndCallback;
+        this.chart.music.onend = () => {this.gameEndCallback()};
 
         this._animateStatus = 0;
         this._gameStartTime = Date.now();
@@ -423,7 +380,7 @@ export default class Game {
             if (!judgeline.sprite) continue;
 
             judgeline.sprite.alpha = 0;
-            if (this._settings.showAPStatus && (judgeline.texture == null || !judgeline.isText)) judgeline.sprite.tint = 0xFFECA0;
+            if (this._settings.showAPStatus) judgeline.setColor(0xFFECA0)
         };
         for (const note of this.chart.notes) {
             if (!note.sprite) continue;
@@ -653,6 +610,8 @@ export default class Game {
         };
 
         if (this.judgement.input.sprite) this.judgement.input.sprite.clear();
+        this.render.stage.filters = []
+        this.renders.gameContainer.filters = []
     }
 
     runCallback(type: string) {
@@ -769,6 +728,8 @@ export default class Game {
                 }
             case 3:
                 {
+                    this.render.stage.filters = []
+                    this.renders.gameContainer.filters = []
                     break;
                 }
         }
@@ -827,7 +788,10 @@ export default class Game {
                 this._animateStatus = 3;
                 this._isPaused = true;
                 this._isEnded = true;
+                this.render.stage.filters = []
+                this.renders.gameContainer.filters = []
                 this.runCallback('end');
+                //this.gameEndCallback()
             }
         }
     }

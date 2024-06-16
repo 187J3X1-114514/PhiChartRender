@@ -32,7 +32,7 @@ export default class Judgeline {
     };
 
 
-    sprite: Sprite|Text;
+    sprite: Sprite | Text;
     speed = 1;
     x = 0.5;
     y = 0.5;
@@ -249,9 +249,9 @@ export default class Judgeline {
         return result;
     }
 
-    createSprite(texture: PhiAssets, zipFiles: ResourceManger,rp="") {
+    createSprite(texture: PhiAssets, zipFiles: ResourceManger, rp = "") {
         if (!this.isText) {
-            this.sprite = new Sprite(zipFiles.get(rp+"/"+this.texture) ? zipFiles.get(rp+"/"+this.texture)! as Texture : texture.judgeLine);
+            this.sprite = new Sprite(zipFiles.get(rp + "/" + this.texture) ? zipFiles.get(rp + "/" + this.texture)! as Texture : texture.judgeLine);
 
             if (this.texture) {
                 this.baseScaleX = this.baseScaleY = 1;
@@ -379,6 +379,16 @@ export default class Judgeline {
             if ((this.noteControls as any)[valueType][i].y < y) return (this.noteControls as any)[valueType][i - 1].value;
         }
         return defaultValue;
+    }
+    setColor(color: number, force: boolean = false) {
+        if (force) {
+            this.sprite.tint = color
+        } else if (Number.isNaN(this.color)) {
+            this.sprite.tint = color
+        }else{
+            this.sprite.tint = 0xFFFFFF
+        }
+
     }
 }
 
