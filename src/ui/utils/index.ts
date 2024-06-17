@@ -1,4 +1,5 @@
 import utils from "../../core/chart/convert/utils";
+import { Button } from "mdui";
 
 function clamp(value: number) {
     return Math.min(1, Math.max(0, value));
@@ -61,7 +62,7 @@ export function genAnimation(e: Element, keyframe: keyframe, name: string) {
         keyframe["offset"] = v.startTime
         keyframes.push(keyframe)
     })
-    keyframes.push((()=>{
+    keyframes.push((() => {
         let v = events.pop()!
         v.startTime = clamp(v.startTime)
         v.endTime = clamp(v.endTime)
@@ -73,5 +74,11 @@ export function genAnimation(e: Element, keyframe: keyframe, name: string) {
     console.log(keyframes)
     return new Animation(new KeyframeEffect(e, keyframes, {
         duration: keyframe.duration, fill: 'forwards'
-    }),document.timeline)
+    }), document.timeline)
+}
+export function genDialogBtn(variant: "elevated" | "filled" | "tonal" | "outlined" | "text") {
+    let btn = new Button()
+    btn.slot = "action"
+    btn.variant = variant
+    return btn
 }

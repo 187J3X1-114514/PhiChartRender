@@ -13,3 +13,7 @@ styleEl.innerHTML = style
 document.head.appendChild(styleEl)
 export const fontFaceObservernew = new FontFaceObserver(fontName)
 export const loadFont = async () => { await fontFaceObservernew.load(null, 30000) }
+await loadFont()
+const mFaceObservernew = new FontFaceObserver("Material Icons")
+await mFaceObservernew.load(null, 30000)
+
