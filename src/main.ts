@@ -24,9 +24,9 @@ function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: Event) 
     inpEle.id = `__file_${Math.trunc(Math.random() * 100000)}`;
     inpEle.type = "file";
     inpEle.style.display = "none";
-     
+    // 文件类型限制
     accept && (inpEle.accept = accept);
-     
+    // 多选限制
     multiple && (inpEle.multiple = multiple);
     inpEle.addEventListener("change", event => fn(inpEle.files, inpEle, event), { once: true });
     inpEle.click();
@@ -91,12 +91,36 @@ sbtn.addEventListener("click", async () => {
         backgroundAlpha: 1,
         preference: "webgl",
         preferWebGLVersion: 2,
-        resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : undefined
-    });
-
-    (game.render.view as HTMLCanvasElement).style.width = "100%";
-    (game.render.view as HTMLCanvasElement).style.height = "100%";
-
+        //resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : undefined
+    })
+    await game.init({
+        app: app,
+        render: {
+            resizeTo: document.documentElement
+            , resolution: window.devicePixelRatio
+        },
+        chart: ress.charts[s.value as string]!,
+        assets: res.Assets,
+        zipFiles: ress,
+        settings: {
+            autoPlay: false, shader: true
+        }
+    })
+    //(game.render.view as HTMLCanvasElement).style.width = "100%";
+    //(game.render.view as HTMLCanvasElement).style.height = "100%";
+    //function rendererResize(application: Application) {
+    //
+    //    let [width, height] = [document.documentElement.clientWidth, document.documentElement.clientHeight];
+    //    (game.render.canvas as HTMLCanvasElement).style.width = `${document.documentElement.clientWidth}px`;
+    //    (game.render.canvas as HTMLCanvasElement).style.height = `${document.documentElement.clientHeight}px`;
+    //    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+    //        console.log(width / (width * window.devicePixelRatio), height / (height * window.devicePixelRatio))
+    //        application.stage.y = height-application.stage.height
+    //       application.stage.scale.set(1 / window.devicePixelRatio,-(1 / window.devicePixelRatio));
+    //    }
+    //
+    //    application.renderer.resize(width, height);
+    //}
     function rendererResize() {
         let stage = app.stage;
         let [width, height] = [document.documentElement.clientWidth, document.documentElement.clientHeight];
@@ -120,31 +144,18 @@ sbtn.addEventListener("click", async () => {
         stage.scale.set(ratio);
         app.renderer.resize(width, height);
     }
-    window.addEventListener("resize", () => {  game.resize(true) });
+    window.addEventListener("resize", () => { game.resize(true) });
     (game.render.canvas as HTMLCanvasElement).classList.add('canvas-game');
     if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
         await (game.render.canvas as HTMLCanvasElement).requestFullscreen()
     }
-    
+    //
     game.createSprites()
     game.start()
-    game.on('pause', () => {
-        game.pause(false)
-    })
 })
 
 document.body.append(c)
-
-let result = await PhiraAPI.login("smjwoaini@qq.com", "158168yang")
-if (!result.ok) {
-    dialog({
-        headline: "错误",
-        description: `${result.status}: ${result.error}`,
-        actions: [
-            {
-                text: "👌",
-            }
-        ]
-    });
+if (document.URL.includes("192")) {
+    let api = await PhiraAPI.login("smjwoaini@qq.com", "158168yang")
+    console.log(await api.api!.search())
 }
-//console.log(await loginPage(document.body))

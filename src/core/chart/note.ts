@@ -1,5 +1,5 @@
 import * as verify from '../verify';
-import { Sprite, Texture } from 'pixi.js';
+import { Container, Sprite, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import WAudio from '../audio';
 import { PhiAssets, ResourceManger } from '../resource';
@@ -37,7 +37,7 @@ export default class Note {
     public baseScale: number = 1
     public judgelineX?: number
     public judgelineY?: number
-    public sprite: Sprite;
+    public sprite: Sprite|Container;
     constructor(params: any) {
         this.id = verify.number(params.id, -1, 0);
         this.type = verify.number(params.type, 1, 1, 4);
@@ -108,7 +108,7 @@ export default class Note {
                         this.sprite.height = this.holdLength;
                     }
                     else {
-                        this.sprite = new Sprite();
+                        this.sprite = new Container();
 
                         let head = new Sprite((this.isMulti && multiHL ? texture.note.holdMH.head : texture.note.hold.head));
                         let body = new Sprite((this.isMulti && multiHL ? texture.note.holdMH.body : texture.note.hold.body));

@@ -69,7 +69,7 @@ export default class Game {
         mainContainerCover: Container
         fpsText: Text
         sizer: SizerData,
-        bg:Sprite
+        bg: Sprite
     } = {
             mainContainer: new Container(),
             parentNode: document.documentElement,
@@ -79,7 +79,7 @@ export default class Game {
             mainContainerCover: new Sprite(),
             fpsText: new Text(),
             sizer: ({} as any),
-            bg:new Sprite()
+            bg: new Sprite()
         }
     render: Application = uk
     judgement: Judgement = uk
@@ -253,14 +253,30 @@ export default class Game {
         this.sprites.pauseButton.eventMode = 'static';
         this.sprites.pauseButton.buttonMode = true;
         this.sprites.pauseButton.cursor = 'pointer';
-        this.sprites.pauseButton.on('pointerdown', () => { console.log(114511);this.pauseBtnClickCallback });
+        this.sprites.pauseButton.addEventListener('pointerdown', () => { console.log(114511); this.pauseBtnClickCallback });
+        this.render.canvas.addEventListener("click", (e) => {
+            let x = e.clientX - this.renders.sizer.widthOffset
+            let y = e.clientY
+            let sx = this.sprites.pauseButton.x - (this.sprites.pauseButton.texture.width * 1.5)
+            let sy = this.sprites.pauseButton.y - (this.sprites.pauseButton.texture.height / 2)
+            let ex = sx + this.sprites.pauseButton.texture.width * 2
+            let ey = sy + this.sprites.pauseButton.texture.height * 2
+            if (x >= sx && y >= sy) {
+                if (x <= ex && y <= ey) {
+                    console.log(114511)
+                    this.pauseBtnClickCallback()
+                }
+            }
 
-        this.sprites.pauseButton.hitArea = new Rectangle(
-            -(this.sprites.pauseButton.texture.width * 1.5),
-            -(this.sprites.pauseButton.texture.height / 2),
-            this.sprites.pauseButton.texture.width * 2,
-            this.sprites.pauseButton.texture.height * 2
-        );
+
+        })
+        //this.renders.fpsText.addEventListener("p")
+        //this.sprites.pauseButton.hitArea = new Rectangle(
+        //    -(this.sprites.pauseButton.texture.width * 1.5),
+        //    -(this.sprites.pauseButton.texture.height / 2),
+        //    this.sprites.pauseButton.texture.width * 2,
+        //    this.sprites.pauseButton.texture.height * 2
+        //);
         this.sprites.pauseButton.clickCount = 0;
         this.sprites.pauseButton.lastClickTime = Date.now();
         this.sprites.pauseButton.isEndRendering = false;
@@ -284,6 +300,9 @@ export default class Game {
                 align: 'right',
                 fill: 0xFFFFFF
             });
+            this.renders.fpsText = new Text({
+
+            });
             this.renders.fpsText.anchor.x = 1;
             this.renders.fpsText.alpha = 0.5;
             this.renders.fpsText.zIndex = 999999;
@@ -304,6 +323,8 @@ export default class Game {
         if (!this.chart.music) throw new Error('You must have a music to play');
         this.renders.gameContainer.filters = []
         this.render.stage.filters = []
+        this.renders.UIContainer.interactive = true
+        this.renders.mainContainer.interactive = true
         //const newFilters = (this.renders.gameContainer.filters as Filter[]).slice()
         //newFilters.push(Shader.defaultFrag.filter)
         //this.renders.gameContainer.filters = newFilters
@@ -317,7 +338,7 @@ export default class Game {
         }
 
         this.chart.music.speed = this._settings.speed;
-        this.chart.music.onend = () => {this.gameEndCallback()};
+        this.chart.music.onend = () => { console.log(114514); this.gameEndCallback() };
 
         this._animateStatus = 0;
         this._gameStartTime = Date.now();
@@ -342,16 +363,18 @@ export default class Game {
         }
     }
 
-    pause(v: boolean) {
-        this._isPaused = v;
-        this.judgement.input._isPaused = v;
-
-        if (!v) {
+    pause() {
+        this._isPaused = !this._isPaused;
+        this.judgement.input._isPaused = this._isPaused;
+        
+        if (!this._isPaused) {
+            this._animateStatus = 1
             this.chart.music.pause();
             this.runCallback('pause');
         }
         else {
-            this.chart.music.play(true);
+            this._animateStatus = 1
+            this.chart.music.play();
         }
     }
 
@@ -440,9 +463,8 @@ export default class Game {
             this.renders.mainContainerMask.visible = true;
 
             this.renders.mainContainerMask.clear()
-                .beginFill(0xFFFFFF)
-                .drawRect(this.renders.sizer.widthOffset, 0, this.renders.sizer.width, this.renders.sizer.height)
-                .endFill();
+                .rect(this.renders.sizer.widthOffset, 0, this.renders.sizer.width, this.renders.sizer.height)
+                .fill({ color: 0xFFFFFF })
         }
         else {
             this.renders.mainContainer.mask = null;
@@ -577,8 +599,7 @@ export default class Game {
         let pauseButton = this.sprites.pauseButton;
         pauseButton.clickCount++;
         if (pauseButton.clickCount >= 2 && Date.now() - pauseButton.lastClickTime <= 2000) {
-            this.pause(false);
-
+            this.pause();
             pauseButton.lastRenderTime = Date.now();
             pauseButton.isEndRendering = true;
             pauseButton.clickCount = 0;
@@ -620,7 +641,7 @@ export default class Game {
     }
 
     calcTick() {
-        console.log(this.render.stage.filters,this.renders.gameContainer.filters)
+        console.log(this.render.stage.filters, this.renders.gameContainer.filters)
         { // 为暂停按钮计算渐变
             let pauseButton = this.sprites.pauseButton;
             if (pauseButton.clickCount === 1) {
@@ -657,30 +678,32 @@ export default class Game {
                 }
             case 1:
                 {
+
                     let { chart, effects, judgement, functions, processors, sprites, renders, _settings: settings, render } = this;
                     let currentTime = chart.music.currentTime - (chart.offset + settings.offset);
-                    for (let i = 0, length = chart.bpmList.length; i < length; i++) {
-                        let bpm = chart.bpmList[i];
-
-                        if (bpm.endTime < currentTime) continue;
-                        if (bpm.startTime > currentTime) break;
-
-                        judgement._holdBetween = bpm.holdBetween;
-                    };
-
-                    for (let i = 0, length = chart.judgelines.length; i < length; i++) {
-                        const judgeline = chart.judgelines[i];
-                        judgeline.calcTime(currentTime, renders.sizer);
-                        for (let x = 0, length = processors.judgeline.length; x < length; x++) processors.judgeline[x](judgeline, currentTime);
-                    };
-                    for (let i = 0, length = chart.notes.length; i < length; i++) {
-                        const note = chart.notes[i];
-                        note.calcTime(currentTime, renders.sizer);
-                        for (let x = 0, length = processors.note.length; x < length; x++) processors.note[x](note, currentTime);
-                        judgement.calcNote(currentTime, note);
-                    };
-
                     if (!this._isPaused) {
+                        for (let i = 0, length = chart.bpmList.length; i < length; i++) {
+                            let bpm = chart.bpmList[i];
+
+                            if (bpm.endTime < currentTime) continue;
+                            if (bpm.startTime > currentTime) break;
+
+                            judgement._holdBetween = bpm.holdBetween;
+                        };
+
+                        for (let i = 0, length = chart.judgelines.length; i < length; i++) {
+                            const judgeline = chart.judgelines[i];
+                            judgeline.calcTime(currentTime, renders.sizer);
+                            for (let x = 0, length = processors.judgeline.length; x < length; x++) processors.judgeline[x](judgeline, currentTime);
+                        };
+                        for (let i = 0, length = chart.notes.length; i < length; i++) {
+                            const note = chart.notes[i];
+                            note.calcTime(currentTime, renders.sizer);
+                            for (let x = 0, length = processors.note.length; x < length; x++) processors.note[x](note, currentTime);
+                            judgement.calcNote(currentTime, note);
+                        };
+
+
                         judgement.calcTick();
                         for (let x = 0, length = functions.tick.length; x < length; x++) functions.tick[x](this, currentTime);
 
@@ -791,6 +814,7 @@ export default class Game {
                 this.render.stage.filters = []
                 this.renders.gameContainer.filters = []
                 this.runCallback('end');
+                this.renders.fpsText.alpha = 0
                 //this.gameEndCallback()
             }
         }

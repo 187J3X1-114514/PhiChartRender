@@ -1,21 +1,12 @@
 import * as API_URL from '../url'
-fetch('https://api.phira.cn/chart?pageNum=28&page=1&order=-updated')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // 处理从API获取的数据
-        console.log(data);
-    })
-    .catch(error => {
-        // 处理错误
-        console.error('There was a problem with the fetch operation:', error);
-    });
 export interface loginResult {
     api?: PhiraAPI, error: string, status: number, ok: boolean
+}
+export interface searchResult {
+    count:number,
+    maxPages:number,
+    page:number,
+    results:PhiraAPIChartInfo[]
 }
 export class PhiraAPI {
     public userToken: string
@@ -101,7 +92,7 @@ export class PhiraAPI {
         })
     }
     fetch(url: string, method?: string, headers?: any, body?: any) {
-        if (!url.includes(API_URL.PHIRA_API_CORS)) {
+        if (!(url.includes(API_URL.PHIRA_API_CORS)||url.split(API_URL.PHIRA_API_CORS).pop()!.split(API_URL.PHIRA_API_BASE_URL_NO_CORS1).pop()!.length<=12)) {
             url = url.replace(
                 API_URL.PHIRA_API_BASE_URL_NO_CORS1,
                 API_URL.PHIRA_API_BASE_URL)
@@ -158,4 +149,65 @@ export class PhiraAPI {
         this.userToken = loginJson["token"]
         this.userInfo = meJson
     }
+    async search(order: SearchOrder = SearchOrder.timeReverse, division: SearchDivision = SearchDivision.ordinary, searchText?: string, pageNum = 1, page = 1) {
+        let baseUrl = API_URL.PHIRA_API_URL_CHART
+        function addParams(url: string, queryParams: { [key: string]: string | number }): string {
+            let updatedUrl = url;
+            const hasQueryParams = url.includes('?');
+            const separator = hasQueryParams ? '&' : '?';
+            Object.keys(queryParams).forEach((key, index) => {
+                const connector = index === 0 ? separator : '&';
+                updatedUrl += `${connector}${key}=${queryParams[key]}`;
+            });
+            return updatedUrl;
+        }
+        addParams(baseUrl, {
+            page: page,
+            pageNum: 1,
+            order: order.valueOf(),
+            ...(() => {
+                let r = {}
+                if (searchText) r = { ...r, search: searchText }
+                if (division != SearchDivision.ordinary) r = { ...r, division: division.valueOf() }
+                return r
+            })()
+        })
+        baseUrl = encodeURI(baseUrl)
+        let r = await(await this.fetch(baseUrl,"GET")).json() as searchResult
+        r.page = page
+        r.maxPages = Math.ceil(r.count/pageNum)
+        return r
+    }
+}
+export enum SearchOrder {
+    rating = "rating",
+    time = "updated",
+    name = "name",
+    ratingReverse = "-rating",
+    timeReverse = "-updated",
+    nameReverse = "-name",
+
+}
+export enum SearchDivision {
+    ordinary = "",
+    viewing = "visual",
+    difficulty = "plain",
+    shenjin = "troll"
+}
+export interface PhiraAPIChartInfo{
+    id: number
+    name: string
+    level: string
+    charter: string
+    composer: string
+    illustrator: string
+    description: string
+    illustration: string
+    preview: string
+    file: string
+    uploader: number
+    tags: string[]
+    created: string
+    updated: string
+    chartUpdated: string
 }
