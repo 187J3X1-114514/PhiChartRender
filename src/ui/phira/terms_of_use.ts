@@ -9,7 +9,7 @@ interface protocolResult {
 export default async function protocolPage(t: Element): Promise<protocolResult> {
     if (Cookies.get("protocol")) {
         try {
-            let p = JSON.parse(Cookies.get("protocol")!)
+            let p = JSON.parse(atob(Cookies.get("protocol")!))
             if (p.terms_of_use&& p.privacy_policy) {
                 return {
                     terms_of_use: true,
@@ -81,7 +81,7 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
                 t.removeChild(el)
                 el.remove()
             })
-            Cookies.set("protocol", JSON.stringify(r), { expires: 365 })
+            Cookies.set("protocol", btoa(JSON.stringify(r)), { expires: 365 })
             return ra(r)
         })
         cancelButton.addEventListener("click", () => {
@@ -90,7 +90,7 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
                 t.removeChild(el)
                 el.remove()
             })
-            Cookies.set("protocol", JSON.stringify(r), { expires: 365 })
+            Cookies.set("protocol", btoa(JSON.stringify(r)), { expires: 365 })
             return ra(r)
         })
     })

@@ -12,13 +12,18 @@ import { fontName } from './core/font';
 import { PhiraAPI } from './api/phira';
 import protocolPage from './ui/phira/terms_of_use'
 import 'mdui/components/icon.js';
-import loginPage from './ui/phira/login';
+import loginPage, { genCookie, getCookie } from './ui/phira/login';
 try {
     const mainWebview = WebviewWindow.getByLabel('main')!
     mainWebview.setFullscreen(false)
 } catch { }
 document.body.style.fontFamily = fontName
 setTheme("dark")
+if (document.URL.includes("192")) {
+    let api = await loginPage(document.body)
+    console.log(api)
+    
+}
 function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: Event) => any, accept?: string, multiple?: boolean) {
     const inpEle = document.createElement("input");
     inpEle.id = `__file_${Math.trunc(Math.random() * 100000)}`;
@@ -155,7 +160,4 @@ sbtn.addEventListener("click", async () => {
 })
 
 document.body.append(c)
-if (document.URL.includes("192")) {
-    let api = await PhiraAPI.login("smjwoaini@qq.com", "158168yang")
-    console.log(await api.api!.search())
-}
+
