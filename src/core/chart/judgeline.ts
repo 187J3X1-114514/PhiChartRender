@@ -1,6 +1,6 @@
 import * as verify from '../verify';
 import utils from './convert/utils';
-import { Sprite, Text, Texture } from 'pixi.js';
+import { Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import EventLayer from './eventlayer';
 import * as font from '../font'
 import { floorPositionEvent, Event, valueEvent } from './baseEvents';
@@ -49,6 +49,7 @@ export default class Judgeline {
     scaleY = 1
     inclineSinr = NaN;
     color = NaN;
+    spriteStyle?: TextStyle
     constructor(params: any) {
         this.id = verify.number(params.id, -1, 0);
         this.texture = params.texture ? params.texture : null;
@@ -258,10 +259,13 @@ export default class Judgeline {
             }
         }
         else {
-            this.sprite = new Text('', {
+            this.spriteStyle = new TextStyle({
                 fontFamily: font.fontName,
                 align: 'center',
                 fill: 0xFFFFFF
+            })
+            this.sprite = new Text({
+                text: "", style: this.spriteStyle
             });
         }
 
@@ -274,7 +278,6 @@ export default class Judgeline {
         if (this.extendEvent.scaleY.length > 0 && this.extendEvent.scaleY[0].startTime <= 0) {
             this.scaleY = this.extendEvent.scaleY[0].start;
         }
-        console.log(this)
         return this.sprite;
     }
 
@@ -385,10 +388,10 @@ export default class Judgeline {
             this.sprite.tint = color
         } else if (Number.isNaN(this.color)) {
             this.sprite.tint = color
-        }else{
+        } else {
             this.sprite.tint = 0xFFFFFF
         }
-
     }
+
 }
 

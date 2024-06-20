@@ -48,8 +48,8 @@ dependencies:
     specifier: 1.0.1
     version: 1.0.1
   pixi.js:
-    specifier: ^8.1.6
-    version: 8.1.6
+    specifier: ^8.1.8
+    version: 8.1.8
   stackblur-canvas:
     specifier: ^2.7.0
     version: 2.7.0
@@ -1077,8 +1077,8 @@ packages:
   /picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
 
-  /pixi.js@8.1.6:
-    resolution: {integrity: sha512-FZT/dLZ9Tdw8eN6odgunSQHORsgHcvLlfOWm7cpR4ZxVGPRqFgDQ4hXpwVxeY9UK4PZtlJ4U910H1QZ4XNLJxg==}
+  /pixi.js@8.1.8:
+    resolution: {integrity: sha512-P+RhNNq27Re3dPWJ2YXufAxah9gtr4YrYEmlaJs44EcaoM8HXsTLHC53ptX8+SLcsZcO/mbAEGJX7XZZc5YF4A==}
     dependencies:
       '@pixi/colord': 2.9.6
       '@types/css-font-loading-module': 0.0.12

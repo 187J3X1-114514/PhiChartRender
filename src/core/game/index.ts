@@ -69,7 +69,8 @@ export default class Game {
         mainContainerCover: Container
         fpsText: Text
         sizer: SizerData,
-        bg: Sprite
+        bg: Sprite,
+        pauseButton:Sprite
     } = {
             mainContainer: new Container(),
             parentNode: document.documentElement,
@@ -79,7 +80,8 @@ export default class Game {
             mainContainerCover: new Sprite(),
             fpsText: new Text(),
             sizer: ({} as any),
-            bg: new Sprite()
+            bg: new Sprite(),
+            pauseButton: new Sprite()
         }
     render: Application = uk
     judgement: Judgement = uk
@@ -208,7 +210,10 @@ export default class Game {
     }
 
     createSprites() {
-
+        this.render.stage.eventMode = "static"
+        this.renders.gameContainer.eventMode = "static"
+        this.renders.mainContainer.eventMode = "static"
+        this.renders.UIContainer.eventMode = "static"
         if (this.chart.bg) { // 创建超宽屏舞台覆盖
             this.renders.mainContainerCover = new Container();
             this.renders.bg = new Sprite(this.chart.bg)
@@ -249,27 +254,27 @@ export default class Game {
         this.renders.UIContainer.addChild(this.sprites.progressBar);
 
         // 暂停按钮
-        this.sprites.pauseButton = new Sprite(pauseButton);
-        this.sprites.pauseButton.eventMode = 'static';
-        this.sprites.pauseButton.buttonMode = true;
-        this.sprites.pauseButton.cursor = 'pointer';
-        this.sprites.pauseButton.addEventListener('pointerdown', () => { console.log(114511); this.pauseBtnClickCallback });
-        this.render.canvas.addEventListener("click", (e) => {
-            let x = e.clientX - this.renders.sizer.widthOffset
-            let y = e.clientY
-            let sx = this.sprites.pauseButton.x - (this.sprites.pauseButton.texture.width * 1.5)
-            let sy = this.sprites.pauseButton.y - (this.sprites.pauseButton.texture.height / 2)
-            let ex = sx + this.sprites.pauseButton.texture.width * 2
-            let ey = sy + this.sprites.pauseButton.texture.height * 2
-            if (x >= sx && y >= sy) {
-                if (x <= ex && y <= ey) {
-                    console.log(114511)
-                    this.pauseBtnClickCallback()
-                }
-            }
-
-
-        })
+        this.renders.pauseButton = new Sprite(pauseButton);
+        this.renders.pauseButton.eventMode = 'static';
+        this.renders.pauseButton.cursor = 'pointer';
+        this.renders.pauseButton.addEventListener('pointerdown', () => { console.log(114511); this.pauseBtnClickCallback });
+        console.log(this.renders.pauseButton.isInteractive());
+        //this.render.canvas.addEventListener("click", (e) => {
+        //    let x = e.clientX - this.renders.sizer.widthOffset
+        //    let y = e.clientY
+        //    let sx = this.sprites.pauseButton.x - (this.sprites.pauseButton.texture.width * 1.5)
+        //    let sy = this.sprites.pauseButton.y - (this.sprites.pauseButton.texture.height / 2)
+        //    let ex = sx + this.sprites.pauseButton.texture.width * 2
+        //    let ey = sy + this.sprites.pauseButton.texture.height * 2
+        //    if (x >= sx && y >= sy) {
+        //        if (x <= ex && y <= ey) {
+        //            console.log(114511)
+        //            this.pauseBtnClickCallback()
+        //        }
+        //    }
+//
+//
+        //})
         //this.renders.fpsText.addEventListener("p")
         //this.sprites.pauseButton.hitArea = new Rectangle(
         //    -(this.sprites.pauseButton.texture.width * 1.5),
@@ -277,15 +282,15 @@ export default class Game {
         //    this.sprites.pauseButton.texture.width * 2,
         //    this.sprites.pauseButton.texture.height * 2
         //);
-        this.sprites.pauseButton.clickCount = 0;
-        this.sprites.pauseButton.lastClickTime = Date.now();
-        this.sprites.pauseButton.isEndRendering = false;
-        this.sprites.pauseButton.lastRenderTime = Date.now();
+        (this.renders.pauseButton as any).clickCount = 0;
+        (this.renders.pauseButton as any).lastClickTime = Date.now();
+        (this.renders.pauseButton as any).isEndRendering = false;
+        (this.renders.pauseButton as any).lastRenderTime = Date.now();
 
-        this.sprites.pauseButton.anchor.set(1, 0);
-        this.sprites.pauseButton.alpha = 0.5;
-        this.sprites.pauseButton.zIndex = 99999;
-        this.renders.UIContainer.addChild(this.sprites.pauseButton);
+        this.renders.pauseButton.anchor.set(1, 0);
+        this.renders.pauseButton.alpha = 0.5;
+        this.renders.pauseButton.zIndex = 99999;
+        this.renders.UIContainer.addChild(this.renders.pauseButton);
 
         // 假判定线，过场动画用
         this.sprites.fakeJudgeline = new Sprite(this.assets.judgeLine);
@@ -492,10 +497,10 @@ export default class Game {
                 this.sprites.progressBar.baseScaleX = this.renders.sizer.width / (this.sprites.progressBar as Sprite).texture.source.width;
             }
 
-            if (this.sprites.pauseButton) {
-                this.sprites.pauseButton.position.x = this.renders.sizer.width - this.renders.sizer.heightPercent * 72;
-                this.sprites.pauseButton.position.y = this.renders.sizer.heightPercent * (61 + 14);
-                this.sprites.pauseButton.scale.set(0.94 * this.renders.sizer.heightPercent);
+            if (this.renders.pauseButton) {
+                this.renders.pauseButton.position.x = this.renders.sizer.width - this.renders.sizer.heightPercent * 72;
+                this.renders.pauseButton.position.y = this.renders.sizer.heightPercent * (61 + 14);
+                this.renders.pauseButton.scale.set(0.94 * this.renders.sizer.heightPercent);
             }
 
             if (this.sprites.fakeJudgeline) {
@@ -596,7 +601,7 @@ export default class Game {
     }
 
     pauseBtnClickCallback() {
-        let pauseButton = this.sprites.pauseButton;
+        let pauseButton = this.renders.pauseButton as any;
         pauseButton.clickCount++;
         if (pauseButton.clickCount >= 2 && Date.now() - pauseButton.lastClickTime <= 2000) {
             this.pause();
@@ -643,7 +648,7 @@ export default class Game {
     calcTick() {
         console.log(this.render.stage.filters, this.renders.gameContainer.filters)
         { // 为暂停按钮计算渐变
-            let pauseButton = this.sprites.pauseButton;
+            let pauseButton = this.renders.pauseButton as any;
             if (pauseButton.clickCount === 1) {
                 if (pauseButton.alpha < 1) { // 按钮刚被点击一次
                     pauseButton.alpha = 0.5 + (0.5 * ((Date.now() - pauseButton.lastClickTime) / 200));
@@ -728,7 +733,7 @@ export default class Game {
 
                                 effect.calcTime(currentTime, renders.sizer.shaderScreenSize);
                                 if (!effect.isGlobal) {
-                                    let temp = (render.stage.filters as Filter[]).slice()
+                                    let temp:any = (render.stage.filters as Filter[]).slice()
                                     temp.push((effect.shader as Shader).filter)
                                     render.stage.filters = temp
                                 } else {
@@ -770,7 +775,7 @@ export default class Game {
         sprites.score.combo.container.position.y = -(sprites.score.combo.container.height + sprites.score.acc.height) + ((sprites.score.combo.container.height + sprites.score.acc.height + (this.renders.sizer.heightPercent * 41)) * progress);
         sprites.score.acc.position.y = sprites.score.combo.container.position.y + (this.renders.sizer.heightPercent * 72);
         sprites.score.score.position.y = -(sprites.score.score.height) + ((sprites.score.score.height + (this.renders.sizer.heightPercent * 61)) * progress);
-        this.sprites.pauseButton.position.y = -(this.sprites.pauseButton.height) + ((this.sprites.pauseButton.height + (this.renders.sizer.heightPercent * (61 + 14))) * progress);
+        this.renders.pauseButton.position.y = -(this.renders.pauseButton.height) + ((this.renders.pauseButton.height + (this.renders.sizer.heightPercent * (61 + 14))) * progress);
         this.sprites.progressBar.position.y = -(this.renders.sizer.heightPercent * 12) * (1 - progress);
 
         // 谱面信息
