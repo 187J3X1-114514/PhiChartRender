@@ -1,5 +1,5 @@
 import * as presets from './presets/index';
-import { Filter, GlProgram } from 'pixi.js';
+import { Filter } from 'pixi.js';
 import defaultShader from './default.vert?raw'
 import defaultShaderFrag from './default.frag?raw'
 const defaultValueReg = /uniform\s+(\w+)\s+(\w+);\s+\/\/\s+%([^%]+)%/g;
@@ -26,7 +26,6 @@ export default class Shader {
             shaderTextList = (_shaderText as any).replaceAll('uv', 'vTextureCoord').replaceAll('screenTexture', 'uTexture').split("\n")
         }
         shaderText = shaderTextList.join("\n");
-        console.log(shaderText);
         [...shaderText.matchAll(defaultValueReg)].map((uniform) => {
             const type = uniform[1];
             const name = uniform[2];
@@ -46,7 +45,6 @@ export default class Shader {
                     throw Error('Unknown type: ' + type);
 
             }
-            console.log(this.uniforms2[name], this.name)
         }
         );
         this.uniforms = {
@@ -62,15 +60,6 @@ export default class Shader {
                 fragment: shaderText
             },
         })
-
-
-        console.log(this.filter.resources["my"].uniformStructures, this.name, this)
-        //for (const name in uniforms) {
-        //    if (this.filter.resources["my"].uniformStructures[name] == (undefined || null)) {
-        //        this.filter.resources["my"].uniformStructures[name] = { ...uniforms[name], name: name, size: (uniforms[name].value.push) ? uniforms[name].value.length : 1 }
-        //    }
-        //}
-
     }
     static from(shaderText: string, name: string) {
         return new Shader(shaderText, name);
@@ -94,9 +83,6 @@ export default class Shader {
             if (Number.isNaN(this.filter.resources.my.uniforms[name])) {
                 this.filter.resources.my.uniforms[name] = Number.isNaN(this.uniformsAll[name].value) ? (this.uniforms2[name]?this.uniforms2[name].value:NaN) : this.uniformsAll[name].value
             }
-        }
-        if (this.name == "glitch") {
-            console.log(this)
         }
 
     }

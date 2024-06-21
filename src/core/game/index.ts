@@ -70,7 +70,7 @@ export default class Game {
         fpsText: Text
         sizer: SizerData,
         bg: Sprite,
-        pauseButton:Sprite
+        pauseButton: Sprite
     } = {
             mainContainer: new Container(),
             parentNode: document.documentElement,
@@ -272,16 +272,16 @@ export default class Game {
         //            this.pauseBtnClickCallback()
         //        }
         //    }
-//
-//
+        //
+        //
         //})
         //this.renders.fpsText.addEventListener("p")
-        //this.sprites.pauseButton.hitArea = new Rectangle(
-        //    -(this.sprites.pauseButton.texture.width * 1.5),
-        //    -(this.sprites.pauseButton.texture.height / 2),
-        //    this.sprites.pauseButton.texture.width * 2,
-        //    this.sprites.pauseButton.texture.height * 2
-        //);
+        this.renders.pauseButton.hitArea = new Rectangle(
+            -(this.renders.pauseButton.texture.width * 1.5),
+            -(this.renders.pauseButton.texture.height / 2),
+            this.renders.pauseButton.texture.width * 2,
+            this.renders.pauseButton.texture.height * 2
+        );
         (this.renders.pauseButton as any).clickCount = 0;
         (this.renders.pauseButton as any).lastClickTime = Date.now();
         (this.renders.pauseButton as any).isEndRendering = false;
@@ -371,7 +371,7 @@ export default class Game {
     pause() {
         this._isPaused = !this._isPaused;
         this.judgement.input._isPaused = this._isPaused;
-        
+
         if (!this._isPaused) {
             this._animateStatus = 1
             this.chart.music.pause();
@@ -733,7 +733,7 @@ export default class Game {
 
                                 effect.calcTime(currentTime, renders.sizer.shaderScreenSize);
                                 if (!effect.isGlobal) {
-                                    let temp:any = (render.stage.filters as Filter[]).slice()
+                                    let temp: any = (render.stage.filters as Filter[]).slice()
                                     temp.push((effect.shader as Shader).filter)
                                     render.stage.filters = temp
                                 } else {

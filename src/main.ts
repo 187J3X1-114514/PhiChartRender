@@ -13,16 +13,20 @@ import { PhiraAPI } from './api/phira';
 import protocolPage from './ui/phira/terms_of_use'
 import 'mdui/components/icon.js';
 import loginPage, { genCookie, getCookie } from './ui/phira/login';
+import { reqFullSc } from './ui';
+document.documentElement.addEventListener("click",()=>{
+    reqFullSc()
+})
 try {
     const mainWebview = WebviewWindow.getByLabel('main')!
     mainWebview.setFullscreen(false)
 } catch { }
 document.body.style.fontFamily = fontName
 setTheme("dark")
-if (document.URL.includes("192")) {
+if (!document.URL.includes("192")) {
     let api = await loginPage(document.body)
     console.log(api)
-    
+
 }
 function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: Event) => any, accept?: string, multiple?: boolean) {
     const inpEle = document.createElement("input");
@@ -96,6 +100,8 @@ sbtn.addEventListener("click", async () => {
         backgroundAlpha: 1,
         preference: "webgl",
         preferWebGLVersion: 2,
+        hello: true,
+        resizeTo:document.documentElement
         //resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : undefined
     })
     await game.init({
@@ -127,29 +133,25 @@ sbtn.addEventListener("click", async () => {
     //    application.renderer.resize(width, height);
     //}
     function rendererResize() {
-        let stage = app.stage;
-        let [width, height] = [document.documentElement.clientWidth, document.documentElement.clientHeight];
-        let ratio = 1;
-        if (width > app.stage.width || height > app.stage.height) {
-            width = app.stage.width;
-            height = app.stage.height;
-        }
-        if (width >= height) {
+        if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+            let stage = app.stage;
+            let [width, height] = [document.documentElement.clientWidth, document.documentElement.clientHeight];
+            let ratio = window.devicePixelRatio;
+            if (width > app.stage.width || height > app.stage.height) {
+                width = app.stage.width;
+                height = app.stage.height;
+            }
             stage.rotation = 0;
             stage.x = 0;
-            ratio = width / app.stage.width;
+            ratio = ratio * (width / app.stage.width);
+            (game.render.canvas as HTMLCanvasElement).style.width = `${width}px`;
+            (game.render.canvas as HTMLCanvasElement).style.height = `${height}px`;
+            stage.scale.set(ratio);
+            app.renderer.resize(width, height);
         }
-        else {
-            stage.rotation = Math.PI / 2;
-            stage.x = width;
-            ratio = height / app.stage.width;
-        }
-        (game.render.canvas as HTMLCanvasElement).style.width = `${width}px`;
-        (game.render.canvas as HTMLCanvasElement).style.height = `${height}px`;
-        stage.scale.set(ratio);
-        app.renderer.resize(width, height);
     }
-    window.addEventListener("resize", () => { game.resize(true) });
+    
+    window.addEventListener("resize", () => { rendererResize(); game.resize(true) });
     (game.render.canvas as HTMLCanvasElement).classList.add('canvas-game');
     if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
         await (game.render.canvas as HTMLCanvasElement).requestFullscreen()
