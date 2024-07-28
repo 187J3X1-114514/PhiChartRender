@@ -1,0 +1,1 @@
+import{U as s,__tla as i}from"./o.O.js";let l,o=Promise.all([(()=>{try{return i}catch{}})()]).then(async()=>{const n={};l=function(t){let e=n[t];if(e)return e;const r=new Int32Array(t);for(let a=0;a<t;a++)r[a]=a;return e=n[t]=new s({uTextures:{value:r,type:"i32",size:t}},{isStatic:!0}),e}});export{o as __tla,l as g};
