@@ -1,106 +1,150 @@
-# <u>**This project is now deprecated**</u>
+<div align="center">
+<img src="/assets/logo.gif">
+  <h1>PhiChartRender</h1>
+</div>
+此项目是基于MisaLiu/phi-chart-render的改进版本
 
-Read [this](https://github.com/MisaLiu/phi-chart-render/issues/19) for more infomation (Chinese).
+拥有基于[MDUI](https://www.mdui.org/)的界面，对各种格式铺面更好的支持(RPE,prpr的extra.json)
 
-# Phi-Chart-Render
+PS:这个模拟器只是因为我想在学校的希沃白板上玩Phigros的心愿 ~~(怨念)~~ 而诞生的，所以代码可能会有一些丑 ~~(答辩)~~。
 
-A *Phigros* chart render based on [Pixi.js](https://pixijs.com)
+<div align="center">
+<h4>
+Phira搜索界面
+</h4>
+<img src="/assets/5b4edb2c1f8d007d3924d3eb58cf823.png">
+<h4>
+AUTOPLAY模式游玩
+</h4>
+<img src="/assets/16bafc07abd44483b4c5508ee8735fc.png">
 
-This project is still working.
+</div>
 
-## Currently supported chart features
+## 当前实现的功能
+* 界面
+    * Phira *(强制需要同意相关条款才可使用)* *(由于浏览器同源策略，部分数据会经过[代理](https://cors.smjwoaini.workers.dev)中转)*
+        * [x] 浏览铺面 *(Phira的API不太稳定，会抽风)*
+        * [x] 搜索铺面
+        * [x] 登录 
+        * [ ] 其它功能不计划支持
+    * PhiZone
+        * [ ] 浏览铺面
+        * [ ] 搜索铺面
+        * [ ] 登录
+        * [ ] 其它功能不计划支持
+    * 铺面录制
+        * [ ] 基本UI *(马上就有了)*
+    * prpr的铺面拓展编辑
+        * [ ] 基本UI *(在录制铺面完成后再做)*
+* 铺面
+    * Official
+        * [x] 完全支持
 
-* Official charts
-    * [x] Basic support
-    * [x] Custom judgeline texture *(Need test)*
+    * PhiEdit
+        * [x] 基本支持
+        * [x] BPMList 
 
-* PhiEdit charts
-    * [x] Basic support
-    * [x] BPM List *(Need test)*
-    * [x] Custom judgeline texture *(Need test)*
-    * [x] Negative alpha *(Need test)*
-    * note features
-        * [x] Basic support
-        * [x] Fake note support
-        * [x] Note scale support
+    * Re:PhiEdit
+        * [x] 基本支持
+        * [x] BPMList 
+        * [x] EventLayers
+        * [x] 判定线zIndex 
+        * [x] 贝塞尔(Bezier)事件缓动
+        * [x] attachUI *(需要测试)*
+        * Extend events
+           * [x] X轴缩放
+           * [x] Y轴缩放
+           * [x] 文字
+           * [x] 颜色
+           * [x] 倾斜
+           * [ ] Draw *(无计划)* *(好怪的东西)* ~~*(年轻人的第一款绘图软件)*~~
+        * Note controls *(需要测试)*
+           * [x] 不透明度
+           * [x] 缩放
+           * [ ] 倾斜 *(无计划)*
+           * [x] X
+           * [ ] Y *(未来可能会)*
+        * note features
+            * [x] 基本支持
+            * [x] FakeNote支持
+            * [x] 缩放
+            * [x] 透明度
+            * [x] yOffset
+            * [x] 可视时间
 
-* Re:PhiEdit charts
-    * [x] BPM List *(Need test)*
-    * [x] Event Layers support  *(Need test)*
-    * [x] Custom judgeline texture *(Need test)*
-    * [x] Judgeline cover type
-    * [x] Parent judgeline
-    * [x] Easing start/end point
-    * [x] judgeline z order *(Need test)*
-    * [x] Bezier event easing *(Need test)*
-    * [ ] Event link group *(?)*
-    * [ ] BPM factor *(?)*
-    * [ ] ~~attachUI (wont support)~~
-    * Extend events
-       * [x] Scale X
-       * [x] Scale Y
-       * [x] Text
-       * [x] Color
-       * [x] Incline
-       * [ ] ~~Draw (wont support)~~
-    * Note controls *(Need test)*
-       * [x] Alpha
-       * [x] Scale
-       * [ ] Skew
-       * [x] X
-       * [ ] Y
-    * note features
-        * [x] Basic support
-        * [x] Fake note support
-        * [x] Note scale
-        * [x] Note alpha
-        * [x] yOffset
-        * [x] visible time
+    * prpr features
+        * [x] 特效/着色器/异象 *(prpr自带着色器正常，其它着色器可能会出问题)*
+        * [x] 视频 *(需要测试)*
 
-* prpr features
-    * [x] Shaders *(Need test)*
-    * [ ] Videos
+* 功能
+    * 录制铺面 *(马上就有了)*
+    * prpr的铺面拓展编辑 *(在录制铺面完成后再做)*
 
-## Development
+## 更新日志
 
-You must have a Node.js enviorment to helping development.
+项目根目录下的[CHANGELOG.md](CHANGELOG.md)
 
-1. `git clone https://github.com/MisaLiu/phi-chart-render`
-2. `npm install`
-3. `npm run dev`
+## 相较于原项目的更改
 
-## Thanks
+* 由TypeScript编写
+* pixi.js版本由v7.4.2升级到v8.x.x
+* 更多功能
+* UI变化
+* UI框架重写
+* 仿Phigros原版UI
+* 等等 *~~懒得写了~~*
 
-* [pixijs](https://github.com/pixijs/pixijs)
-* [@lchzh3473](https://github.com/lchzh3473)
-* [@IcedDog](https://github.com/IcedDog)
-* [@luch4736](https://github.com/luch4736)
-* [@Naptie](https://github.com/Naptie)
-* [@Greenball233](https://github.com/Greenball233)
-* [@inokana](https://github.com/GBTP)
-* [@totorowldox](https://github.com/totorowldox)
-* [osugame.online](http://osugame.online/)
-* [bemuse.ninja](https://bemuse.ninja/)
-* [All contributors](https://github.com/MisaLiu/phi-chart-render/graphs/contributors)
-* And you
+## 使用
+### 本地使用
+#### 开发
+1. `git clone https://github.com/187J3X1-114514/PhiChartRender`
+2. `pnpm install`
+3. `pnpm run dev`
+#### 构建
+1. `git clone https://github.com/187J3X1-114514/PhiChartRender`
+2. `pnpm install`
+3. `pnpm run build`
 
-## License
-```
-    phi-chart-render - A Phigros chart render based on Pixi.js
-    Copyright (C) 2022 HIMlaoS_Misa
+### 在线使用
+网址 [Cloudflare](https://phichartrender.pages.dev) 或 [Github Pages](https://187j3x1-114514.github.io/PhiChartRender/)
+### 其它
+现在我并不想 ~~*(懒得做)*~~ 给这个模拟器的UI再进行完善，所以你可以通过在网址后面加上一个`?`，例如`187j3x1-114514.github.io/PhiChartRender/?`，这样就可以进入在线浏览Phira铺面的界面，不加`?`则会进入从本地上传铺面的界面。
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+## 感谢
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+* [@MisaLiu](https://github.com/MisaLiu) [*(原项目的维护者)*](https://github.com/MisaLiu/phi-chart-render)
+* [pixijs](https://github.com/pixijs/pixijs) *(模拟器使用的框架)*
+* [@lchzh3473](https://github.com/lchzh3473) *(使用了[模拟器](https://github.com/lchzh3473/sim-phi)内界面UI位置与大小数据以及相关文档)*
+* [@Mivik](https://github.com/Mivik) *(借鉴RPE铺面解析的相关代码)*
+* [@TeamFlos](https://github.com/TeamFlos) *(使用了Phira的api接口)*
+* 所有的贡献者 [*(原项目)*](https://github.com/MisaLiu/phi-chart-render/graphs/contributors) [*(此项目)*](https://github.com/187J3X1-114514/PhiChartRender/graphs/contributors)
+* And you ~~(很难想象到你是怎么发现这个模拟器的)~~
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-```
+## 许可证
 
-All assets used in this project are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+此项目源码按 [GPL-3.0](LICENSE.txt) 协议开源；严禁任何形式的售卖。
+
+### 你可以
+* 使用本项目录制视频并发布在视频平台上，不需要声明视频是由本项目录制的。
+### 你不可以
+* 将本项目的源代码及其构建后的产物二次发布在任何网站上。
+* 利用本项目进行除录制视频并发布在视频平台上之外的任何商业用途。
+* 利用本项目违反中华人民共和国法律。
+
+在使用本项目的过程中（仅在使用Phira相关功能时），此项目会把你的Phira账号相关信息（仅限电子邮箱和密码，非明文储存）加密储存在Cookie中，如果这造成了你的信息泄露，与TeamFlos和我无关，需要你自行承担损失。
+
+在使用本项目的过程中，此项目不会把你的任何数据售卖给第三方。
+
+此项目所使用的与Phigros游戏有关的任何资源文件，版权属于Pigeon Games公司，若Pigeon Games公司认为侵权可以通过在issues中留言，我会立即删除有关的资源。
+
+此项目中与Phira相关的api使用未经TeamFlos直接允许，若TeamFlos不允许此项目调用相关api接口可以通过issues联系我，我会立即删除有关代码。
+
+## 其它
+
+这个模拟器其实2022年就有想法了，但是期间重构了许多次，最后还是选择[*phi-chart-render*](https://github.com/MisaLiu/phi-chart-render)这个项目，至于为什么做这个，主要因为在学校玩Phigros太麻烦了，希沃白板的Windows上的Phira不支持多指，但是安卓性能太低，lchzh3473的模拟器对RPE和PEC的铺面支持一言难尽，装安卓模拟器动静太大 *(而且我们学校的希沃白板I3-6100+4G内存能跑就有鬼了)*，最后还是选择自己做个 *(主要是闲)*，然后经过N年才做出了这个模拟器，终于可以在希沃上爽玩力
+
+对了，顺便感谢下某位名字叫YHL的同学，感谢他每次下学都会“帮”我关白板 *(You're dead,duge)*
+
+~~*(还有那个我玩白板时骂我的年级办)*~~
+
+PS：这个模拟器一共用过的框架 fabric.js -> konva.js -> fabric.js -> 原生CanvasRenderer -> fabric.js -> pixi.js v7 -> 现在 pixi.js v8

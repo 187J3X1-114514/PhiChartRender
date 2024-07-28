@@ -1,0 +1,52 @@
+name: 部署
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: 构建 (Build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 签出仓库 (Checkout repo)
+        uses: actions/checkout@v3
+
+      - name: 初始化node环境 (Setup Node)
+        uses: actions/setup-node@v3
+
+      - name: 安装pnpm (Install PNPM)
+        run: npm install -g pnpm @pnpm/exe
+
+      - name: 安装依赖 (Install dependencies)
+        run: pnpm install
+
+      - name: 构建项目 (Build project)
+        run: pnpm run build
+
+      - name: 上传构建完成的文件 (Upload production-ready build files)
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-files
+          path: ./dist
+
+  deploy:
+    name: 部署 (Deploy)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 下载工件 (Download artifact)
+        uses: actions/download-artifact@v3
+        with:
+          name: production-files
+          path: ./dist
+
+      - name: 部署到 GitHub Pages (Deploy to GitHub Pages)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
