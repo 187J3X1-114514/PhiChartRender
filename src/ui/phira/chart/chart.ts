@@ -1,29 +1,10 @@
-import { Button, LinearProgress, TextField, Card, Chip, Divider, Select, MenuItem } from "mdui";
+import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem } from "mdui";
 import { dialog } from "mdui/functions/dialog.js";
 import { PhiraAPI, PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
 import { PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
 import { ResPack, account, navigationDrawer } from "../../main";
 import { PlayS } from "../../play/play";
-import { loadZip } from "../../../core/file/zip";
-export let a = {
-    id: 19508,
-    name: "Ours",
-    level: "IN Lv.14",
-    charter: "Ours（vitaminb＆唯空wekon）",
-    composer: "*Luna feat.初音ミク",
-    illustrator: "",
-    description: "B站:没有营养的维生素b＆唯空wekon\n高考纪念谱，希望大家喜欢！\n手元及屏元需同时@我们两位谱师\nps:那两个移动hold是全屏判定",
-    illustration: "https://api.phira.cn/files/363219b3-37b5-47b4-9319-b70cb1f9e2e3",
-    preview: "https://api.phira.cn/files/4ec5e086-9335-46d1-b983-c8157f82118f",
-    file: "https://api.phira.cn/files/7740f9c2-527d-412d-b0d6-75fb392d25f3",
-    uploader: 30,
-    tags: [
-        "regular"
-    ],
-    created: "2024-05-04T12:08:47.669191Z",
-    updated: "2024-05-04T15:38:15.823452Z",
-    chartUpdated: "2024-05-04T12:08:47.669191Z"
-}
+import { File } from "../../../core/file";
 let classChart1 = document.getElementById("class-chart-1")!
 let classChart2 = document.getElementById("class-chart-2")!
 let classChart3 = document.getElementById("class-chart-3")!
@@ -38,7 +19,6 @@ const NONE_IMG = await (async () => {
 export class ChartPage {
     public chart: PhiraAPIChartInfo[] = []
     public api: PhiraAPI = (undefined as unknown) as any
-    //private el: HTMLElement = (undefined as unknown) as any
     public height: number = 7
     public width: number = 4
     private chartCount = 0
@@ -47,7 +27,6 @@ export class ChartPage {
     private select1?: Select
     private select2?: Select
     private searchDiv?: HTMLDivElement
-    //private pel: HTMLElement = (undefined as unknown) as any
     private searchBtn: Button = (undefined as unknown) as any
     private page: number = 1
     private type: number = 2
@@ -118,13 +97,12 @@ export class ChartPage {
         this.load.classList.add("hide")
         this.div.append(this.searchDiv)
         document.body.append(this.load)
-        this.div.append(new Divider())
         this.div.append(this.cards)
         classChart2.classList.add("list-item-active")
         this.searchBtn.addEventListener("click", async () => {
             this.searchBtn.disabled = true
             this.searchBtn.loading = true
-            await this.searchC()
+            await this.searchChart()
             this.searchBtn.disabled = false
             this.searchBtn.loading = false
 
@@ -136,7 +114,7 @@ export class ChartPage {
             this.type = 0
             this.page = 1
             navigationDrawer.open = false
-            this.searchC()
+            this.searchChart()
         })
         classChart2.addEventListener("click", () => {
             classChart2.classList.add("list-item-active")
@@ -145,7 +123,7 @@ export class ChartPage {
             this.type = 2
             this.page = 1
             navigationDrawer.open = false
-            this.searchC()
+            this.searchChart()
         })
         classChart3.addEventListener("click", () => {
             classChart3.classList.add("list-item-active")
@@ -154,7 +132,7 @@ export class ChartPage {
             this.type = 1
             this.page = 1
             navigationDrawer.open = false
-            this.searchC()
+            this.searchChart()
         })
         setTimeout(() => {
         }, 200)
@@ -170,7 +148,6 @@ export class ChartPage {
         this.cards!.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`
     }
     static async create(api: PhiraAPI, el: HTMLElement) {
-
         let pel = document.createElement("div")
         el.appendChild(pel)
         let chartPage = new this()
@@ -180,7 +157,7 @@ export class ChartPage {
         chartPage.cards!.style.display = 'grid'
         chartPage.cards!.style.gap = '20px'
         chartPage.cards!.style.margin = '10px'
-        await chartPage.searchC()
+        await chartPage.searchChart()
         return chartPage
     }
     async genChartCard(data: PhiraAPIChartInfo) {
@@ -249,8 +226,11 @@ export class ChartPage {
         });
         i.onload = () => {
             load.remove();
-
         };
+        i.onerror = () => {
+            load.remove();
+            i.remove()
+        }
         rootCard.appendChild(i)
         rootCard.appendChild(level)
         rootCard.appendChild(info)
@@ -276,7 +256,7 @@ export class ChartPage {
             el: rootCard
         };
     }
-    async searchC() {
+    async searchChart() {
 
         let api = account!
         let r = await api.search(
@@ -285,7 +265,7 @@ export class ChartPage {
             this.search!.value, 30, this.page, this.type
         )
         while (this.cards!.firstChild) {
-            this.cards!.removeChild(this.cards!.firstChild)
+            this.cards!.removeChild(this.cards!.firstChild!)
         }
         this.load.classList.remove("hide")
         r.results.forEach(async (v) => {
@@ -311,7 +291,7 @@ export class ChartPage {
             try {
                 r = await fetch(
                     (PHIRA_API_CORS + data.file).replace("https://api.phira.cn/files/", PHIRA_API_BASE_URL_NO_CORS2),
-                    { method: "GET", headers: {'Authorization': 'Bearer ' + account!.userToken } }
+                    { method: "GET", headers: { 'Authorization': 'Bearer ' + account!.userToken } }
                 )
                 return
             } catch {
@@ -340,14 +320,17 @@ export class ChartPage {
         }
         await f()
 
-        let ac = await loadZip(generateRandomString(32) + ".zip", await r!.blob())
-        let li: any[] = []
-        ac.files.forEach((v) => { li.push(v) })
-        let c = new PlayS(li, ResPack)
+        //let ac = await loadZip(generateRandomString(32) + ".zip", await r!.blob())
+        //let li: any[] = []
+        //ac.files.forEach((v) => { li.push(v) })
+        let c = new PlayS(new File(await r!.blob(), generateRandomString(32) + ".zip"), ResPack)
         c.setOnEnd(() => {
             setTimeout(() => {
                 this.div!.classList.add("push-in")
                 this.div.classList.remove("hide")
+                setTimeout(() => {
+                    this.div!.classList.remove("push-in")
+                }, 800)
             }, 650)
         })
         await c.load()
@@ -357,14 +340,18 @@ export class ChartPage {
 
 }
 function generateRandomString(length: number): string {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
+    try {
+        return self.crypto.randomUUID()
+    } catch {
+        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
 
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters.charAt(randomIndex);
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            result += characters.charAt(randomIndex);
+        }
+
+        return result;
     }
-
-    return result;
 }
 

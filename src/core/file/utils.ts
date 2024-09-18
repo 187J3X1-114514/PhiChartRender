@@ -28,7 +28,6 @@ function join(path: string, ...paths: string[]): string {
     return result_path;
 }
 function dirname(p: string): string {
-    // Returns the directory component of a pathname
     p = String(p);
     const sep = "/";
     const i = p.lastIndexOf(sep) + 1;
@@ -40,6 +39,7 @@ function dirname(p: string): string {
 
     return head;
 }
+const NFile = File
 export {
-    join,dirname
+    join,dirname,NFile
 }

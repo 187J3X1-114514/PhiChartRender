@@ -4,17 +4,14 @@ import Cookies from 'js-cookie'
 import md5 from 'md5-js'
 import * as CryptoJS from 'crypto-js'
 import protocolPage from "./terms_of_use";
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
+const fpPromise = await FingerprintJS.load()
+const DID = await genID()
 export default async function loginPage(t: Element): Promise<loginResult> {
-
-    const el = document.createElement("div")
-    el.style.position = "absolute"
-    el.style.top = "0px"
-    el.style.left = "0px"
-    el.style.zIndex = "999"
     const dialog = new Dialog()
     dialog.classList.add("close-on-overlay-click")
     dialog.headline = "登录Phira账号"
-    const dialogInput = document.createElement("div")
+    const dialogInput = document.createElement("form")
     dialogInput.slot = "description"
     //email#####################################
     const emailInput = new TextField()
@@ -39,13 +36,13 @@ export default async function loginPage(t: Element): Promise<loginResult> {
     passwordInputHelp.slot = "helper"
     passwordInput.addEventListener("input", () => {
         if (passwordInput.value.length >= 8) {
-            passwordInputHelp.innerText = passwordInput.value.length >= 32 ? "你能记住吗🤔" : "很合理的密码🤗"
+            passwordInputHelp.innerText = ""
             passwordInputHelp.style.color = "unset"
         } else if (passwordInput.value == "") {
             passwordInputHelp.innerText = ""
             passwordInputHelp.style.color = "unset"
         } else {
-            passwordInputHelp.innerText = "密码太短了😒"
+            passwordInputHelp.innerText = "密码太短了"
             passwordInputHelp.style.color = "#f2b8b5"
         }
     })
@@ -55,6 +52,15 @@ export default async function loginPage(t: Element): Promise<loginResult> {
     passwordInput.append(passwordInputHelp)
     passwordInput.autocomplete = "on"
     emailInput.autocomplete = "on"
+    dialogInput.id = generateRandom().toFixed(10)
+    emailInput.required = true
+    emailInput.form = dialogInput.id
+    passwordInput.required = true
+    passwordInput.form = dialogInput.id
+    passwordInput.autocomplete = "on"
+    emailInput.autocomplete = "on"
+    emailInput.name = "email"
+    passwordInput.name = "password"
     dialogInput.append(emailInput)
     dialogInput.append(passwordInput)
     //ok/cancel##########################################
@@ -75,16 +81,13 @@ export default async function loginPage(t: Element): Promise<loginResult> {
     dialog.append(okButton)
     dialogInput.append(checkKeepPassword)
     dialog.append(dialogInput)
-    el.append(dialog)
-    t.append(el)
-    dialog.open = true
+    t.append(dialog)
+    setTimeout(() => {
+        dialog.open = true
+    }, 100)
     return await new Promise<loginResult>(async (r) => {
         cancelButton.addEventListener("click", () => {
             dialog.open = false
-            dialog.addEventListener("closed", () => {
-                t.removeChild(el)
-                el.remove()
-            })
             r({ api: undefined, ok: false, status: 200, error: "用户取消操作" } as loginResult)
         })
         okButton.addEventListener("click", async () => {
@@ -103,10 +106,6 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 dialog.append(newCancelButton)
                 newCancelButton.addEventListener("click", () => {
                     dialog.open = false
-                    dialog.addEventListener("closed", () => {
-                        t.removeChild(el)
-                        el.remove()
-                    })
                     r({ api: undefined, ok: false, status: 200, error: "用户不同意TeamFlos的《服务条款》和《隐私政策》" } as loginResult)
                 })
             } else {
@@ -125,6 +124,7 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 let api = await PhiraAPI.login(emailInput.value, passwordInput.value)
                 dialog.headline = api.api ? "登录成功" : "登录失败"
                 dialogInput.removeChild(p)
+                if (!api.ok) dialogInput.innerText = api.error
                 dialog.removeChild(cancelButton)
 
                 let newCancelButton = new Button()
@@ -137,13 +137,14 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 }
                 newCancelButton.addEventListener("click", () => {
                     dialog.open = false
-                    dialog.addEventListener("closed", () => {
-                        t.removeChild(el)
-                        el.remove()
-                    })
-
                     r(api)
                 })
+                if (api.ok) {
+                    setTimeout(() => {
+                        dialog.open = false
+                        r(api)
+                    }, 400)
+                }
             }
 
         })
@@ -159,7 +160,6 @@ export default async function loginPage(t: Element): Promise<loginResult> {
         }
     })
 }
-//如果你要看这些代码来获取别人的账号+密码，那我只能说fuck you,My dear bitch🤗🤗🤗🤗
 
 function generateRandom(): number {
     return Math.atan2(Math.random() * Math.cos(Math.random()) * Math.sin(Math.random()), Math.random() * Math.cos(Math.random()) * Math.sin(Math.random()))
@@ -182,7 +182,7 @@ export function genCookie(email: string, password: string) {
     return md5(md5_1 + md5_2 + md5_3 + key_str + iv_str) + id + encrypted.toString() + ";" + keys_str
 }
 export function getCookie(data: string) {
-    let id = genID()
+    let id = DID
     if (data == "null" || !data.includes(id)) {
         return {
             email: "",
@@ -199,7 +199,7 @@ export function getCookie(data: string) {
         password: decrypted[1]
     }
 }
-function genID() {
+async function genID() {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')!
     const txt = navigator.userAgent
@@ -213,5 +213,5 @@ function genID() {
     ctx.fillStyle = "rgba(114, 51, 4, 0.1145)"
     ctx.fillText(txt, 1, 4)
     const b64 = canvas.toDataURL().replace("data:image/png;base64,", "")
-    return atob(md5(atob(b64)).slice(0, 16))
+    return atob(md5(atob(b64) + await fpPromise.get()).slice(0, 16))
 }

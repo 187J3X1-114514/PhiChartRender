@@ -6,10 +6,11 @@ import * as font from '../font'
 import { floorPositionEvent, Event, valueEvent } from './baseEvents';
 import { PhiAssets, ResourceManger } from '../resource';
 import { SizerData } from '../types/params';
+import { chart_log } from './convert';
 const blackJudgeLine = (() => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
-    canvas.width =1920
+    canvas.width = 1920
     canvas.height = 3
     ctx.fillStyle = 'rgba(0,0,0,1)';
     ctx.fillRect(0, 0, 1920, 3);
@@ -266,7 +267,21 @@ export default class Judgeline {
 
     createSprite(texture: PhiAssets, zipFiles: ResourceManger, rp = "") {
         if (!this.isText) {
-            this.sprite = new Sprite(zipFiles.get(rp + "/" + this.texture) ? zipFiles.get(rp + "/" + this.texture)! as Texture : texture.judgeLine);
+            let tex
+            if (this.texture) {
+                tex = zipFiles.get(rp + "/" + this.texture) as Texture
+                if (tex) {
+                    
+                } else {
+                    chart_log.warn(`ID为${this.id}的判定线的材质获取失败，名称 ${this.texture} 完整路径 ${rp + "/" + this.texture}`)
+                    tex = texture.judgeLine
+                }
+            } else {
+                tex = texture.judgeLine
+            }
+
+            this.sprite = new Sprite(tex);
+
 
             if (this.texture) {
                 this.baseScaleX = this.baseScaleY = 1;

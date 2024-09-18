@@ -28,9 +28,6 @@ if (self.__TAURI__ == undefined) {
             if (r.cache === "only-if-cached" && r.mode !== "same-origin") {
                 return;
             }
-            if (r.url.includes('http://ipc.localhost/') || r.url.includes("http://tauri.localhost/")) {
-                return
-            }
             const request = (coepCredentialless && r.mode === "no-cors")
                 ? new Request(r, {
                     credentials: "omit",
@@ -39,6 +36,7 @@ if (self.__TAURI__ == undefined) {
             event.respondWith(
                 fetch(request)
                     .then((response) => {
+
                         if (response.status === 0) {
                             return response;
                         }

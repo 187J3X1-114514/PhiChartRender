@@ -5,7 +5,7 @@ import { loadZip } from '../../core/file';
 import { Recorder, Encoders } from "canvas-record";
 
 const _FFMPEG = new FFmpeg()
-export async function load_ffmpeg() {
+export async function load_ffmpeg(m?: boolean) {
     let base_url = window.location.href.split("?")[0].endsWith("/") ? window.location.href.split("?")[0] : window.location.href.split("?")[0] + "/"
     let ffmpeg_7z_path = base_url + "assets/dep/ffmpeg.7z"
     let ffmpeg_7z = await loadZip("ffmpeg.7z", await (await fetch(ffmpeg_7z_path)).arrayBuffer())
@@ -14,7 +14,7 @@ export async function load_ffmpeg() {
     return await _FFMPEG.load({
         coreURL: url[0],
         wasmURL: url[1],
-        workerURL: url[2]
+        ...(m ? { workerURL: url[2] } : {})
     })
 }
 

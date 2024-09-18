@@ -44,7 +44,7 @@ export default class Effect {
         for (const name in vars) {
             const values = vars[name];
             if (name.includes("@#$%&___")) {
-                array_var[name.split("@#$%&___")[0]][parseInt(name.split("@#$%&___").pop()!)] = valueCalculator(values, currentTime, (shader as Shader).uniforms2[name])
+                array_var[name.split("@#$%&___")[0]][parseInt(name.split("@#$%&___").pop()!)] = valueCalculator(values, currentTime, ((shader as Shader).uniforms2[name.split("@#$%&___")[0]] as any)[parseInt(name.split("@#$%&___").pop()!)])
                 continue
             }
             _currentValue![name] = valueCalculator(values, currentTime, (shader as Shader).uniforms2[name]);

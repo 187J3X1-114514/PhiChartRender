@@ -1,6 +1,5 @@
 import { number as verifyNum } from '../verify';
 import * as Convert from './convert';
-import md5Hash from 'md5-js';
 import { Sprite, Graphics, Text, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import Note from './note';
@@ -8,7 +7,6 @@ import { bpmEvent } from './baseEvents';
 import WAudio from '../audio';
 import { PhiAssets, ResourceManger } from '../resource';
 import { SizerData } from '../types/params';
-
 export default class Chart {
     judgelines: Judgeline[]
     notes: Note[]

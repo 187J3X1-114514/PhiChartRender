@@ -2,10 +2,8 @@ import { defineConfig } from "vite";
 import { internalIpV4 } from "internal-ip";
 import topLevelAwait from 'vite-plugin-top-level-await'
 import GitRevisionVitePlugin from 'git-revision-vite-plugin';
-// @ts-expect-error
 import { readFile } from 'fs'
-// @ts-expect-error
-const mobile = !!/android|ios/.exec(process.env.TAURI_ENV_PLATFORM);
+
 function assetFileName(chunkInfo: any): string {
     var n = chunkInfo.name
     if (n!.split('.')[1] == 'css') {
@@ -44,16 +42,7 @@ export default defineConfig(async () => ({
         },
     },
     server: {
-        port: 1420,
         strictPort: true,
-        host: mobile ? "192.168.1.4" : false,
-        hmr: mobile
-            ? {
-                protocol: "ws",
-                host: await internalIpV4(),
-                port: 1421,
-            }
-            : undefined,
         watch: {
             ignored: ["**/src-tauri/**"],
         },
@@ -62,7 +51,6 @@ export default defineConfig(async () => ({
         GIT_COMMITHASH: "",
         "_PACKAGE_JSON": pj,
         "VES": pj.version,
-        // @ts-expect-error
         "ENV": process,
         "BUILD_TIME": Date.now()
     },

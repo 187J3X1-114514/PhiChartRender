@@ -91,15 +91,14 @@ export class ResourceManger {
                     }
                     break
                 case FileType.CHARTINFO:
-                    if (file.extension == "yml") {
-                        let yes = true
-                        let info = await ChartInfo.from(file, this)
-                        let t = file.name.split('/')
-                        t.pop()
-                        info.setRoot(t.join("/"))
-                        let n_ = info.chart.split('/')[info.chart.split('/').length - 1]
-                        if (yes && (n_ != "" && n_ != undefined)) this.charts[n_] = info
-                    }
+                    let yes = true
+                    let info = await ChartInfo.from(file, this)
+                    let t = file.name.split('/')
+                    t.pop()
+                    info.setRoot(t.join("/"))
+                    let n_ = info.chart.split('/')[info.chart.split('/').length - 1]
+                    if (yes && (n_ != "" && n_ != undefined)) this.charts[n_] = info
+
                     break
                 case FileType.VIDEO:
                     try {
@@ -168,6 +167,7 @@ export class ResourceManger {
     }
     async load(name: string, file: Blob | ArrayBuffer) {
         const zip = await loadZip(name, file)
+        console.log(zip)
         for (let f of zip.files) {
             let file = f[1]
             file.name = name + "/" + file.name
@@ -202,6 +202,7 @@ export class ResourceManger {
             }))
 
         }
+        console.log(this)
     }
     async getFilesByType(type: FileType) {
         let list = []
@@ -219,15 +220,19 @@ export class ResourceManger {
     }
 }
 function generateRandomString(length: number): string {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
+    try {
+        return self.crypto.randomUUID()
+    } catch {
+        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
 
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters.charAt(randomIndex);
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            result += characters.charAt(randomIndex);
+        }
+
+        return result;
     }
-
-    return result;
 }
 
 async function fixType(file: File) {
@@ -240,10 +245,10 @@ async function fixType(file: File) {
         JSON.parse(t)
         file.type = FileType.JSON
     } catch {
-        if (file.type == FileType.CHART || file.type == FileType.JSON){
-            if (Number.isNaN(parseInt(t.split("\n")[0]))){
+        if (file.type == FileType.CHART || file.type == FileType.JSON) {
+            if (Number.isNaN(parseInt(t.split("\n")[0]))) {
                 file.type = FileType.CHARTINFO
-            }else{
+            } else {
                 file.type = FileType.CHART
                 file.extension = "pec"
             }

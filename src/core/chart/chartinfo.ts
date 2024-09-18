@@ -6,6 +6,7 @@ import * as yaml from 'js-yaml'
 import { File } from "../file"
 import * as StackBlur from 'stackblur-canvas';
 import { PrprExtra } from "../prpr/prpr"
+import { printImage } from "../utils"
 
 interface PhiraChartInfo extends BaseChartInfo {
     id: number
@@ -62,8 +63,17 @@ export class ChartInfo {
     }
     get(resMan: ResourceManger) {
         (resMan.get(this.chart) as Chart).rootPath = this.dir
+        let c = resMan.get(this.chart) as Chart
+        c.info = {
+            name: this.src.name,
+            artist: this.src.composer,
+            author: this.src.charter,
+            bgAuthor: "",
+            difficult: this.src.level,
+            md5: ""
+        };
         return {
-            chart: resMan.get(this.chart) as Chart,
+            chart: c,
             music: resMan.get(this.music) as WAudio,
             illustration: resMan.get(this.illustration) as Texture,
             prpr: resMan.get(this.dir + '/' + "extra.json")
@@ -81,8 +91,13 @@ export class ChartInfo {
                 t.type = "phira"
                 return t
             case "json":
-                data = JSON.parse(await file.async("text")).META
-                const newData = {
+                data = JSON.parse(await file.async("text"))
+                if (data.formatVersion) {
+                    return new this("", "", "", (undefined as unknown) as any)
+                } else{
+                    data = data.META
+                }
+                let newData = {
                     RPEVersion: data.RPEVersion,
                     charter: data.charter,
                     composer: data.composer,
@@ -96,6 +111,25 @@ export class ChartInfo {
                 t = new this(newData.chart, newData.music, newData.illustration, newData)
                 t.resManger = resManger
                 t.type = "rpe"
+                return t
+            case "txt":
+                let _data = (await file.async("text")) as string
+                let _txt_info = loadTxtChartInfo(_data)
+                let _newData = {
+                    RPEVersion: 100,
+                    charter: _txt_info.Charter,
+                    composer: _txt_info.Composer,
+                    level: _txt_info.Level,
+                    offset: 0,
+                    name: _txt_info.Name,
+                    music: _txt_info.Song,
+                    illustration: _txt_info.Picture,
+                    chart: _txt_info.Chart
+                    
+                } as RPEChartInfo
+                t = new this(_newData.chart, _newData.music, _newData.illustration, _newData)
+                t.resManger = resManger
+                t.type = "txt"
                 return t
             default:
                 return new this("", "", "", (undefined as unknown) as any)
@@ -113,9 +147,26 @@ export class ChartInfo {
         const ctx = c.getContext("2d")!
         c.width = img.width
         c.height = img.height
-        ctx.drawImage(img,0,0)
-        StackBlur.canvasRGB(c,0,0,img.width,img.height,r)
+        ctx.drawImage(img, 0, 0)
+        StackBlur.canvasRGB(c, 0, 0, img.width, img.height, r)
         const newImg = Texture.from(await createImageBitmap(c))
         this.resManger!.files[this.illustration] = newImg
+    }
+}
+function loadTxtChartInfo(str: string) {
+    let list = str.split("\n")
+    if (list[0].includes("#")) {
+        let Data: any = {}
+        list.slice(1).forEach((line) => {
+            try{
+                let _ = line.split(":")
+                Data[_[0].trim()] = _[1].trim()
+            }catch{}
+        })
+        return Data
+    } else {
+        printImage(0.5)
+        throw "铺面信息格式错误"
+        return undefined
     }
 }

@@ -5,7 +5,7 @@ export const pauseButton = (() => {
     const ctx = canvas.getContext('2d')!;
     const buttonWidth = 11
     const width = 33
-    const height = 39
+    const height = 37
     canvas.width = width;
     canvas.height = height;
     ctx.clearRect(0, 0, width, height);

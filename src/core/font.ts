@@ -29,11 +29,12 @@ const styleEl = document.createElement("style")
 styleEl.innerHTML = style
 document.head.appendChild(styleEl)
 export const fontFaceObservernew = new FontFaceObserver("Font")
-export const loadFont = async () => { await fontFaceObservernew.load(null, 3000000) }
-await loadFont()
 const mFaceObservernew = new FontFaceObserver("Material Icons")
-await mFaceObservernew.load(null, 3000000)
 const eFaceObservernew = new FontFaceObserver("Fluent UI Emoji Flat")
-await eFaceObservernew.load(null, 3000000)
+export const loadFont = async () => {
+    await fontFaceObservernew.load(null, 3000000)
+    await mFaceObservernew.load(null, 3000000)
+    await eFaceObservernew.load(null, 3000000)
+}
 
 

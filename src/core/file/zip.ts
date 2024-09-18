@@ -2,7 +2,14 @@ import SevenZip, { SevenZipModule } from "7z-wasm";
 import { File } from './file'
 import { newLogger } from '../log'
 import { mimeTypes } from './minetype';
-import { join } from './utils';
+import { join, NFile } from './utils';
+import {Archive as LibArchive} from 'libarchive.js';
+
+LibArchive.init({
+    workerUrl: 'assets/dep/worker-bundle.js'
+});
+
+
 const log = newLogger("Zip")
 function generateRandomString(length: number): string {
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -25,7 +32,7 @@ export class _7zip {
     static async create() {
         var _n_7z = new this()
         let js7z_wasm = await fetch("/assets/dep/7zz.wasm")
-        if (!js7z_wasm.ok)js7z_wasm = await fetch("/PhiChartRender/assets/dep/7zz.wasm")
+        if (!js7z_wasm.ok)js7z_wasm = await fetch("/assets/dep/7zz.wasm")
         _n_7z.js7z = await (SevenZip as any)({
             print: (t: string) => { _n_7z._print(t) },
             printErr: (t: string) => { _n_7z._printErr(t) },
@@ -208,8 +215,8 @@ export class Archive {
     }
 }
 
-export async function loadZip(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
-    log.info("加载zip文件 " + name + " 中...")
+export async function loadZipUse7zWASM(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
+    log.info("加载压缩包文件 " + name + " 中...")
     const zip = await _7ZIP.load(file, name)
     const filel = await _7ZIP.get(zip.extractPath)!
     const files: { "name": string, "file": File }[] = []
@@ -230,6 +237,39 @@ export async function loadZip(name: string, file: Blob | ArrayBuffer): Promise<A
 
     }
     
-    log.info("加载zip文件 " + name + " 完成")
+    log.info("加载压缩包文件 " + name + " 完成")
+    return new Archive(o, name)
+}
+
+function toFile(name: string, file: Blob | ArrayBuffer){
+    let nfile
+    if (file instanceof Blob) {
+        nfile = new NFile([file],name)
+    }else{
+        nfile = new NFile([new Blob([file])],name)
+    }
+    return nfile
+    
+}
+
+export async function loadZipUseLibarchivejs(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
+    log.info("加载压缩包文件 " + name + " 中...")
+    const archive = await LibArchive.open(toFile(name,file))
+    const obj = await archive.extractFiles();
+    console.log(obj)
+    const files: { "name": string, "file": File }[] = []
+
+    for (let key of Object.keys(obj)){
+        if (obj[key] instanceof NFile){
+            files.push({ "name": key, "file": new File(new Blob([await obj[key].arrayBuffer()]),key) })
+        }
+    }
+    let o = []
+    for (let file of files) {
+        const f = file.file
+        await f.getBlob()
+        o.push(f)
+    }
+    log.info("加载压缩包文件 " + name + " 完成")
     return new Archive(o, name)
 }

@@ -166,9 +166,11 @@ export class PrprExtra {
             let nl = name.split('')
             nl.splice(0, 1)
             let _name = nl.join('').split('.')[0]
-            switch (_name) {
-                case "Bloom":
+            switch (_name.toLowerCase()) { //着色器兼容
+                case "bloom":
                     return (Shader.presets as any)['bloom']
+                case "movecamera":
+                    return (Shader.presets as any)['movecamera']
                 default:
                     return this.formatShader(this.game!.zipFiles.get(this.game!.chart.rootPath + name) as string)
             }

@@ -65,6 +65,9 @@ export class File {
             case 'bmp':
                 this.type = FileType.IMG
                 break
+            case 'jpeg':
+                this.type = FileType.IMG
+                break
             case 'fs':
                 this.type = FileType.SHADER
                 break

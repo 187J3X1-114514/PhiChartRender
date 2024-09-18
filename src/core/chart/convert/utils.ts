@@ -28,6 +28,10 @@ function calculateEventsBeat(events: any) {
     return events;
 }
 
+function clamp(val: number, min: number, max: number) {
+    return val > max ? max : val < min ? min : val;
+}
+
 /**
  * 计算在某时间下某一事件的返回值
  * 
@@ -46,7 +50,7 @@ function valueCalculator(event: any, Easings: any, currentTime: any, easingsOffs
     let timePercentStart = 1 - timePercentEnd;
 
     if (event.bezier === 1) {
-        let bezier = Bezier(event.bezierPoints[0], event.bezierPoints[1], event.bezierPoints[2], event.bezierPoints[3]);
+        let bezier = Bezier(clamp(event.bezierPoints[0], 0, 1), event.bezierPoints[1], clamp(event.bezierPoints[2], 0, 1), event.bezierPoints[3]);
         return event.start * bezier(timePercentStart) + event.end * bezier(timePercentEnd);
     }
     else {

@@ -4,7 +4,7 @@
         "beforeBuildCommand": "pnpm run build",
         "beforeDevCommand": "pnpm run dev",
         "frontendDist": "../dist",
-        "devUrl": "http://localhost:1420"
+        "devUrl": "http://localhost:1420/"
     },
     "bundle": {
         "active": false,
@@ -36,11 +36,13 @@
                 "transparent": true,
                 "resizable": true,
                 "label": "main",
-                "url": "http://localhost:64"
+                "url": "index.html"
             }
         ],
         "security": {
-            "capabilities": ["main"]
+            "capabilities": ["main"],
+            "csp":null
+            
         }
 
     }

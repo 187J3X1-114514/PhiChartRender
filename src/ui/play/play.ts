@@ -3,7 +3,7 @@ import Game from "../../core/game";
 import { ResourceManger, ResourcePack } from "../../core/resource";
 import { File } from "../../core/file";
 import { Application } from "pixi.js";
-import { topAppBar } from "../main";
+import {  topAppBar,BACKGROUND } from "../main";
 
 export class PlayS {
     private res: ResourceManger
@@ -12,7 +12,7 @@ export class PlayS {
     private app?: Application
     private file: File[]
     private resp: ResourcePack
-    private end:()=>void
+    private end: () => void
     constructor(file: File | File[] | ChartInfo, resp: ResourcePack, resm: ResourceManger = new ResourceManger()) {
         this.res = resm
         this.file = file instanceof Array ? file : (file instanceof ChartInfo ? [] : [file])
@@ -20,12 +20,9 @@ export class PlayS {
         if (file instanceof ChartInfo) {
             this.chart = file
         }
-        this.end = ()=>{}
+        this.end = () => { }
     }
-    async page(el: HTMLElement) {
-        let root = document.createElement("div")
-    }
-    setOnEnd(f:()=>void){
+    setOnEnd(f: () => void) {
         this.end = f
     }
     async load() {
@@ -64,7 +61,7 @@ export class PlayS {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: true, shader: true, showInputPoint: false, showFPS: true,bgDim:0.6
+                autoPlay: true, shader: true, showInputPoint: false, showFPS: false, bgDim: 0.3
             }
         })
         let r = new ResizeObserver(() => { this.game!.resize(true) })
@@ -79,12 +76,14 @@ export class PlayS {
         document.body.style.paddingTop = "0px"
         this.app!.canvas.classList.add("push-in")
         this.app!.canvas.classList.add("game")
-        setTimeout(()=>{
+        BACKGROUND.pause()
+        setTimeout(() => {
             this.game!.start()
             this.app!.canvas.classList.remove("push-in")
-        },620)
+        }, 620)
     }
     private onend() {
+        BACKGROUND.render()
         topAppBar.style.display = "flex"
         document.body.style.paddingTop = "64px"
         this.app!.canvas.classList.add("push-out")

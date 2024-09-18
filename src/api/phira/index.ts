@@ -26,50 +26,63 @@ export class PhiraAPI {
         this.userInfo = meJson
     }
     static async login(email: string, password: string) {
-        let r: { [key: string]: any } = {}
-        let loginJson
-        let fetchResult
-        let fetchJSON
-        let meJson
-        fetchResult = await fetch(API_URL.PHIRA_API_URL_LOGIN, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: email, password: password
+        return new Promise<loginResult>(async (r__) => {
+            let st = performance.now()
+            let r: { [key: string]: any } = {}
+            let loginJson
+            let fetchResult
+            let fetchJSON
+            let meJson
+            let checkT = setInterval(() => {
+                if (performance.now() - st >= 20 * 1000) {
+                    r["api"] = undefined
+                    r["status"] = -1
+                    r["error"] = "登录超时"
+                    r["ok"] = false
+                    clearInterval(checkT)
+                    r__(r as loginResult)
+                }
+            }, 100)
+            fetchResult = await fetch(API_URL.PHIRA_API_URL_LOGIN, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email, password: password
+                })
             })
-        })
-        fetchJSON = await fetchResult.json()
-        if (!fetchResult.ok) {
-            r["api"] = undefined
-            r["status"] = fetchResult.status
-            r["error"] = fetchJSON["error"]
-            r["ok"] = false
-            return r as loginResult
-        }
-        loginJson = fetchJSON
-        fetchResult = await fetch(API_URL.PHIRA_API_URL_ME, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + loginJson["token"]
+            fetchJSON = await fetchResult.json()
+            if (!fetchResult.ok) {
+                r["api"] = undefined
+                r["status"] = fetchResult.status
+                r["error"] = fetchJSON["error"]
+                r["ok"] = false
+                return r as loginResult
             }
+            loginJson = fetchJSON
+            fetchResult = await fetch(API_URL.PHIRA_API_URL_ME, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + loginJson["token"]
+                }
+            })
+            fetchJSON = await fetchResult.json()
+            if (!fetchResult.ok) {
+                r["api"] = undefined
+                r["status"] = fetchResult.status
+                r["error"] = fetchJSON["error"]
+                r["ok"] = false
+                return r as loginResult
+            }
+            meJson = fetchJSON
+            r["api"] = new this(loginJson, { name: meJson["name"], email: email, password: password }, meJson)
+            r["status"] = 200
+            r["error"] = ""
+            r["ok"] = true
+            r__(r as loginResult)
         })
-        fetchJSON = await fetchResult.json()
-        if (!fetchResult.ok) {
-            r["api"] = undefined
-            r["status"] = fetchResult.status
-            r["error"] = fetchJSON["error"]
-            r["ok"] = false
-            return r as loginResult
-        }
-        meJson = fetchJSON
-        r["api"] = new this(loginJson, { name: meJson["name"], email: email, password: password }, meJson)
-        r["status"] = 200
-        r["error"] = ""
-        r["ok"] = true
-        return r as loginResult
     }
     async getAvatar() {
         return await new Promise<string>((r) => {
@@ -77,7 +90,7 @@ export class PhiraAPI {
             let headers = new Headers();
             headers.append('Authorization', 'Bearer ' + this.userToken);
 
-            this.fetch(API_URL.PHIRA_API_CORS+imageUrl,
+            this.fetch(API_URL.PHIRA_API_CORS + imageUrl,
                 'GET',
                 headers,
             )
@@ -86,7 +99,7 @@ export class PhiraAPI {
                     r(new Promise((resolve, _reject) => {
                         const fileReader = new FileReader();
                         fileReader.onload = (e) => {
-                            resolve((e.target!.result as string).replace("application/octet-stream","image/png"));
+                            resolve((e.target!.result as string).replace("application/octet-stream", "image/png"));
                         };
                         fileReader.readAsDataURL(blob);
                         fileReader.onerror = () => {
@@ -146,7 +159,7 @@ export class PhiraAPI {
         this.userToken = loginJson["token"]
         this.userInfo = meJson
     }
-    async search(order: SearchOrder = SearchOrder.timeReverse, division: SearchDivision = SearchDivision.ordinary, searchText?: string, pageNum = 20, page = 1,type:number=-1) {
+    async search(order: SearchOrder = SearchOrder.timeReverse, division: SearchDivision = SearchDivision.ordinary, searchText?: string, pageNum = 20, page = 1, type: number = -1) {
         let baseUrl = API_URL.PHIRA_API_URL_CHART
         function addParams(url: string, queryParams: { [key: string]: string | number }): string {
             let updatedUrl = url;

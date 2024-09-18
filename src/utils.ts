@@ -39,3 +39,16 @@ export const updataFullscreen = (e?: boolean) => {
         (e != undefined ? (e ? launchFullscreen : exitFullscreen) : launchFullscreen)()
     }
 }
+
+export function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: Event) => any, accept?: string, multiple?: boolean) {
+    const inpEle = document.createElement("input");
+    inpEle.id = `__file_${Math.trunc(Math.random() * 100000)}`;
+    inpEle.type = "file";
+    inpEle.style.display = "none";
+    // 文件类型限制
+    accept && (inpEle.accept = accept);
+    // 多选限制
+    multiple && (inpEle.multiple = multiple);
+    inpEle.addEventListener("change", event => fn(inpEle.files, inpEle, event), { once: true });
+    inpEle.click();
+}

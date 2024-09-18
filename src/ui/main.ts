@@ -1,91 +1,79 @@
-import { Avatar, ButtonIcon, Dropdown, MenuItem, NavigationDrawer, getTheme, setTheme, dialog } from "mdui"
+import { BUILD_ENV, BUILDTIME, GIT_HASH, PACKAGE_JSON } from "./env";
+document.getElementById("top-app-bar-title")!.innerText += (' V' + PACKAGE_JSON.version.split('v').pop())
+let v = '' + PACKAGE_JSON.version.split('v').pop()
+let nv = `V${v}-${GIT_HASH.slice(0, 7).toLocaleUpperCase()}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
+document.getElementById("info")!.innerText = nv
+
+import { Avatar, ButtonIcon, Dropdown, MenuItem, NavigationDrawer, getTheme, setTheme, CircularProgress, LinearProgress, NavigationRail, Collapse } from "mdui"
 import loginPage from "./phira/login"
 import { PhiraAPI } from "../api/phira"
 import { Zip, loadZip } from "../core/file";
 import { ResourcePack } from "../core/resource";
 import Cookies from 'js-cookie'
 import { Theme } from "mdui/internal/theme";
-import * as TAURI from "./tauri"
-import { BUILD_ENV, BUILDTIME, GIT_HASH, PACKAGE_JSON } from "./env";
+
+import { loadFont } from "../core/font";
+import { get_theme, main, MAINWINDOW_HWND, ON_TAURI, RUN_RS_FN } from "./tauri";
+import { openDebug } from "./debug/ui_pos";
+import { background } from "./background/background";
+
+await loadFont()
 const UI_HTML = `    
-<mdui-top-app-bar variant="hide" id="top-app-bar" style="display: flex">
-        <mdui-button-icon icon="menu" id="top-app-bar-menu"></mdui-button-icon>
-        <mdui-top-app-bar-title id="top-app-bar-title">一个及其简陋的Phigros模拟器</mdui-top-app-bar-title>
 
-        <div style="flex-grow: 1" id="top-app-bar-other">
-        </div>
-        <div style="margin: auto 0;height: 100%;white-space:nowrap" id="top-app-bar-other">
-            <mdui-button-icon variant="tonal" icon="auto_mode" id="mode" class="modeBtn"></mdui-button-icon>
-            <mdui-dropdown trigger="hover" close-delay="2000" id="avatar-dropdown">
-                <mdui-avatar style="height: 100%;right: 8px;" id="avatar" icon="account_circle" slot="trigger">
-                </mdui-avatar>
-                <mdui-menu>
-                    <mdui-menu-item id="avatar-dropdown-1"> <mdui-icon slot="end-icon" name="login"></mdui-icon>
-                        <span slot="end-text">登陆Phira账户</span></mdui-menu-item>
-                    <mdui-menu-item id="avatar-dropdown-2"> <mdui-icon slot="end-icon" name="logout"></mdui-icon>
-                        <span slot="end-text">登出Phira账户</span></mdui-menu-item>
-                </mdui-menu>
-            </mdui-dropdown>
-            <h4 style="display:inline;" id="avatar-name">未登录</h4>
-        </div>
-
-
-    </mdui-top-app-bar>
-    <mdui-navigation-drawer close-on-esc id="navigation-drawer" close-on-overlay-click style="top: 64px;">
-        <mdui-list>
-            <mdui-collapse>
-                <mdui-collapse-item>
-                    <mdui-list-item rounded slot="header" icon="class">分区<mdui-icon slot="end-icon" class="arrow"
-                            name="expand_more"></mdui-icon></mdui-list-item>
-                    <div style="margin-left: 2.5em;">
-                        <mdui-list-item rounded id="class-chart-1">已上架</mdui-list-item>
-                        <mdui-list-item rounded id="class-chart-2">未上架</mdui-list-item>
-                        <mdui-list-item rounded id="class-chart-3">特殊</mdui-list-item>
-                    </div>
-
-                </mdui-collapse-item>
-            </mdui-collapse>
-        </mdui-list>
-    </mdui-navigation-drawer>
 `
-let v = '' + PACKAGE_JSON.version.split('v').pop()
-let nv = `V${v}-${GIT_HASH.slice(0, 7).toLocaleUpperCase()}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
-document.getElementById("info")!.innerText = nv
-document.documentElement.classList.remove("black")
-setTheme((() => {
+document.getElementById("start-o")!.classList.remove("black");
+async function setThemeP(a: string) {
+    if (a != "auto") {
+        document.body.style.setProperty("--color", a == "light" ? "#000000" : "#FFFFFF")
+        document.body.style.setProperty("--color--s", a == "light" ? "255" : "0")
+    } else {
+        document.body.style.setProperty("--color", window.matchMedia("(prefers-color-scheme: light)").matches ? "#000000" : "#FFFFFF")
+        document.body.style.setProperty("--color--s", window.matchMedia("(prefers-color-scheme: light)").matches ? "255" : "0")
+    }
+    if (ON_TAURI) {
+        switch (a) {
+            case "light":
+                await RUN_RS_FN("set_theme", {
+                    hwnd: MAINWINDOW_HWND,
+                    mode: 0
+                })
+                break
+            case "dark":
+                await RUN_RS_FN("set_theme", {
+                    hwnd: MAINWINDOW_HWND,
+                    mode: 1
+                })
+                break
+            case "auto":
+                console.log(await get_theme())
+                if (await get_theme() == 0) {
+                    await RUN_RS_FN("set_theme", {
+                        hwnd: MAINWINDOW_HWND,
+                        mode: 1
+                    })
+                } else {
+                    await RUN_RS_FN("set_theme", {
+                        hwnd: MAINWINDOW_HWND,
+                        mode: 0
+                    })
+                }
+
+        }
+    }
+    setTheme(a as any);
+}
+
+setThemeP((() => {
     let t = Cookies.get("mode") ? Cookies.get("mode") : "auto"
     return (t) as Theme
 })());
-(()=>{
-    try {
-        new SharedArrayBuffer(4)
-        return
-    } catch {
-        if (TAURI.ON_TAURI) {
-            return
-        }
-        setTimeout(() => {
-            location.reload()
-        }, 10000)
-        dialog(
-            {
-                headline: "提示",
-                description: "检测到当前无法使用多线程功能，将在10秒后自动刷新页面，你也可以手动刷新页面，如果刷新后仍然出现此提升请反馈这个问题。",
-                actions: [
-                    {
-                        text: "👌"
-                    }
-                ]
-            }
-        )
-    }
-})()
-
+await main()
 document.body.innerHTML = UI_HTML + document.body.innerHTML
 export var account: undefined | PhiraAPI = undefined;
 (document.getElementById("avatar-dropdown-1")! as MenuItem).disabled = false;
-(document.getElementById("avatar-dropdown-2")! as MenuItem).disabled = true
+(document.getElementById("avatar-dropdown-2")! as MenuItem).disabled = true;
 export const topAppBar = document.getElementById("top-app-bar")!
+export const app = document.getElementById("app")!
 export const topAppBarMenu = document.getElementById("top-app-bar-menu")!
 export const topAppBarTitle = document.getElementById("top-app-bar-title")!
 export const topAppBarOther = document.getElementById("top-app-bar-other")!
@@ -93,12 +81,19 @@ export const avatar = document.getElementById("avatar")! as Avatar
 export const avatarName = document.getElementById("avatar-name")!
 export const modeBtn = document.getElementById("mode")! as ButtonIcon
 export const navigationDrawer = document.getElementById("navigation-drawer")! as NavigationDrawer
+export const navigationRail = document.getElementById("navigation-rail")! as NavigationRail
+export const locDrawer = document.getElementById("loc-drawer")! as Collapse
+export const recDrawer = document.getElementById("rec-drawer")! as Collapse
+export const phiraDrawer = document.getElementById("phira-drawer")! as Collapse
+export const load = document.getElementById("load-stage")! as LinearProgress
+export const debugBtn = document.getElementById("debug-btn")! as ButtonIcon
 uModeBtn()
 
-let a = await fetch("assets/pack/resource.zip")
+let a = await fetch("assets/pack/resource")
 let zip: Zip
-zip = await loadZip("resource.zip", await a.blob())
+zip = await loadZip("resource.7z", await a.blob())
 export const ResPack = await ResourcePack.load(zip)
+
 for (let e of document.getElementsByClassName("arrow")) {
     var el = (e as HTMLElement).parentElement as HTMLElement
     el.addEventListener("click", () => {
@@ -108,6 +103,14 @@ for (let e of document.getElementsByClassName("arrow")) {
             e.classList.add("arrow-active")
         }
     })
+}
+export const BACKGROUND = await background.init()
+BACKGROUND.render()
+load.classList.add("hide")
+function buildCPross() {
+    let r = new CircularProgress()
+    r.style.height = "65%"
+    return r
 }
 navigationDrawer.open = false
 topAppBarMenu?.addEventListener("click", () => {
@@ -121,16 +124,46 @@ topAppBarMenu?.addEventListener("click", () => {
     (document.getElementById("avatar-dropdown")! as Dropdown).open = false
     reqLogout()
 });
-modeBtn.addEventListener("click", () => {
+modeBtn.addEventListener("click", async () => {
     let m = getTheme()
     let m_ = "auto"
     if (m == "light") m_ = "dark"
     if (m == "dark") m_ = "auto"
     if (m == "auto") m_ = "light"
     Cookies.set("mode", m_)
-    setTheme(m_ as Theme)
+    await setThemeP(m_ as Theme)
+    console.log(m_)
+    if (m_ != "auto") {
+        (document.getElementsByClassName("phira-github")[0]! as HTMLElement).style.setProperty("--color", m_ == "light" ? "#000000" : "#FFFFFF")
+    } else {
+        (document.getElementsByClassName("phira-github")[0]! as HTMLElement).style.setProperty("--color", window.matchMedia("(prefers-color-scheme: light)").matches ? "#000000" : "#FFFFFF")
+    }
+
     uModeBtn()
 
+})
+navigationRail.addEventListener("change", () => {
+    switch (navigationRail.value) {
+        case "loc":
+            locDrawer.classList.remove("hide")
+            recDrawer.classList.add("hide")
+            phiraDrawer.classList.add("hide")
+            break
+        case "rec":
+            locDrawer.classList.add("hide")
+            recDrawer.classList.remove("hide")
+            phiraDrawer.classList.add("hide")
+            break
+        case "phira":
+            locDrawer.classList.add("hide")
+            recDrawer.classList.add("hide")
+            phiraDrawer.classList.remove("hide")
+            break
+    }
+
+})
+debugBtn.addEventListener("click",async()=>{
+    await openDebug()
 })
 export async function reqLogin() {
     (document.getElementById("avatar-dropdown")! as Dropdown).open = false;
@@ -140,11 +173,15 @@ export async function reqLogin() {
         (document.getElementById("avatar-dropdown-1")! as MenuItem).disabled = false;
         (document.getElementById("avatar-dropdown-2")! as MenuItem).disabled = false
         avatar.icon = undefined;
+
         (async () => {
-            avatar.src = await loginR.api!.getAvatar()
+            let load = buildCPross()
+            avatar.appendChild(load)
+            avatar.src = await loginR.api!.getAvatar();
+            avatar.removeChild(load)
         })()
-        account = loginR.api!
-        avatarName.innerText = account.userName
+        account = loginR.api
+        avatarName.innerText = account!.userName
     } else {
         reqLogout()
     }

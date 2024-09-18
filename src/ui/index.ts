@@ -1,6 +1,6 @@
 export async function reqFullSc() {
     try {
-        if (document.fullscreenElement==null) {
+        if (document.fullscreenElement == null) {
             document.documentElement.requestFullscreen({
                 navigationUI: "hide"
             })
@@ -16,8 +16,6 @@ export async function reqFullSc() {
     }
     if (getOppositeOrientation() == "landscape") { //怪了
         (screen as any).orientation.lock("landscape")
-        
+
     }
-
-
 }

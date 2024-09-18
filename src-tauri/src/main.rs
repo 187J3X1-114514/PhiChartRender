@@ -66,6 +66,28 @@ fn get_window_handle(window: tauri::Window) -> Result<i32, String> {
     Ok(handle.0 as i32)
 }
 
+#[tauri::command]
+fn get_theme() -> i32{
+    let mut mode_int = 0;
+    let mode = dark_light::detect();
+    
+    match mode {
+        // Dark mode
+        dark_light::Mode::Dark => {
+            mode_int = 0;
+        },
+        // Light mode
+        dark_light::Mode::Light => {
+            mode_int = 1;
+        },
+        // Unspecified
+        dark_light::Mode::Default => {
+            mode_int = 2;
+        },
+    }
+    return mode_int;
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
@@ -81,19 +103,20 @@ fn main() {
                 ])
                 .build(),
         )
-        .plugin(
-            tauri_plugin_localhost::Builder::new(64)
-                .on_request(|_req, resp| {
-                    resp.add_header("Cross-Origin-Opener-Policy", "same-origin");
-                    resp.add_header("Cross-Origin-Embedder-Policy", "require-corp");
-                })
-                .build(),
-        )
+        //.plugin(
+        //    tauri_plugin_localhost::Builder::new(64)
+        //        .on_request(|_req, resp| {
+        //            resp.add_header("Cross-Origin-Opener-Policy", "same-origin");
+        //            resp.add_header("Cross-Origin-Embedder-Policy", "require-corp");
+        //        })
+        //        .build(),
+        //)
         .invoke_handler(tauri::generate_handler![
             set_theme,
             set_wa,
             set_transparency,
-            get_window_handle
+            get_window_handle,
+            get_theme
         ])
         //.setup(|app| {
         //    tauri::WebviewWindowBuilder::new(

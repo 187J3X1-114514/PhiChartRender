@@ -33,11 +33,18 @@ export default class EventLayer {
     }
 
     calcTime(currentTime: number) {
-        this._posX = this.valueCalculator(this.moveX, currentTime, this.moveXOriginValue || this._posX);
-        this._posY = this.valueCalculator(this.moveY, currentTime, this.moveYOriginValue || this._posY);
-        this._alpha = this.valueCalculator(this.alpha, currentTime, this.alphaOriginValue || this._alpha);
-        this._rotate = this.valueCalculator(this.rotate, currentTime, this.rotateOriginValue || this._rotate);
-
+        let _posX = this.valueCalculator(this.moveX, currentTime, this.moveXOriginValue || this._posX);
+        let _posY = this.valueCalculator(this.moveY, currentTime, this.moveYOriginValue || this._posY);
+        let _alpha = this.valueCalculator(this.alpha, currentTime, this.alphaOriginValue || this._alpha);
+        let _rotate = this.valueCalculator(this.rotate, currentTime, this.rotateOriginValue || this._rotate);
+        //let _posX = this.valueCalculator(this.moveX, currentTime, this._posX || this.moveXOriginValue);
+        //let _posY = this.valueCalculator(this.moveY, currentTime, this._posY || this.moveYOriginValue);
+        //let _alpha = this.valueCalculator(this.alpha, currentTime, this._alpha || this.alphaOriginValue);
+        //let _rotate = this.valueCalculator(this.rotate, currentTime, this._rotate || this.rotateOriginValue);
+        this._posX = _posX[0]
+        this._posY = _posY[0]
+        this._alpha = _alpha[0]
+        this._rotate = _rotate[0]
         for (let i = 0, length = this.speed.length; i < length; i++) {
             let event = this.speed[i];
             if (event.endTime < currentTime) continue;
@@ -45,23 +52,24 @@ export default class EventLayer {
 
             this._speed = event.value!;
         }
+        return { alpha: _alpha[1], x: _posX[1], y: _posY[1], rotate: _rotate[1] }
     }
 
-    valueCalculator(events: { startTime: number, endTime: number, start: number, end: number }[], currentTime: number, originValue: number = 0, _eventIndex: number = 0): number {
+    valueCalculator(events: { startTime: number, endTime: number, start: number, end: number }[], currentTime: number, originValue: number = 0, _eventIndex: number = 0): [number, boolean] {
         for (let i = _eventIndex, length = events.length; i < length; i++) {
             let event = events[i];
             if (event.endTime < currentTime) continue;
             if (event.startTime > currentTime) break;
-            if (event.start == event.end) return event.start
+            if (event.start == event.end) return [event.start, true]
 
             let timePercentEnd = (currentTime - event.startTime) / (event.endTime - event.startTime);
             let timePercentStart = 1 - timePercentEnd;
 
-            return event.start * timePercentStart + event.end * timePercentEnd;
+            return [event.start * timePercentStart + event.end * timePercentEnd, true];
         }
         //if (events[_eventIndex - 1]) {
         //    return events[_eventIndex - 1].end;
         //}
-        return originValue;
+        return [originValue, false];
     }
 }
