@@ -1,4 +1,4 @@
-import { Effect,getRealTime } from "./effect"
+import { Effect, getRealTime } from "./effect"
 
 export class ShaderToy {
     public mAudioContext: AudioContext | undefined = undefined as any;
@@ -40,36 +40,24 @@ export class ShaderToy {
         this.mCreated = true;
     }
     startRendering() {
-        var me = this;
-
-        function renderLoop2() {
-            requestAnimationFrame(renderLoop2);
-
-            if (me.mIsPaused && !me.mForceFrame) {
-                me.mEffect.UpdateInputs(0, false);
-                return;
-            }
-
-            me.mForceFrame = false;
-            var time = getRealTime();
-            var ltime = me.mTOffset + time - me.mTo;
-
-            if (me.mIsPaused) ltime = me.mTf; else me.mTf = ltime;
-
-            var dtime = 1000.0 / 60.0;
-
-            me.mEffect.Paint(ltime / 1000.0, dtime / 1000.0, 60, me.mMouseOriX, me.mMouseOriY, me.mMousePosX, me.mMousePosY, me.mIsPaused);
-
-            me.mFpsFrame++;
-
-            if ((time - me.mFpsTo) > 1000) {
-                var ffps = 1000.0 * me.mFpsFrame / (time - me.mFpsTo);
-                me.mFpsFrame = 0;
-                me.mFpsTo = time;
-            }
+    }
+    render() {
+        if (this.mIsPaused && !this.mForceFrame) {
+            this.mEffect.UpdateInputs(0, false);
+            return;
         }
-
-        renderLoop2();
+        this.mForceFrame = false;
+        var time = getRealTime();
+        var ltime = this.mTOffset + time - this.mTo;
+        if (this.mIsPaused) ltime = this.mTf; else this.mTf = ltime;
+        var dtime = 1000.0 / 60.0;
+        this.mEffect.Paint(ltime / 1000.0, dtime / 1000.0, 60, this.mMouseOriX, this.mMouseOriY, this.mMousePosX, this.mMousePosY, this.mIsPaused);
+        this.mFpsFrame++;
+        if ((time - this.mFpsTo) > 1000) {
+            var ffps = 1000.0 * this.mFpsFrame / (time - this.mFpsTo);
+            this.mFpsFrame = 0;
+            this.mFpsTo = time;
+        }
     }
     Stop() {
         this.mIsPaused = true;
@@ -137,7 +125,7 @@ export class ShaderToy {
 }
 
 export async function iCompileAndStart(viewerParent: HTMLCanvasElement, jsnShader: any) {
-    return new Promise<ShaderToy>((r)=>{
+    return new Promise<ShaderToy>((r) => {
         var gShaderToy = new ShaderToy(viewerParent);
         var gRes = gShaderToy.Load(jsnShader[0])
         if (gRes.mFailed) {
@@ -150,7 +138,7 @@ export async function iCompileAndStart(viewerParent: HTMLCanvasElement, jsnShade
                 if (gShaderToy.mIsPaused) {
                     gShaderToy.Stop();
                 }
-                gShaderToy.startRendering();
+                gShaderToy.render();
                 gShaderToy.pauseTime()
                 r(gShaderToy)
             });

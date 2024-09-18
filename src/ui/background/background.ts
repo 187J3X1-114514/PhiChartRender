@@ -3,12 +3,14 @@ import * as Shader from "./shader";
 import * as StackBlur from 'stackblur-canvas';
 import * as presets from '../../core/prpr/effect/shader/presets/index';
 import { genNoise } from "./utils";
-import { iCompileAndStart } from "./shadertoy/shadertoy";
+import { iCompileAndStart, ShaderToy } from "./shadertoy/shadertoy";
 export const BACKGROUNDCANVAS = document.createElement("canvas")
 BACKGROUNDCANVAS.id = "background"
 export class background {
     public app: Application = undefined as any
+    private app__: ShaderToy = undefined as any
     private shaders: { [key: string]: Shader.Shader } = {}
+    private isStop: boolean = false
     //private textures: { [key: string]: Texture } = {}
     //private frameBuffer: { [key: string]: Texture } = {}
     //private container: { [key: string]: Container } = {}
@@ -27,7 +29,7 @@ export class background {
         //        resolution: 1.0
         //    }
         //)
-        //_.app.ticker.maxFPS = 25
+        ////_.app.ticker.maxFPS = 10
         //_.app.start()
         ////_.textures.noise = Texture.from(await genNoise(256, 256))
         ////_.textures.iChannel0 = await Assets.load("assets/background/iChannel0.jpg")
@@ -41,15 +43,13 @@ export class background {
         ////_.sprite.a = new Sprite(_.frameBuffer.a)
         ////_.app.stage.addChild(_.sprite.a)
         //_.resize()
-        //document.body.appendChild(_.app.canvas)
+        document.body.appendChild(BACKGROUNDCANVAS)
         //let r = new ResizeObserver(() => { _.resize() })
         //r.observe(_.app.canvas)
         //_.init_shader()
-        var shaderToy
-        fetch("background.json").then(async (v) => {
-            shaderToy = await iCompileAndStart(BACKGROUNDCANVAS, await v.json())
-            console.log(shaderToy)
-        })
+        let v = await fetch("background.json")
+        let shaderToy = await iCompileAndStart(BACKGROUNDCANVAS, await v.json())
+        _.app__ = shaderToy
         return _
 
     }
@@ -139,13 +139,20 @@ export class background {
         //this.background_image.anchor.set(0.5)
         //this.background_image.x = this.app.canvas.width / 2
         //this.background_image.y = this.app.canvas.height / 2
-        this.render()
         //this.create_framebuffer()
     }
     render() {
+        this.isStop = false
+        const loop = () => {
+            if (!this.isStop) {
+                this.app__.render()
+            }
+            requestAnimationFrame(loop)
+        }
+        loop()
         //this.app.start()
     }
     pause() {
-        //this.app.stop()
+        this.isStop = !this.isStop
     }
 }
