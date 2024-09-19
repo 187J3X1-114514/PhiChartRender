@@ -6,6 +6,10 @@ import * as CryptoJS from 'crypto-js'
 import protocolPage from "./terms_of_use";
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 const fpPromise = await FingerprintJS.load()
+var id = await fpPromise.get()
+setInterval(async()=>{
+    id = await fpPromise.get()
+},15*60*60*1000)
 const DID = await genID()
 export default async function loginPage(t: Element): Promise<loginResult> {
     const dialog = new Dialog()
@@ -166,7 +170,7 @@ function generateRandom(): number {
 }
 
 export function genCookie(email: string, password: string) {
-    let id = genID()
+    let id = DID
     let md5_1 = md5(email) + id
     let md5_2 = md5(password) + id
     function reverseString(str: string): string {
@@ -199,7 +203,7 @@ export function getCookie(data: string) {
         password: decrypted[1]
     }
 }
-async function genID() {
+function genID() {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')!
     const txt = navigator.userAgent
@@ -213,5 +217,5 @@ async function genID() {
     ctx.fillStyle = "rgba(114, 51, 4, 0.1145)"
     ctx.fillText(txt, 1, 4)
     const b64 = canvas.toDataURL().replace("data:image/png;base64,", "")
-    return atob(md5(atob(b64) + await fpPromise.get()).slice(0, 16))
+    return atob(md5(atob(b64) + id).slice(0, 16))
 }

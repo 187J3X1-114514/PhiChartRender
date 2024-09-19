@@ -26,7 +26,7 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
     el.style.position = "absolute"
     el.style.top = "0px"
     el.style.left = "0px"
-    el.style.zIndex = "999"
+    el.style.zIndex = "3000"
     const dialog = new Dialog()
     dialog.classList.add("close-on-overlay-click")
     dialog.headline = "《服务条款》和《隐私政策》"

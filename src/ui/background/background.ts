@@ -1,16 +1,17 @@
-import { Application, Graphics, Container, Sprite, Assets, BlurFilter, Texture, RenderTexture, RenderTarget } from "pixi.js"
-import * as Shader from "./shader";
-import * as StackBlur from 'stackblur-canvas';
-import * as presets from '../../core/prpr/effect/shader/presets/index';
-import { genNoise } from "./utils";
+//import { Application } from "pixi.js"
+//import * as Shader from "./shader";
+//import * as StackBlur from 'stackblur-canvas';
+//import * as presets from '../../core/prpr/effect/shader/presets/index';
+//import { genNoise } from "./utils";
 import { iCompileAndStart, ShaderToy } from "./shadertoy/shadertoy";
 export const BACKGROUNDCANVAS = document.createElement("canvas")
 BACKGROUNDCANVAS.id = "background"
 export class background {
-    public app: Application = undefined as any
+    //public app: Application = undefined as any
     private app__: ShaderToy = undefined as any
-    private shaders: { [key: string]: Shader.Shader } = {}
+    //private shaders: { [key: string]: Shader.Shader } = {}
     private isStop: boolean = false
+    private renderFrame:number = 0
     //private textures: { [key: string]: Texture } = {}
     //private frameBuffer: { [key: string]: Texture } = {}
     //private container: { [key: string]: Container } = {}
@@ -44,8 +45,8 @@ export class background {
         ////_.app.stage.addChild(_.sprite.a)
         //_.resize()
         document.body.appendChild(BACKGROUNDCANVAS)
-        //let r = new ResizeObserver(() => { _.resize() })
-        //r.observe(_.app.canvas)
+        let r = new ResizeObserver(() => { _.resize() })
+        r.observe(BACKGROUNDCANVAS)
         //_.init_shader()
         let v = await fetch("background.json")
         let shaderToy = await iCompileAndStart(BACKGROUNDCANVAS, await v.json())
@@ -53,6 +54,7 @@ export class background {
         return _
 
     }
+    /*
     private create_framebuffer() {
         //this.frameBuffer.a = RenderTexture.create({width:this.app.canvas.width,height:this.app.canvas.height})
         //this.frameBuffer.b = RenderTexture.create({width:this.app.canvas.width,height:this.app.canvas.height})
@@ -128,8 +130,9 @@ export class background {
         //console.log(0)
         //this.app.renderer.render(this.container.a, { renderTexture: this.frameBuffer.a })
 
-    }
+    }*/
     resize() {
+        this.renderFrame = 0
         //this.background_image.zIndex = -10
         //if (this.app.canvas.width > this.app.canvas.height) {
         //    this.background_image.scale.set(2)
@@ -144,8 +147,9 @@ export class background {
     render() {
         this.isStop = false
         const loop = () => {
-            if (!this.isStop) {
+            if (!this.isStop && !(this.renderFrame > 100)) {
                 this.app__.render()
+                this.renderFrame++
             }
             requestAnimationFrame(loop)
         }

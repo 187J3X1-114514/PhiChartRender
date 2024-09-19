@@ -162,7 +162,7 @@ navigationRail.addEventListener("change", () => {
     }
 
 })
-debugBtn.addEventListener("click",async()=>{
+debugBtn.addEventListener("click", async () => {
     await openDebug()
 })
 export async function reqLogin() {
@@ -170,16 +170,18 @@ export async function reqLogin() {
     (document.getElementById("avatar-dropdown-1")! as MenuItem).disabled = true;
     let loginR = await loginPage(document.body)
     if (loginR.ok) {
-        (document.getElementById("avatar-dropdown-1")! as MenuItem).disabled = false;
+        (document.getElementById("avatar-dropdown-1")! as MenuItem).disabled = true;
         (document.getElementById("avatar-dropdown-2")! as MenuItem).disabled = false
         avatar.icon = undefined;
+        let load = buildCPross()
+        avatar.appendChild(load)
+        loginR.api!.getAvatar().then((s) => {
 
-        (async () => {
-            let load = buildCPross()
-            avatar.appendChild(load)
-            avatar.src = await loginR.api!.getAvatar();
+            if (s != "") {
+                avatar.src = s
+            }
             avatar.removeChild(load)
-        })()
+        })
         account = loginR.api
         avatarName.innerText = account!.userName
     } else {

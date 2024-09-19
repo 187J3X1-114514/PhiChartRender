@@ -76,7 +76,7 @@ mdui-navigation-drawer {
     white-space: nowrap;
     word-wrap: normal;
     direction: ltr;
-    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
 }
 
@@ -614,13 +614,15 @@ mdui-navigation-drawer::part(panel) {
 }
 */
 #background {
-    width: 80% !important;
+    width: 100% !important;
     position: fixed;
-    height: 80% !important;
+    height: 100% !important;
+    /*padding-left: 80px;
+    padding-top: 64px;*/
     top: 0px;
     left: 0px;
     z-index: -10;
-    transform:scale(1.25, 1.25) translateX(10%) translateY(10%);
+    /*transform:scale(1.25, 1.25) translateX(10%) translateY(10%);*/
 }
 
 mdui-navigation-drawer mdui-list mdui-collapse mdui-list-item {
@@ -654,18 +656,20 @@ mdui-navigation-drawer {
     top: 0px;
     left: 0px;
     z-index: -1;
-    backdrop-filter: blur(30px);
+    /*backdrop-filter: blur(30px);*/
 }
 
 #top-app-bar {
-    background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.2);
+    /*background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.2);*/
     left: 80px !important;
     z-index: 3 !important;
+    box-shadow: 0 2.75px 9px 0 rgba(var(--mdui-color-shadow), 40%), 0 0.25px 3px 0 rgba(var(--mdui-color-shadow), 3.9%);
 }
-
+/*
 #top-app-bar.tauri {
-    background-color: rgba(0, 0, 0, 0.1) !important;
+   /* background-color: rgba(0, 0, 0, 0.1) !important;
 }
+*/
 
 .debug-ui {
     z-index: 1000000;

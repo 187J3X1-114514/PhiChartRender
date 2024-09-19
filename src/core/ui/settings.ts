@@ -3,7 +3,7 @@ export const defaultUISettings = {
     scale: {
         Pause: 0.7,
         ComboNumber: 1.0,
-        Combo: 0.9,
+        Combo: 0.95,
         Score: 1.0,
         Name: 1.0,
         Level: 1.0
@@ -20,7 +20,7 @@ export const defaultUISettings = {
         , y: {
             Pause: 0.043,
             ComboNumber: 0.05,
-            Combo: 0.08,
+            Combo: 0.087,
             Score: 0.046,
             Name: 0.036,
             Level: 0.036

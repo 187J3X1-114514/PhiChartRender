@@ -164,7 +164,7 @@ export default class UIManger implements baseUIManger {
         this.PauseBtnOutLine.fill({
             color: 0, alpha: 0.0
         })
-        this.PauseBtnOutLine.stroke({ width: 4, color: 0xA9A9A9, alpha: alpha });
+        this.PauseBtnOutLine.stroke({ width: this.size!.lineHeightScale*3*0.6, color: 0xA9A9A9, alpha: alpha });
 
 
     }

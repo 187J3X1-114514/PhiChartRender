@@ -61,7 +61,7 @@ export class PlayS {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: true, shader: true, showInputPoint: false, showFPS: false, bgDim: 0.3
+                autoPlay: false, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.3
             }
         })
         let r = new ResizeObserver(() => { this.game!.resize(true) })

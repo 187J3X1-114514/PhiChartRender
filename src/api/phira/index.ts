@@ -105,6 +105,9 @@ export class PhiraAPI {
                         fileReader.onerror = () => {
                         };
                     }))
+                })
+                .catch(()=>{
+                    r("")
                 });
 
         })
