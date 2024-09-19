@@ -34,8 +34,10 @@ canvas.game {
     bottom: 0.1rem;
     right: 0.1rem;
     z-index: 1000;
-    opacity: 0.19114514;
+    opacity: 0.4;
     font-size: clamp(0.625rem, 0.625rem + 0.28vw, 0.813rem);
+    /*color: rgb(25, 0, 255);*/
+    background: rgb(var(--color--s),var(--color--s),var(--color--s));
     user-select: none;
 }
 

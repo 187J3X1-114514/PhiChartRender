@@ -34,7 +34,7 @@
     "md5-js": "0.0.3",
     "mdui": "^2.1.2",
     "pixi-filters": "^6.0.4",
-    "pixi.js": "^8.2.1",
+    "pixi.js": "^8.4.1",
     "stackblur-canvas": "^2.7.0",
     "tslog": "^4.9.2",
     "vite-plugin-top-level-await": "^1.4.1"
