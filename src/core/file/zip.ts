@@ -199,7 +199,7 @@ export class _7zip {
     }
 
 }
-export const _7ZIP = await _7zip.create()
+export const _7ZIP = undefined as any
 
 export class Archive {
     public files: Map<string, File> = new Map<string, File>()
