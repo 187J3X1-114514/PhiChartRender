@@ -1,311 +1,136 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>phi-chart-render</title>
-        <meta name="description" content="A Phigros chart render based on Pixi.js" />
-        <meta name="author" content="MisaLiu" />
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="shortcut icon" href="./icons/favicon.ico" />
-        <link href="src/style/index.css" rel="stylesheet" />
-        <!--script src="./eruda.min.js"></script>
-        <script>eruda.init();</script-->
-        <script>
-            // 全屏相关。代码来自 lchzh3473
-            const fullscreen = {
-                // 切换全屏状态
-                toggle(elem, inDocument = false) {
-                    // if (!this.enabled) return false;
-                    if (this.element) {
-                        if (!inDocument) {
-                            if (document.exitFullscreen) return document.exitFullscreen();
-                            if (document.cancelFullScreen) return document.cancelFullScreen();
-                            if (document.webkitCancelFullScreen) return document.webkitCancelFullScreen();
-                            if (document.mozCancelFullScreen) return document.mozCancelFullScreen();
-                            if (document.msExitFullscreen) return document.msExitFullscreen();
-                        }
-                        
-                        if (this.element == elem) {
-                            elem.style.position = 'relative';
-                            elem.style.top = 'unset';
-                            elem.style.left = 'unset';
-                            elem.style.zIndex = 'unset';
-                            document.body.style.overflow = 'auto';
-                            
-                            document.inDocumentFullscreenElement = null;
-                            if (global.functions.resizeCanvas) global.functions.resizeCanvas();
-                            return true;
-                        }
-                        
-                        return false;
-                        
-                    } else {
-                        if (!inDocument) {
-                            if (!(elem instanceof HTMLElement)) elem = document.body;
-                            if (elem.requestFullscreen) return elem.requestFullscreen();
-                            if (elem.webkitRequestFullscreen) return elem.webkitRequestFullscreen();
-                            if (elem.mozRequestFullScreen) return elem.mozRequestFullScreen();
-                            if (elem.msRequestFullscreen) return elem.msRequestFullscreen();
-                        }
-                        
-                        if (elem != document.body) {
-                            elem.style.position = 'fixed';
-                            elem.style.top = '0';
-                            elem.style.left = '0';
-                            elem.style.zIndex = '5050';
-                            document.body.style.overflow = 'hidden';
-                            
-                            document.inDocumentFullscreenElement = elem;
-                            if (global.functions.resizeCanvas) global.functions.resizeCanvas();
-                            return true;
-                        }
-                        
-                        return false;
-                    }
-                },
-                
-                // 检查当前全屏的元素
-                check(elem) {
-                    if (!(elem instanceof HTMLElement)) elem = document.body;
-                    return this.element == elem;
-                },
-                
-                // 返回当前浏览器的全屏组件。
-                get element() {
-                    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || document.inDocumentFullscreenElement;
-                },
-                
-                // 返回当前浏览器是否支持全屏 API。
-                get enabled() {
-                    return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
-                },
-                
-                // 返回当前的全屏模式。2 == 网页内全屏，1 == API 全屏，0 == 没有开启全屏
-                get type() {
-                    if (document.inDocumentFullscreenElement) {
-                        return 2;
-                    } else if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
+<!doctype html>
+<html lang="en" class="black mdui-theme-auto">
+
+<head>
+    <link rel="icon" href="favicon.png">
+    <script src="coi-serviceworker.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Phigros</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+    <script type="module" src="/src/main.ts" defer></script>
+    <link rel="stylesheet" href="/src/phira.css" />
+    <mdui-linear-progress id="load-stage" class="search-load"></mdui-linear-progress>
+</head>
+
+<body>
+    <div id="start-o" class="black"></div>
+    <div id="___background" class="___background-two"></div>
+    <mdui-top-app-bar variant="hide" id="top-app-bar" style="display: flex" class="left-all">
+        <div class="top-app-bar-blur"></div>
+        <mdui-top-app-bar-title id="top-app-bar-title">Phigros Simulator Plus</mdui-top-app-bar-title>
+        <div style="flex-grow: 1" id="top-app-bar-other">
+        </div>
+        <div style="margin: auto 0;height: 100%;white-space:nowrap" id="top-app-bar-other">
+            <mdui-button-icon variant="tonal" icon="auto_mode" id="mode" class="modeBtn"></mdui-button-icon>
+            <mdui-dropdown trigger="hover" close-delay="2000" id="avatar-dropdown">
+                <mdui-avatar style="height: 100%;right: 8px;" id="avatar" icon="account_circle" slot="trigger">
+
+                </mdui-avatar>
+                <mdui-menu>
+                    <mdui-menu-item id="avatar-dropdown-1"> <mdui-icon slot="end-icon" name="login"></mdui-icon>
+                        <span slot="end-text">登陆Phira账户</span></mdui-menu-item>
+                    <mdui-menu-item id="avatar-dropdown-2"> <mdui-icon slot="end-icon" name="logout"></mdui-icon>
+                        <span slot="end-text">登出Phira账户</span></mdui-menu-item>
+                </mdui-menu>
+            </mdui-dropdown>
+            <h4 style="display:inline;" id="avatar-name">未登录</h4>
+        </div>
+
+
+    </mdui-top-app-bar>
+    <mdui-navigation-drawer modal close-on-esc id="navigation-drawer" close-on-overlay-click style="top: 64px;">
+        <div class="navigation-drawer-blur"></div>
+        <mdui-list>
+            <mdui-collapse accordion id="phira-drawer" class="collapse-rail hide">
+                <mdui-collapse-item>
+                    <mdui-list-item rounded slot="header" icon="class">分区<mdui-icon slot="end-icon"
+                            class="arrow" name="expand_more"></mdui-icon></mdui-list-item>
+                    <div style="margin-left: 2.5em;">
+                        <mdui-list-item rounded id="class-chart-1">已上架</mdui-list-item>
+                        <mdui-list-item rounded id="class-chart-2">未上架</mdui-list-item>
+                        <mdui-list-item rounded id="class-chart-3">特殊</mdui-list-item>
+                    </div>
+
+                </mdui-collapse-item>
+            </mdui-collapse>
+            <div id="rec-drawer" class="collapse-rail hide">
+                <mdui-list-item rounded nonclickable class="dev-text">
+                    <span>
+                        正在开发
+                    </span>
+
+                </mdui-list-item>
+            </div>
+            <mdui-collapse accordion id="loc-drawer" class="collapse-rail">
+                <mdui-list-item rounded id="loc-drawer-1" icon="clear">清除所有加载的铺面</mdui-list-item>
+                <mdui-list-item rounded id="loc-drawer-1" icon="folder">查看当前已加载的文件</mdui-list-item>
+            </mdui-collapse>
+        </mdui-list>
+    </mdui-navigation-drawer>
+    <mdui-navigation-rail  value="loc" id="navigation-rail">
+        <div class="navigation-rail-blur"></div>
+        <mdui-button-icon icon="menu" slot="top" id="top-app-bar-menu"></mdui-button-icon>
+        <mdui-button-icon icon="bug_report" slot="bottom"  id="debug-btn"></mdui-button-icon>
+        <mdui-button-icon icon="settings" slot="bottom"></mdui-button-icon>
+
+
+        <mdui-navigation-rail-item icon="cloud" class="black-font"
+            value="phira"><span>Phira</span></mdui-navigation-rail-item>
+        <mdui-navigation-rail-item icon="videocam" class="black-font"
+            value="rec"><span>录制</span></mdui-navigation-rail-item>
+        <mdui-navigation-rail-item icon="insert_drive_file" value="loc"
+            class="black-font"><span>本地</span></mdui-navigation-rail-item>
+    </mdui-navigation-rail>
+    <div id="app" class="left-all"></div>
+    <span class="info" id="info">{{VES}}</span>
+    <script type="module">
+        import { dialog, alert } from "mdui"
+        import { snackbar } from 'mdui/functions/snackbar.js';
+        import Cookies from 'js-cookie'
+        (() => {
+            try {
+                new SharedArrayBuffer(4)
+                return
+            } catch {
+                if (self.__TAURI__ != undefined) {
+                    return
                 }
-            };
-
-            function getSearchString(name)
-            {
-                let searchString = window.location.search.substring(1, window.location.search.length);
-                let searchStrings = searchString.split('&');
-
-                if (!name || name == '') return null;
-                if (searchStrings.length <= 0) return null;
-
-                for (const singleString of searchStrings)
-                {
-                    if (singleString.indexOf(name + '=') >= 0)
-                    {
-                        let stringValue = singleString.replace(name + '=', '');
-                        return decodeURIComponent(stringValue);
-                    }
+                if (!Cookies.get("isreload") == 1) {
+                    snackbar({
+                        message: "检测到当前无法使用多线程功能，将在10秒后自动刷新页面，你也可以手动刷新页面，如果刷新后仍然出现此提升请反馈这个问题。"
+                    })
+                    setTimeout(() => {
+                        Cookies.set("isreload", "1")
+                        location.reload()
+                    }, 10000)
+                } else {
+                    snackbar({
+                        message: "仍然无法使用多线程功能，将关闭多线程功能"
+                    })
                 }
 
-                return null;
+
             }
-
-            if (getSearchString('debug') === 'true')
-            {
-                let xhr = new XMLHttpRequest();
-
-                xhr.onreadystatechange = () =>
-                {
-                    if (xhr.readyState === 4 && xhr.status === 200)
-                    {
-                        eval(xhr.responseText);
-                        window.vConsole = new window.VConsole();
-
-                        console.warn(
-                            'You\'re using debug mode, which will enable vConsole for mobile device debuging.\n' +
-                            'You SHOULDN\'T use debug mode in normal use, and don\'t run ANY code here from people that you don\'t know.'
-                        );
-                        console.warn(
-                            '你正在使用 debug 模式，该模式将启用 vConsole 以方便在移动设备上进行调试。\n' +
-                            '你【不应该】在正常使用中启用 debug 模式，并不要在这里运行【任何】来自你不认识的人的代码。'
-                        );
-                    }
-                }
-
-                xhr.open('GET', 'https://cdn.bootcdn.net/ajax/libs/vConsole/3.15.0/vconsole.min.js');
-                xhr.send();
-            }
-        </script>
-    </head>
-    <body>
-        <div class="file-select">
+        })()
+    </script>
+    <div id="phira-main" class="left-all hide">
+        <img class="phira-logo" src="/assets/phira.png">
+        <div class="phira-c">
+            <h1 class="phira-text">Phira</h1>
             <div>
-                <b>For iOS users:</b><br>
-                Please use Quark Browser for better experience (not ad) .
-            </div>
-            <hr />
-            <div>
-                Due to some performance issue on FireFox Android, consider using <a href="https://github.com/kiwibrowser/src.next/releases" target="_blank">Kiwi Browser</a> or <a href="https://viayoo.com/" target="_blank">Via</a> or <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a>.
-            </div>
-            <hr />
-            <a href="https://t.bilibili.com/820800655803285656" target="_blank">致中国大陆用户的公告</a>
-            <hr />
-            <div class="loading" id="loading-status">Loading scripts...</div>
-            <hr />
-            <div class="tab">
-                <div class="bar">
-                    <div data-tab-id="file" class="active">File</div>
-                    <div data-tab-id="visual">Visual</div>
-                    <div data-tab-id="sound">Sound</div>
-                    <div data-tab-id="other">Other</div>
-                    <div data-tab-id="phizone">PhiZone</div>
-                </div>
-                <div class="content">
-                    <div id="tab-file">
-                        <label>Select chart file(s): <input type="file" id="file-chart-pack" multiple disabled></label><br>
-                        <div class="loading" id="file-read-progress">Please wait until assets loaded...</div>
-                        <hr />
-                        <label>Chart: <select id="file-chart"></select></label><br>
-                        <label>Music: <select id="file-music"></select></label><br>
-                        <label>BG: <select id="file-bg"></select></label>
-                        <hr />
-                        <label><input type="checkbox" id="settings-shader-editor" checked />Shader Editor</label><br>
-                    </div>
-                    <div id="tab-visual">
-                        <label>Custom skin pack: <input type="file" id="file-skin-pack" disabled /></label>&nbsp;<a href="./skin.example.zip" download="skin.example.zip">Download example skin pack</a><br>
-                        <div class="loading" id="loading-skin-pack">No skinpack selected.</div>
-                        <hr />
-                        <label><input type="checkbox" id="settings-show-bg" checked />Show BG</label><br>
-                        <label><input type="checkbox" id="settings-multi-note-hl" checked />Highlight same time notes</label><br>
-                        <label><input type="checkbox" id="settings-show-ap-status" checked />Show AP status</label><br>
-                        <label><input type="checkbox" id="settings-show-input-point" checked />Show input point</label><br>
-                        <label><input type="checkbox" id="settings-anti-alias" checked />Anti-alias</label><br>
-                        <label><input type="checkbox" id="settings-low-resolution" />Low resolution mode</label><br>
-                        <label><input type="checkbox" id="settings-prpr-extra" checked />Use prpr's extra.json (experimental)</label>
-                        <hr />
-                        <label>BG quality: <select id="settings-bg-quality">
-                            <option value="0">Low (480P)</option>
-                            <option value="1" default selected>Medium (720P)</option>
-                            <option value="2">High (1080P)</option>
-                            <option value="3">Original</option>
-                        </select></label>
-                        <hr />
-                        <label>Note scale: <input type="range" id="settings-note-scale" min="0" max="4000" value="2000"></label><br>
-                        <label>Background dim: <input type="range" id="settings-bg-dim" min="0" max="1" step="0.01" value="0.5"></label><br>
-                        <label>BG blur: <input type="range" id="settings-bg-blur" min="0" max="100" value="50" /></label>
-                    </div>
-                    <div id="tab-sound">
-                        <label>Chart offset: <input type="number" id="settings-audio-offset" placeholder="0" style="width:4em" />ms</label><br>
-                        <div style="margin-left:20px">(recommended 100ms for Chrome/Chrome based browsers)</div>
-                        <button id="settings-test-input-delay">Tap on this button to test input delay...</button><br>
-                        <label><input type="checkbox" id="settings-use-browser-latency" />Use browser's output latency (experimental)</label><br>
-                        <label>Speed: <input type="range" id="settings-audio-speed" min="0.25" max="1.75" step="0.25" value="1"></label><br>
-                        <hr />
-                        <label><input type="checkbox" id="settings-hitsound" checked />Hitsound</label><br>
-                        <label>Hitsound volume: <input type="range" id="settings-hitsound-volume" min="0" max="1" step="0.01" value="1"></label><br>
-                    </div>
-                    <div id="tab-other">
-                        <label><input type="checkbox" id="settings-challenge-mode" />Challenge Mode</label><br>
-                        <label><input type="checkbox" id="settings-plyndb" />Play like you never did before</label><br>
-                        <label><input type="checkbox" id="settings-autoplay" />AutoPlay</label><br>
-                        <label><input type="checkbox" id="settings-debug" />Debug</label><br>
-                    </div>
-                    <div id="tab-phizone">
-                        <label>Paste chart link/ID from <a href="https://www.phi.zone/" target="_href">PhiZone</a> here: <input id="phizone-chart-link" /></label>
-                        <button id="phizone-download-chart">Download</button>
-                        <hr />
-                        <div class="loading" id="phizone-download-progress">No download task</div>
-                    </div>
-                </div>
-            </div>
-            <hr />
-            <button id="start" disabled>Start</button>
-            <hr />
-            Current version: <%= GIT_VERSION %><br>
-            GitHub homepage: <a href="https://github.com/MisaLiu/phi-chart-render" target="_blank">https://github.com/MisaLiu/phi-chart-render</a><br>
-            Report bugs <a href="https://github.com/MisaLiu/phi-chart-render/issues/new/choose" target="_blank">Here</a>
-            <hr />
-            Consider <a href="https://patreon.com/HIMlaoS_Misa" target="_blank">support me on Patreon</a> if you like!<br />
-            喜欢的话可以到 <a href="https://afdian.net/a/MisaLiu" target="_blank">爱发电</a> 支持一下！
-            <hr />
-            We uses <a href="https://sentry.io" target="_blank">Sentry.io</a> and <a href="https://analytics.google.com/" target="_blank">Google Analytics</a> to tracking errors and analyze user usage data.
-
-            <button onclick="fullscreen.toggle(document.body, false)" class="fullscreen" id="fullscreen">Fullscreen</button>
-        </div>
-
-        <div class="debug-value"></div>
-        
-        <div class="play-result">
-            <div class="bg-shadow-cover top"></div>
-            <div class="bg-shadow-cover"></div>
-
-            <div class="song-info">
-                <div class="title">Song name</div>
-                <div class="subtitle artist">Artist</div>
-                <div class="subtitle diff">SP Lv.?</div>
-            </div>
-
-            <div class="judge-icon">S</div>
-            <div class="extra-info">FULL COMBO</div>
-            
-            <div class="info-bar score">
-                <div class="score">1000000</div>
-                <div class="acc">Accuracy 100.00%</div>
-            </div>
-
-            <div class="info-bar acc-bar">
-                <div class="judge-histogram">
-                    <div class="center"></div>
-                </div>
-            </div>
-
-            <div class="info-bar detail">
-                <div class="detail">
-                    <div class="detail-single">
-                        <div class="type">Perfect</div>
-                        <div class="value perfect">100</div>
-                    </div>
-                    <div class="detail-single">
-                        <div class="type">Good</div>
-                        <div class="value good">0</div>
-                    </div>
-                    <div class="detail-single">
-                        <div class="type">Bad</div>
-                        <div class="value bad">0</div>
-                    </div>
-                    <div class="detail-single">
-                        <div class="type">Miss</div>
-                        <div class="value miss">0</div>
-                    </div>
-                </div>
-                <div class="max-combo">Max Combo 100</div>
-            </div>
-
-            <div class="actions">
-                <button onclick="history.go(0)">Refresh</button>
-                <button class="big highlight" onclick="restartGame()">Restart</button>
-                <button class="big highlight" onclick="exitGame()">Exit</button>
+                <mdui-chip elevated class="phira-link" target="_blank" href="https://phira.moe/">官网</mdui-chip>
+                <mdui-chip elevated class="phira-link-github" target="_blank"
+                    href="https://github.com/TeamFlos/phira">Github
+                    <svg style="margin: 0;fill: var(--color);" slot="icon" height="24" aria-hidden="true"
+                        viewBox="0 0 24 24" version="1.1" width="32" data-view-component="true" class="phira-github">
+                        <path
+                            d="M12.5.75C6.146.75 1 5.896 1 12.25c0 5.089 3.292 9.387 7.863 10.91.575.101.79-.244.79-.546 0-.273-.014-1.178-.014-2.142-2.889.532-3.636-.704-3.866-1.35-.13-.331-.69-1.352-1.18-1.625-.402-.216-.977-.748-.014-.762.906-.014 1.553.834 1.769 1.179 1.035 1.74 2.688 1.25 3.349.948.1-.747.402-1.25.733-1.538-2.559-.287-5.232-1.279-5.232-5.678 0-1.25.445-2.285 1.178-3.09-.115-.288-.517-1.467.115-3.048 0 0 .963-.302 3.163 1.179.92-.259 1.897-.388 2.875-.388.977 0 1.955.13 2.875.388 2.2-1.495 3.162-1.179 3.162-1.179.633 1.581.23 2.76.115 3.048.733.805 1.179 1.825 1.179 3.09 0 4.413-2.688 5.39-5.247 5.678.417.36.776 1.05.776 2.128 0 1.538-.014 2.774-.014 3.162 0 .302.216.662.79.547C20.709 21.637 24 17.324 24 12.25 24 5.896 18.854.75 12.5.75Z">
+                        </path>
+                    </svg></mdui-chip>
             </div>
         </div>
+    </div>
+</body>
 
-        <div class="game-paused">
-            <div class="title">Game paused</div>
-            <div class="action">
-                <button onclick="fullscreen.toggle(document.body, false)">Fullscreen</button>
-                <button onclick="exitGame()">Exit</button>
-                <button onclick="restartGame()">Restart</button>
-                <button onclick="pauseGame()">Continue</button>
-            </div>
-        </div>
-
-        <div class="error-window">
-            <div>An error has just occurred, if you're sure this is not caused by you, please <a href="https://github.com/MisaLiu/phi-chart-render/issues/new/choose" target="_blank">report it on GitHub</a>. <!--a href="#" onclick="eruda.show();return false;">Show Eruda</a--><button class="close">Close</button></div>
-            <pre><code class="content">Test Text Not A Real Error</code></pre>
-            <div>The infomation about this error will upload to <a href="https://sentry.io" target="_blank">Sentry.io</a> for analyze and debug.</div>
-        </div>
-
-        <script type="module" src="/src/index.js"></script>
-    </body>
 </html>

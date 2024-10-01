@@ -1,0 +1,50 @@
+{
+    "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+    "build": {
+        "beforeBuildCommand": "pnpm run build",
+        "beforeDevCommand": "pnpm run dev",
+        "frontendDist": "../dist",
+        "devUrl": "http://localhost:1420/"
+    },
+    "bundle": {
+        "active": false,
+        "category": "DeveloperTool",
+        "copyright": "",
+        "targets": "all",
+        "externalBin": [],
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ],
+        "resources": []
+    },
+    "productName": "Phigros Simulator Plus",
+    "version": "0.0.3",
+    "identifier": "com.phisimplus.tauri",
+    "plugins": {
+    },
+    "app": {
+        "withGlobalTauri": true,
+        "windows": [
+            {
+                "title": "Phigros Simulator Plus+++++++++++++",
+                "width": 1280,
+                "height": 720,
+                "transparent": true,
+                "resizable": true,
+                "label": "main",
+                "url": "index.html"
+            }
+        ],
+        "security": {
+            "capabilities": ["main"],
+            "csp":null
+            
+        }
+
+    }
+
+}
