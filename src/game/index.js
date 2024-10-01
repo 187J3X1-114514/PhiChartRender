@@ -2,7 +2,7 @@ import * as verify from '@/verify';
 import Judgement from '@/judgement';
 import * as TickerFunc from './ticker';
 import * as CallbackFunc from './callback';
-import { Shader } from '@/main';
+import { Shader, Editor } from '@/main';
 import { Application, Container, Texture, Sprite, Graphics, Text, Rectangle, settings as PIXISettings } from 'pixi.js';
 
 PIXISettings.RENDER_OPTIONS.hello = true;
@@ -151,7 +151,8 @@ export default class Game
             challengeMode  : verify.bool(params.settings.challengeMode, false),
             autoPlay       : verify.bool(params.settings.autoPlay, false),
             debug          : verify.bool(params.settings.debug, false),
-            shader         : verify.bool(params.settings.shader, true)
+            shader: verify.bool(params.settings.shader, true),
+            shaderEditor: verify.bool(params.settings.shaderEditor, true)
         };
 
         this._watermarkText = verify.text(params.watermark, 'github/MisaLiu/phi-chart-render');
@@ -328,6 +329,8 @@ export default class Game
                 effect.shader = null;
             }
         });
+
+        this.editor = new Editor(this.chart.music, this.effects);
     }
 
     start()
@@ -384,7 +387,7 @@ export default class Game
 
         if (this._isPaused)
         {
-            this.chart.music.pause();
+            if (!this.music.isPaused) this.chart.music.pause();
             this._runCallback('pause');
         }
         else

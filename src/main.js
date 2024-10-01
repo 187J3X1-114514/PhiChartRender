@@ -4,3 +4,5 @@ export { default as Chart } from './chart';
 export { default as WAudio } from './audio';
 export { default as Effect } from './effect';
 export { default as Shader } from './effect/shader';
+
+export { default as Editor } from './effect/editor';

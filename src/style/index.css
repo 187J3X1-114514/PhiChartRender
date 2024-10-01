@@ -24,6 +24,13 @@ div.file-select {
     z-index: 10;
 }
 
+div.file-select a {
+    color: #EBCF0E;
+}
+
+div.file-select:visited a {
+    color: #ac970b;
+}
 .tab .bar {
     display: flex;
     position: relative;
@@ -460,7 +467,7 @@ div.error-window pre * {
     font-family: 'MiSans';
 }
 .font-loaded div.file-select a {
-    font-family: 'A-OTF Shin Go Pr6N H';
+    font-family: 'A-OTF Shin Go Pr6N H', 'MiSans';
     line-height: 20px;
 }
 

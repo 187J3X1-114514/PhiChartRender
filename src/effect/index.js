@@ -71,14 +71,3 @@ function valueCalculator(values, currentTime, defaultValue)
 
     return defaultValue;
 }
-
-// The thing that needs to be done:
-// 1. Calculate values in ./game/ticker (Now pre-calced)
-// 2. Integrate effects into the chart (./chart/index)
-// 3. Update uniforms in ./game/index
-// If there's anything left that's probably bugfixing.
-
-// Effects should act on Game rather than Chart since
-// the filter is loaded by Game and effected on Containers
-
-// I guess now it's all done

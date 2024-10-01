@@ -52,6 +52,8 @@ const doms = {
         bg: document.querySelector('select#file-bg')
     },
     settings: {
+        shaderEditor: document.querySelector('input#settings-shader-editor'),
+
         showBG: document.querySelector('input#settings-show-bg'),
         multiNoteHL: document.querySelector('input#settings-multi-note-hl'),
         showAPStatus: document.querySelector('input#settings-show-ap-status'),
@@ -100,6 +102,7 @@ const files = {
     images: {},
     infos: [],
     lines: [],
+    effects: [],
     shaders: {},
     all: {}
 };
@@ -361,7 +364,9 @@ doms.startBtn.addEventListener('click', async () => {
             challengeMode: doms.settings.challengeMode.checked,
             autoPlay: doms.settings.autoPlay.checked,
             debug: doms.settings.debug.checked,
-            shader: doms.settings.prprExtra.checked
+            shader: doms.settings.prprExtra.checked,
+
+            shaderEditor: doms.settings.shaderEditor.checked
         },
         watermark: 'github/MisaLiu/phi-chart-render ' + GIT_VERSION + (import.meta.env.MODE === 'development' ? ' [Develop Mode]' : '')
     });

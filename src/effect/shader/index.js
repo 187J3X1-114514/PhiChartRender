@@ -6,6 +6,8 @@ const defaultValueReg = /uniform\s+(\w+)\s+(\w+);\s+\/\/\s+%([^%]+)%/g;
 export default class Shader extends Filter {
     constructor(_shaderText, name)
     {
+        this.shaderText = _shaderText;
+        
         const shaderText = "// " + _shaderText.replaceAll('uv', 'vTextureCoord').replaceAll('screenTexture', 'uSampler');
         const defaultValues = {};
         let uniforms = {

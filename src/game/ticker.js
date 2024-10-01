@@ -45,7 +45,7 @@ function calcTick()
         }
         case 1:
         {
-            let { chart, effects, judgement, functions, processors, sprites, render, _settings: settings } = this;
+            let { chart, effects, judgement, functions, processors, sprites, render, _settings: settings, editor } = this;
             let currentTime = chart.music.currentTime - (chart.offset + settings.offset);
 
             for (let i = 0, length = chart.bpmList.length; i < length; i++)
@@ -97,6 +97,8 @@ function calcTick()
             }
 
             sprites.progressBar.scale.x = chart.music.progress * sprites.progressBar.baseScaleX;
+
+            if (!isNaN(currentTime)) editor.tick(currentTime);
 
             break;
         }
