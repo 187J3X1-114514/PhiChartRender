@@ -1,4 +1,4 @@
-import { Button, Card, Select, MenuItem } from "mdui";
+import { Button, Card, Select, MenuItem, Switch } from "mdui";
 import { ResourceManger } from "../../core/resource";
 import { ResPack } from "../main";
 import { PlayS } from "../play/play";
@@ -25,6 +25,7 @@ export class LocalScreen extends BaseScreen {
         const ress = new ResourceManger()
         const fbtn = new Button()
         const sbtn = new Button()
+        const autoplay = new Switch()
         const c = new Card()
         c.variant = "filled"
         fbtn.innerText = "上传文件"
@@ -33,6 +34,7 @@ export class LocalScreen extends BaseScreen {
         c.append(s)
         c.append(fbtn)
         c.append(sbtn)
+        c.append(autoplay)
         fbtn.addEventListener("click", () => {
             openFilePicker(async (f) => {
                 await ress.loads(f);
@@ -50,7 +52,7 @@ export class LocalScreen extends BaseScreen {
         sbtn.addEventListener("click", async () => {
             let c = ress.charts[s.value as string]!
             let p = new PlayS(c, res, ress)
-            await p.load()
+            await p.load(autoplay.value=="on")
             p.start()
         })
         this.root.appendChild(c)

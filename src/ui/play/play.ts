@@ -4,6 +4,7 @@ import { ResourceManger, ResourcePack } from "../../core/resource";
 import { File } from "../../core/file";
 import { Application } from "pixi.js";
 import {  topAppBar,BACKGROUND } from "../main";
+import { GameParams } from "../../core/types/params";
 
 export class PlayS {
     private res: ResourceManger
@@ -25,7 +26,7 @@ export class PlayS {
     setOnEnd(f: () => void) {
         this.end = f
     }
-    async load() {
+    async load(autoPlay:boolean=false) {
         if (this.chart == undefined) {
             for (let f of this.file) {
                 if (f.extension.toLowerCase() == "zip") {
@@ -61,7 +62,7 @@ export class PlayS {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: false, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1
+                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1
             }
         })
         let r = new ResizeObserver(() => { this.game!.resize(true) })
