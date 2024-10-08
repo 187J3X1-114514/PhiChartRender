@@ -106,7 +106,7 @@ AUTOPLAY模式游玩
 3. `pnpm run build`
 
 ### 在线使用
-网址 [Cloudflare](https://phichartrender.pages.dev) 或 [Github Pages](https://187j3x1-114514.github.io/PhiChartRender/)
+网址 [Cloudflare](https://phichartrender.pages.dev) 或 [Netlify](https://phisimplus.netlify.app/)
 ### 其它
 现在我并不想 ~~*(懒得做)*~~ 给这个模拟器的UI再进行完善，所以你可以通过在网址后面加上一个`?`，例如`187j3x1-114514.github.io/PhiChartRender/?`，这样就可以进入在线浏览Phira铺面的界面，不加`?`则会进入从本地上传铺面的界面。
 
