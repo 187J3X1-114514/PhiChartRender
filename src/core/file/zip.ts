@@ -4,7 +4,7 @@ import { newLogger } from '../log'
 import { mimeTypes } from './minetype';
 import { join, NFile } from './utils';
 import {Archive as LibArchive} from 'libarchive.js';
-
+import JSZip from "jszip"
 LibArchive.init({
     workerUrl: 'assets/dep/worker-bundle.js'
 });
@@ -272,4 +272,33 @@ export async function loadZipUseLibarchivejs(name: string, file: Blob | ArrayBuf
     }
     log.info("加载压缩包文件 " + name + " 完成")
     return new Archive(o, name)
+}
+
+
+export async function loadZipUseJSZip(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
+    return new Promise<Archive>(async(r)=>{
+        log.info("加载压缩包文件 " + name + " 中...");
+        const archive = await JSZip.loadAsync(file)
+        const obj:any = {};
+        for (let key of Object.keys(archive.files)){
+            if (!archive.files[key].dir){
+                obj[archive.files[key].name] = await archive.files[key].async("arraybuffer")
+            }
+
+        }
+        const files: { "name": string, "file": File }[] = []
+    
+        for (let key of Object.keys(obj)){
+            files.push({ "name": key, "file": new File(new Blob([obj[key]]),key) })
+        }
+        let o = []
+        for (let file of files) {
+            const f = file.file
+            await f.getBlob()
+            o.push(f)
+        }
+        log.info("加载压缩包文件 " + name + " 完成")
+        r(new Archive(o, name))
+    })
+
 }

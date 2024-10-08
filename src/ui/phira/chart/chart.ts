@@ -31,7 +31,7 @@ export class ChartPage {
     private page: number = 1
     private type: number = 2
     private load: LinearProgress = (undefined as unknown) as any
-    private div: HTMLDivElement = (undefined as unknown) as any
+    public root: HTMLDivElement = (undefined as unknown) as any
     private constructor() {
 
     }
@@ -45,16 +45,14 @@ export class ChartPage {
         const resizeObserver = new ResizeObserver((_entries) => {
             this.resize()
         })
-        resizeObserver.observe(this.div);
+        resizeObserver.observe(this.root);
         window.addEventListener("resize", () => this.resize())
-        this.cards.classList.add("push-in")
         this.cards.classList.add("active")
-        this.div.classList.add("fadeIn")
-        this.div.classList.add("fadeIn-s")
-        this.div.classList.remove("fadeIn-s")
+        this.root.classList.add("fadeIn")
+        this.root.classList.add("fadeIn-s")
+        this.root.classList.remove("fadeIn-s")
 
         this.searchDiv = document.createElement("div")
-        this.searchDiv.classList.add("push-in")
         this.select1 = new Select()
         this.select2 = new Select()
         this.select1.label = "排列顺序"
@@ -95,9 +93,9 @@ export class ChartPage {
         this.load = new LinearProgress()
         this.load.classList.add("search-load")
         this.load.classList.add("hide")
-        this.div.append(this.searchDiv)
+        this.root.append(this.searchDiv)
         document.body.append(this.load)
-        this.div.append(this.cards)
+        this.root.append(this.cards)
         classChart2.classList.add("list-item-active")
         this.searchBtn.addEventListener("click", async () => {
             this.searchBtn.disabled = true
@@ -134,12 +132,6 @@ export class ChartPage {
             navigationDrawer.open = false
             this.searchChart()
         })
-        setTimeout(() => {
-        }, 200)
-        setTimeout(() => {
-            this.searchDiv!.classList.remove("push-in")
-
-        }, 1000)
 
     }
     private resize() {
@@ -147,17 +139,16 @@ export class ChartPage {
         this.width = Math.min(Math.max((Math.floor(this.cards!.clientWidth * ratio / 270) > 0 ? Math.floor(this.cards!.clientWidth * ratio / 270) : Math.ceil(this.cards!.clientWidth * ratio / 270)), 1), 5)
         this.cards!.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`
     }
-    static async create(api: PhiraAPI, el: HTMLElement) {
+    static create(api: PhiraAPI, el: HTMLElement) {
         let pel = document.createElement("div")
         el.appendChild(pel)
         let chartPage = new this()
         chartPage.api = api
-        chartPage.div = pel
+        chartPage.root = pel
         chartPage.afterCreate()
         chartPage.cards!.style.display = 'grid'
         chartPage.cards!.style.gap = '20px'
         chartPage.cards!.style.margin = '10px'
-        await chartPage.searchChart()
         return chartPage
     }
     async genChartCard(data: PhiraAPIChartInfo) {
@@ -243,10 +234,10 @@ export class ChartPage {
         this.resize()
         rootCard.addEventListener("click", () => {
             setTimeout(() => {
-                this.div!.classList.add("push-out")
+                this.root!.classList.add("push-out")
                 setTimeout(() => {
-                    this.div.classList.add("hide")
-                    this.div!.classList.remove("push-out")
+                    this.root.classList.add("hide")
+                    this.root!.classList.remove("push-out")
                 }, 650)
                 this.playChart(data)
             }, 150)
@@ -288,9 +279,11 @@ export class ChartPage {
         this.load.classList.remove("hide")
         var r
         const f = async () => {
+            const srcUrl = data.file.replace("https://api.phira.cn/files/", PHIRA_API_BASE_URL_NO_CORS2);
+            const url = (PHIRA_API_CORS + data.file).replace("https://api.phira.cn/files/", PHIRA_API_BASE_URL_NO_CORS2);
             try {
                 r = await fetch(
-                    (PHIRA_API_CORS + data.file).replace("https://api.phira.cn/files/", PHIRA_API_BASE_URL_NO_CORS2),
+                    url,
                     { method: "GET", headers: { 'Authorization': 'Bearer ' + account!.userToken } }
                 )
                 return
@@ -304,13 +297,25 @@ export class ChartPage {
                                 text: "返回",
                                 onClick: () => {
                                     this.load.classList.add("hide")
-                                    this.div!.classList.add("push-in")
-                                    this.div.classList.remove("hide")
+                                    this.root!.classList.add("push-in")
+                                    setTimeout(() => {
+                                        this.root!.classList.remove("push-in")
+                                    }, 800)
+                                    this.root.classList.remove("hide")
                                 }
                             },
                             {
                                 text: "重试",
                                 onClick: async () => { await f() },
+                            },
+                            {
+                                text: "手动下载",
+                                onClick: async () => {
+                                    const link = document.createElement('a');
+                                    link.href = srcUrl;
+                                    link.download = "phira-"+data.name+"-"+data.id+".zip";
+                                    link.target = "_blank";
+                                    link.click(); },
                             }
                         ]
                     }
@@ -326,10 +331,10 @@ export class ChartPage {
         let c = new PlayS(new File(await r!.blob(), generateRandomString(32) + ".zip"), ResPack)
         c.setOnEnd(() => {
             setTimeout(() => {
-                this.div!.classList.add("push-in")
-                this.div.classList.remove("hide")
+                this.root!.classList.add("push-in")
+                this.root.classList.remove("hide")
                 setTimeout(() => {
-                    this.div!.classList.remove("push-in")
+                    this.root!.classList.remove("push-in")
                 }, 800)
             }, 650)
         })
@@ -339,7 +344,7 @@ export class ChartPage {
     }
 
     remove(){
-        this.div.remove()
+        this.root.remove()
         this.load.remove()
     }
 

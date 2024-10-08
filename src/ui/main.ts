@@ -95,9 +95,8 @@ export const tabRec = document.getElementById("tab-rec")! as NavigationRailItem
 export const tabLocal = document.getElementById("tab-local")! as NavigationRailItem
 uModeBtn()
 
-let a = await fetch("assets/pack/resource")
 let zip: Zip
-zip = await loadZip("resource.7z", await a.blob())
+zip = await loadZip("resource.zip", await(await fetch("assets/pack/resource")).blob())
 export const ResPack = await ResourcePack.load(zip)
 
 for (let e of document.getElementsByClassName("arrow")) {
@@ -112,42 +111,100 @@ for (let e of document.getElementsByClassName("arrow")) {
 }
 export const BACKGROUND = await background.init()
 
-var cp:any = undefined;
+var cp: ChartPage | undefined = undefined;
 load.classList.add("hide")
-tabPhira.addEventListener("click",async()=>{
+tabPhira.addEventListener("click", async () => {
     if (cp != undefined) {
-        cp.remove()
-        cp = undefined
+        cp.root.classList.add("push-out-y")
+        setTimeout(async () => {
+            lScreen = new LocalScreen(app)
+            lScreen.create()
+            lScreen.root.classList.add("push-in-y")
+            lScreen.addToPage()
+            setTimeout(() => {
+                lScreen!.root.classList.remove("push-in-y")
+            }, 400)
+        }, 220)
+        setTimeout(() => {
+            cp!.remove()
+            cp = undefined
+        }, 270)
+    } else if (lScreen != undefined) {
+        lScreen.root.classList.add("push-out-y")
+        setTimeout(async () => {
+            if (account == undefined) await reqLogin()
+            let api = account!
+
+            cp = ChartPage.create(api, app)
+            cp.root.classList.add("push-in-y")
+            setTimeout(() => {
+                cp!.root.classList.remove("push-in-y")
+            }, 400)
+            await cp.searchChart()
+        }, 220)
+        setTimeout(() => {
+            lScreen!.root.remove()
+            lScreen!.destroy()
+            lScreen = undefined
+        }, 270)
+    } else {
+        while (true) {
+            if (app.firstChild == null) break
+            app.removeChild(app.firstChild!)
+        }
+        if (account == undefined) await reqLogin()
+        let api = account!
+        cp = ChartPage.create(api, app)
+        cp.root.classList.add("push-in-y")
+        setTimeout(() => {
+            cp!.root.classList.remove("push-in-y")
+        }, 400)
+        await cp.searchChart()
     }
-    if (lScreen != undefined) {
-        lScreen.destroy()
-        lScreen = undefined
-    }
-    while (true) {
-        if (app.firstChild == null) break
-        app.removeChild(app.firstChild!)
-    }
-    if (account == undefined) await reqLogin()
-    let api = account!
-    cp = await ChartPage.create(api, app)
 })
-var lScreen:any = undefined;
-tabLocal.addEventListener("click",async()=>{
+var lScreen: LocalScreen | undefined = undefined;
+tabLocal.addEventListener("click", async () => {
     if (cp != undefined) {
-        cp.remove()
-        cp = undefined
+        cp.root.classList.add("push-out-y")
+        setTimeout(async () => {
+            lScreen = new LocalScreen(app)
+            lScreen.create()
+            lScreen.root.classList.add("push-in-y")
+            lScreen.addToPage()
+            setTimeout(() => {
+                lScreen!.root.classList.remove("push-in-y")
+            }, 400)
+        }, 220)
+        setTimeout(() => {
+            cp!.remove()
+            cp = undefined
+        }, 270)
+    } else if (lScreen != undefined) {
+        lScreen.root.classList.add("push-out-y")
+        setTimeout(async () => {
+            if (account == undefined) await reqLogin()
+            let api = account!
+
+            cp = ChartPage.create(api, app)
+            cp.root.classList.add("push-in-y")
+            setTimeout(() => {
+                cp!.root.classList.remove("push-in-y")
+            }, 400)
+            await cp.searchChart()
+        }, 220)
+        setTimeout(() => {
+            lScreen!.root.remove()
+            lScreen!.destroy()
+            lScreen = undefined
+        }, 270)
+    } else {
+        lScreen = new LocalScreen(app)
+        lScreen.create()
+        setTimeout(() => {
+            lScreen!.root.classList.remove("push-in-y")
+        }, 400)
+        lScreen.addToPage()
     }
-    if (lScreen != undefined) {
-        lScreen.destroy()
-        lScreen = undefined
-    }
-    while (true) {
-        if (app.firstChild == null) break
-        app.removeChild(app.firstChild!)
-    }
-    lScreen = new LocalScreen(app)
-    lScreen.create()
-    lScreen.addToPage()
 })
 tabLocal.click()
 function buildCPross() {
