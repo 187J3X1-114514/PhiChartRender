@@ -4,7 +4,7 @@ let v = '' + PACKAGE_JSON.version.split('v').pop()
 let nv = `V${v}-${GIT_HASH.slice(0, 7).toLocaleUpperCase()}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
 document.getElementById("info")!.innerText = nv
 
-import { Avatar, ButtonIcon, Dropdown, MenuItem, NavigationDrawer, getTheme, setTheme, CircularProgress, LinearProgress, NavigationRail, Collapse } from "mdui"
+import { Avatar, ButtonIcon, Dropdown, MenuItem, NavigationDrawer, getTheme, setTheme, CircularProgress, LinearProgress, NavigationRail, Collapse, NavigationRailItem } from "mdui"
 import loginPage from "./phira/login"
 import { PhiraAPI } from "../api/phira"
 import { Zip, loadZip } from "../core/file";
@@ -16,6 +16,9 @@ import { loadFont } from "../core/font";
 import { get_theme, main, MAINWINDOW_HWND, ON_TAURI, RUN_RS_FN } from "./tauri";
 import { openDebug } from "./debug/ui_pos";
 import { background } from "./background/background";
+import { LocalScreen } from "./screen/local";
+import { PhiraScreen } from "./screen/phira";
+import { ChartPage } from "./phira/chart/chart";
 
 await loadFont()
 const UI_HTML = `    
@@ -87,6 +90,9 @@ export const recDrawer = document.getElementById("rec-drawer")! as Collapse
 export const phiraDrawer = document.getElementById("phira-drawer")! as Collapse
 export const load = document.getElementById("load-stage")! as LinearProgress
 export const debugBtn = document.getElementById("debug-btn")! as ButtonIcon
+export const tabPhira = document.getElementById("tab-phira")! as NavigationRailItem
+export const tabRec = document.getElementById("tab-rec")! as NavigationRailItem
+export const tabLocal = document.getElementById("tab-local")! as NavigationRailItem
 uModeBtn()
 
 let a = await fetch("assets/pack/resource")
@@ -105,8 +111,45 @@ for (let e of document.getElementsByClassName("arrow")) {
     })
 }
 export const BACKGROUND = await background.init()
-BACKGROUND.render()
+
+var cp:any = undefined;
 load.classList.add("hide")
+tabPhira.addEventListener("click",async()=>{
+    if (cp != undefined) {
+        cp.remove()
+        cp = undefined
+    }
+    if (lScreen != undefined) {
+        lScreen.destroy()
+        lScreen = undefined
+    }
+    while (true) {
+        if (app.firstChild == null) break
+        app.removeChild(app.firstChild!)
+    }
+    if (account == undefined) await reqLogin()
+    let api = account!
+    cp = await ChartPage.create(api, app)
+})
+var lScreen:any = undefined;
+tabLocal.addEventListener("click",async()=>{
+    if (cp != undefined) {
+        cp.remove()
+        cp = undefined
+    }
+    if (lScreen != undefined) {
+        lScreen.destroy()
+        lScreen = undefined
+    }
+    while (true) {
+        if (app.firstChild == null) break
+        app.removeChild(app.firstChild!)
+    }
+    lScreen = new LocalScreen(app)
+    lScreen.create()
+    lScreen.addToPage()
+})
+tabLocal.click()
 function buildCPross() {
     let r = new CircularProgress()
     r.style.height = "65%"
@@ -132,7 +175,6 @@ modeBtn.addEventListener("click", async () => {
     if (m == "auto") m_ = "light"
     Cookies.set("mode", m_)
     await setThemeP(m_ as Theme)
-    console.log(m_)
     if (m_ != "auto") {
         (document.getElementsByClassName("phira-github")[0]! as HTMLElement).style.setProperty("--color", m_ == "light" ? "#000000" : "#FFFFFF")
     } else {
@@ -174,9 +216,12 @@ export async function reqLogin() {
         (document.getElementById("avatar-dropdown-2")! as MenuItem).disabled = false
         avatar.icon = undefined;
         let load = buildCPross()
+        while (true) {
+            if (avatar.firstChild == null) break
+            avatar.removeChild(avatar.firstChild!)
+        }
         avatar.appendChild(load)
         loginR.api!.getAvatar().then((s) => {
-
             if (s != "") {
                 avatar.src = s
             }

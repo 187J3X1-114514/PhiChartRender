@@ -15,10 +15,10 @@ export class ShaderToy {
     public mCode!: string;
     mTf: number = 0;
     mMouseIsDown: boolean = false;
-    mMouseOriX: number = 0;
-    mMouseOriY: number = 0;
-    mMousePosX: number = 0;
-    mMousePosY: number = 0;
+    public mMouseOriX: number = 0;
+    public mMouseOriY: number = 0;
+    public mMousePosX: number = 0;
+    public mMousePosY: number = 0;
     constructor(element: HTMLCanvasElement) {
         this.mAudioContext = new AudioContext();
         this.mCreated = false;

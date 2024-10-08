@@ -30,29 +30,39 @@ export class PhiraAPI {
             let st = performance.now()
             let r: { [key: string]: any } = {}
             let loginJson
-            let fetchResult
+            let fetchResult: any
             let fetchJSON
             let meJson
             let checkT = setInterval(() => {
-                if (performance.now() - st >= 20 * 1000) {
-                    r["api"] = undefined
-                    r["status"] = -1
-                    r["error"] = "登录超时"
-                    r["ok"] = false
-                    clearInterval(checkT)
-                    r__(r as loginResult)
-                }
+                clearInterval(checkT)
+                //if (performance.now() - st >= 40 * 1000) {
+                //    r["api"] = undefined
+                //    r["status"] = -1
+                //    r["error"] = "登录超时"
+                //    r["ok"] = false
+                //    clearInterval(checkT)
+                //    r__(r as loginResult)
+                //}
             }, 100)
-            fetchResult = await fetch(API_URL.PHIRA_API_URL_LOGIN, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email, password: password
+            try {
+                fetchResult = await fetch(API_URL.PHIRA_API_URL_LOGIN, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email, password: password
+                    })
                 })
-            })
-            fetchJSON = await fetchResult.json()
+                fetchJSON = await fetchResult.json()
+            } catch (e) {
+                r["api"] = undefined
+                r["status"] = fetchResult.status
+                r["error"] = e
+                r["ok"] = false
+                return r as loginResult
+            }
+
             if (!fetchResult.ok) {
                 r["api"] = undefined
                 r["status"] = fetchResult.status
@@ -61,14 +71,23 @@ export class PhiraAPI {
                 return r as loginResult
             }
             loginJson = fetchJSON
-            fetchResult = await fetch(API_URL.PHIRA_API_URL_ME, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + loginJson["token"]
-                }
-            })
-            fetchJSON = await fetchResult.json()
+            try {
+                fetchResult = await fetch(API_URL.PHIRA_API_URL_ME, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + loginJson["token"]
+                    }
+                })
+                fetchJSON = await fetchResult.json()
+            } catch (e) {
+                r["api"] = undefined
+                r["status"] = fetchResult.status
+                r["error"] = e
+                r["ok"] = false
+                return r as loginResult
+            }
+
             if (!fetchResult.ok) {
                 r["api"] = undefined
                 r["status"] = fetchResult.status
@@ -106,7 +125,7 @@ export class PhiraAPI {
                         };
                     }))
                 })
-                .catch(()=>{
+                .catch(() => {
                     r("")
                 });
 

@@ -338,6 +338,11 @@ export class ChartPage {
         c.start()
     }
 
+    remove(){
+        this.div.remove()
+        this.load.remove()
+    }
+
 }
 function generateRandomString(length: number): string {
     try {

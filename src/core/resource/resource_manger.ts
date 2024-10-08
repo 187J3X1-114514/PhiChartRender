@@ -18,7 +18,7 @@ export class ResourceManger {
         this.srcFiles = {}
         this.charts = {}
     }
-    reset() {
+    destroy(){
         this.files = {}
         this.srcFiles = {}
         this.charts = {}
