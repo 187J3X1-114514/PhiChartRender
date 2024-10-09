@@ -5,9 +5,9 @@ import { mimeTypes } from './minetype';
 import { join, NFile } from './utils';
 import {Archive as LibArchive} from 'libarchive.js';
 import JSZip from "jszip"
-LibArchive.init({
-    workerUrl: 'assets/dep/worker-bundle.js'
-});
+//LibArchive.init({
+//    workerUrl: 'assets/dep/worker-bundle.js'
+//});
 
 
 const log = newLogger("Zip")
