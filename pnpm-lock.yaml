@@ -56,9 +56,6 @@ importers:
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
-      fontfaceobserver:
-        specifier: ^2.3.0
-        version: 2.3.0
       git-revision-vite-plugin:
         specifier: ^0.0.11
         version: 0.0.11
@@ -687,9 +684,6 @@ packages:
   file-extension@4.0.5:
     resolution: {integrity: sha512-l0rOL3aKkoi6ea7MNZe6OHgqYYpn48Qfflr8Pe9G9JPPTx5A+sfboK91ZufzIs59/lPqh351l0eb6iKU9J5oGg==}
     engines: {node: '>=4'}
-
-  fontfaceobserver@2.3.0:
-    resolution: {integrity: sha512-6FPvD/IVyT4ZlNe7Wcn5Fb/4ChigpucKYSvD6a+0iMoLn2inpo711eyIcKjmDtE5XNcgAkSH9uN/nfAeZzHEfg==}
 
   fp-ts@2.16.9:
     resolution: {integrity: sha512-+I2+FnVB+tVaxcYyQkHUq7ZdKScaBlX53A41mxQtpIccsfyv8PzdzP7fzp2AY832T4aoK6UZ5WRX/ebGd8uZuQ==}
@@ -1390,8 +1384,6 @@ snapshots:
       strip-final-newline: 2.0.0
 
   file-extension@4.0.5: {}
-
-  fontfaceobserver@2.3.0: {}
 
   fp-ts@2.16.9: {}
 
