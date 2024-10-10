@@ -37,7 +37,7 @@ canvas.game {
     opacity: 0.4;
     font-size: clamp(0.625rem, 0.625rem + 0.28vw, 0.813rem);
     /*color: rgb(25, 0, 255);*/
-    background: rgb(var(--color--s),var(--color--s),var(--color--s));
+    background: rgb(var(--color--s), var(--color--s), var(--color--s));
     user-select: none;
 }
 
@@ -667,6 +667,7 @@ mdui-navigation-drawer {
     z-index: 3 !important;
     box-shadow: 0 2.75px 9px 0 rgba(var(--mdui-color-shadow), 40%), 0 0.25px 3px 0 rgba(var(--mdui-color-shadow), 3.9%);
 }
+
 /*
 #top-app-bar.tauri {
    /* background-color: rgba(0, 0, 0, 0.1) !important;
@@ -720,6 +721,7 @@ mdui-navigation-drawer {
     align-items: center;
     display: flex;
 }
+
 .debug-ui-list-item {
     min-height: 3.5rem;
     padding: 0.5rem 1.5rem 0.5rem 1rem;
@@ -730,7 +732,7 @@ mdui-navigation-drawer {
     padding-left: 16px;
 }
 
-.debug-ui-list-item-text{
+.debug-ui-list-item-text {
     font-size: 15px;
 }
 
@@ -745,9 +747,11 @@ mdui-navigation-drawer {
     0% {
         transform: translateY(0);
     }
-    40%{
+
+    40% {
         opacity: 0;
     }
+
     100% {
         transform: translateY(0);
         opacity: 1;
@@ -766,12 +770,13 @@ mdui-navigation-drawer {
         transform: translateY(0px);
         opacity: 1;
     }
-    50%{
+
+    50% {
         opacity: 1;
     }
+
     100% {
         transform: translateY(700px);
         opacity: 0;
     }
 }
-

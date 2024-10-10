@@ -17,7 +17,6 @@ import { get_theme, main, MAINWINDOW_HWND, ON_TAURI, RUN_RS_FN } from "./tauri";
 import { openDebug } from "./debug/ui_pos";
 import { background } from "./background/background";
 import { LocalScreen } from "./screen/local";
-import { PhiraScreen } from "./screen/phira";
 import { ChartPage } from "./phira/chart/chart";
 
 await loadFont()
@@ -311,3 +310,35 @@ function uModeBtn() {
     if (m == "auto") m_ = "auto_mode"
     modeBtn.icon = m_
 }
+
+let classChart1 = document.getElementById("class-chart-1")!
+let classChart2 = document.getElementById("class-chart-2")!
+let classChart3 = document.getElementById("class-chart-3")!
+classChart2.classList.add("list-item-active")
+classChart1.addEventListener("click", () => {
+    classChart1.classList.add("list-item-active")
+    classChart2.classList.remove("list-item-active")
+    classChart3.classList.remove("list-item-active")
+    cp!.type = 0
+    cp!.page = 1
+    navigationDrawer.open = false
+    cp!.searchChart()
+})
+classChart2.addEventListener("click", () => {
+    classChart2.classList.add("list-item-active")
+    classChart1.classList.remove("list-item-active")
+    classChart3.classList.remove("list-item-active")
+    cp!.type = 2
+    cp!.page = 1
+    navigationDrawer.open = false
+    cp!.searchChart()
+})
+classChart3.addEventListener("click", () => {
+    classChart3.classList.add("list-item-active")
+    classChart1.classList.remove("list-item-active")
+    classChart2.classList.remove("list-item-active")
+    cp!.type = 1
+    cp!.page = 1
+    navigationDrawer.open = false
+    cp!.searchChart()
+})

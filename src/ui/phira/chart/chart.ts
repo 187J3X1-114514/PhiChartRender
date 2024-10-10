@@ -5,9 +5,6 @@ import { PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
 import { ResPack, account, navigationDrawer } from "../../main";
 import { PlayS } from "../../play/play";
 import { File } from "../../../core/file";
-let classChart1 = document.getElementById("class-chart-1")!
-let classChart2 = document.getElementById("class-chart-2")!
-let classChart3 = document.getElementById("class-chart-3")!
 const NONE_IMG = await (async () => {
     let c = document.createElement("canvas")
     let ctx = c.getContext("2d")!
@@ -28,8 +25,8 @@ export class ChartPage {
     private select2?: Select
     private searchDiv?: HTMLDivElement
     private searchBtn: Button = (undefined as unknown) as any
-    private page: number = 1
-    private type: number = 2
+    public page: number = 1
+    public type: number = 2
     private load: LinearProgress = (undefined as unknown) as any
     public root: HTMLDivElement = (undefined as unknown) as any
     private constructor() {
@@ -96,41 +93,13 @@ export class ChartPage {
         this.root.append(this.searchDiv)
         document.body.append(this.load)
         this.root.append(this.cards)
-        classChart2.classList.add("list-item-active")
         this.searchBtn.addEventListener("click", async () => {
             this.searchBtn.disabled = true
             this.searchBtn.loading = true
             await this.searchChart()
             this.searchBtn.disabled = false
             this.searchBtn.loading = false
-
-        })
-        classChart1.addEventListener("click", () => {
-            classChart1.classList.add("list-item-active")
-            classChart2.classList.remove("list-item-active")
-            classChart3.classList.remove("list-item-active")
-            this.type = 0
-            this.page = 1
-            navigationDrawer.open = false
-            this.searchChart()
-        })
-        classChart2.addEventListener("click", () => {
-            classChart2.classList.add("list-item-active")
-            classChart1.classList.remove("list-item-active")
-            classChart3.classList.remove("list-item-active")
-            this.type = 2
-            this.page = 1
-            navigationDrawer.open = false
-            this.searchChart()
-        })
-        classChart3.addEventListener("click", () => {
-            classChart3.classList.add("list-item-active")
-            classChart1.classList.remove("list-item-active")
-            classChart2.classList.remove("list-item-active")
-            this.type = 1
-            this.page = 1
-            navigationDrawer.open = false
-            this.searchChart()
+        
         })
 
     }
