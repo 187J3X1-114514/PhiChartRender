@@ -1,0 +1,4 @@
+[[redirects]]
+  from = "/phira-file/*"
+  to = "https://api.phira.cn/:splat"
+  status = 200

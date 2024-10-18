@@ -6,7 +6,7 @@
 
 拥有基于[MDUI](https://www.mdui.org/)的界面，对各种格式铺面更好的支持(RPE,prpr的extra.json)
 
-PS:这个模拟器只是因为我想在学校的希沃白板上玩Phigros的心愿 ~~(怨念)~~ 而诞生的，所以代码可能会有一些丑 ~~(答辩)~~。
+PS:这个模拟器只是因为我想在学校的希沃白板上玩Phigros的心愿 ~~(怨念)~~ 而诞生的，所以代码可能会有一些石。
 
 <div align="center">
 <h4>
@@ -77,6 +77,7 @@ AUTOPLAY模式游玩
         * [x] 视频 *(需要测试)*
 
 * 功能
+    * 新的铺面格式 *(26mb(rpe格式)->5.2mb)*
     * 录制铺面 *(马上就有了)*
     * prpr的铺面拓展编辑 *(在录制铺面完成后再做)*
 
@@ -137,6 +138,11 @@ AUTOPLAY模式游玩
 
 此项目中与Phira相关的api使用未经TeamFlos直接允许，若TeamFlos不允许此项目调用相关api接口可以通过issues联系我，我会立即删除有关代码。
 
+## TODO
+* 新的铺面格式
+* 录制铺面
+* prpr的铺面拓展编辑
+
 ## 其它
 
 这个模拟器其实2022年就有想法了，但是期间重构了许多次，最后还是选择[*phi-chart-render*](https://github.com/MisaLiu/phi-chart-render)这个项目，至于为什么做这个，主要因为在学校玩Phigros太麻烦了，希沃白板的Windows上的Phira不支持多指，但是安卓性能太低，lchzh3473的模拟器对RPE和PEC的铺面支持一言难尽，装安卓模拟器动静太大 *(而且我们学校的希沃白板I3-6100+4G内存能跑就有鬼了)*，最后还是选择自己做个 *(主要是闲)*，然后经过N年才做出了这个模拟器，终于可以在希沃上爽玩力
@@ -144,5 +150,7 @@ AUTOPLAY模式游玩
 对了，顺便感谢下某位名字叫YHL的同学，感谢他每次下学都会“帮”我关白板 *(You're dead,duge)*
 
 ~~*(还有那个我玩白板时骂我的年级办)*~~
+
+~~(九年级玩不了力)~~
 
 PS：这个模拟器一共用过的框架 fabric.js -> konva.js -> fabric.js -> 原生CanvasRenderer -> fabric.js -> pixi.js v7 -> 现在 pixi.js v8
