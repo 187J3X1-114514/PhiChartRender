@@ -3,7 +3,7 @@ import { File } from './file'
 import { newLogger } from '../log'
 import { mimeTypes } from './minetype';
 import { join, NFile } from './utils';
-import {Archive as LibArchive} from 'libarchive.js';
+import { Archive as LibArchive } from 'libarchive.js';
 import JSZip from "jszip"
 //LibArchive.init({
 //    workerUrl: 'assets/dep/worker-bundle.js'
@@ -27,17 +27,17 @@ export class _7zip {
     public lastRuningCode: number | undefined = undefined
     private ePath: string = "/7_zip_work/extract/"
     private aPath: string = "/7_zip_work/add/"
-    private exitCallback:()=>any = ()=>{}
+    private exitCallback: () => any = () => { }
     public FS = this.js7z.FS
     static async create() {
         var _n_7z = new this()
         let js7z_wasm = await fetch("/assets/dep/7zz.wasm")
-        if (!js7z_wasm.ok)js7z_wasm = await fetch("/assets/dep/7zz.wasm")
+        if (!js7z_wasm.ok) js7z_wasm = await fetch("/assets/dep/7zz.wasm")
         _n_7z.js7z = await (SevenZip as any)({
             print: (t: string) => { _n_7z._print(t) },
             printErr: (t: string) => { _n_7z._printErr(t) },
             wasmBinary: await js7z_wasm.arrayBuffer(),
-            quit:(t: number,_:any) => {_n_7z._onExit(t) }
+            quit: (t: number, _: any) => { _n_7z._onExit(t) }
         })
         _n_7z.FS = _n_7z.js7z.FS
         _n_7z.FS.mkdir("/7_zip_work")
@@ -79,14 +79,14 @@ export class _7zip {
     }
     async callMain(args: string[]) {
         this.outCache = ""
-        this.exitCallback = ()=>{}
+        this.exitCallback = () => { }
         this.isRuning = true
         return await new Promise((r) => {
-            this.exitCallback = ()=>{r(this.outCache)}
-            try{
+            this.exitCallback = () => { r(this.outCache) }
+            try {
                 this.js7z.callMain(args)
-            }catch {
-                log.error("似乎在运行7-zip时遇到了一些问题，命令行：",args.join(" "))
+            } catch {
+                log.error("似乎在运行7-zip时遇到了一些问题，命令行：", args.join(" "))
             }
         })
     }
@@ -102,11 +102,11 @@ export class _7zip {
         } else {
             u8array = src
         }
-        
+
         let path = join(this.ePath, e_path)
         this.FS.writeFile("/" + a_name, u8array)
         this.FS.mkdir(path)
-        await this.callMain(["e", "/" + a_name,"-o"+path])
+        await this.callMain(["e", "/" + a_name, "-o" + path])
         return {
             extractPath: path,
             archivePath: "/" + a_name
@@ -168,18 +168,18 @@ export class _7zip {
                 return l
         }
     }
-    readFile(name:string){
+    readFile(name: string) {
         let _s = this.FS.stat(name)
-        this.FS.chmod(name,777) // <-为什么Js上的FS要有权限系统啊啊啊啊啊啊
-        let s = this.FS.open(name,"r",_s.mode)
+        this.FS.chmod(name, 777) // <-为什么Js上的FS要有权限系统啊啊啊啊啊啊
+        let s = this.FS.open(name, "r", _s.mode)
         let temp = new Uint8Array(_s.size)
-        this.FS.read(s,temp,0,_s.size,0)
+        this.FS.read(s, temp, 0, _s.size, 0)
         let o = new Uint8Array(temp)
         temp = null as any
         this.FS.close(s)
         return o
     }
-    rmDir(path:string){
+    rmDir(path: string) {
         //this.FS.chmod(path,777)
         let t = this.fileType(path)
         let s
@@ -199,7 +199,17 @@ export class _7zip {
     }
 
 }
-export const _7ZIP = undefined as any
+export var isInit7zip = false
+export var _7ZIP = undefined as any
+
+export async function init7ZIP() {
+    
+    if (_7ZIP == undefined) {
+        log.info("初始化7-zip中")
+        _7ZIP = await _7zip.create()
+    }
+    isInit7zip = true
+}
 
 export class Archive {
     public files: Map<string, File> = new Map<string, File>()
@@ -216,6 +226,7 @@ export class Archive {
 }
 
 export async function loadZipUse7zWASM(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
+    await init7ZIP()
     log.info("加载压缩包文件 " + name + " 中...")
     const zip = await _7ZIP.load(file, name)
     const filel = await _7ZIP.get(zip.extractPath)!
@@ -230,38 +241,37 @@ export async function loadZipUse7zWASM(name: string, file: Blob | ArrayBuffer): 
         await f.getBlob()
         o.push(f)
     }
-    try{
+    try {
         _7ZIP.rmDir(zip.extractPath)
         _7ZIP.FS.unlink(zip.archivePath)
-    }catch{
+    } catch {
 
     }
-    
+
     log.info("加载压缩包文件 " + name + " 完成")
     return new Archive(o, name)
 }
 
-function toFile(name: string, file: Blob | ArrayBuffer){
+function toFile(name: string, file: Blob | ArrayBuffer) {
     let nfile
     if (file instanceof Blob) {
-        nfile = new NFile([file],name)
-    }else{
-        nfile = new NFile([new Blob([file])],name)
+        nfile = new NFile([file], name)
+    } else {
+        nfile = new NFile([new Blob([file])], name)
     }
     return nfile
-    
+
 }
 
 export async function loadZipUseLibarchivejs(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
     log.info("加载压缩包文件 " + name + " 中...")
-    const archive = await LibArchive.open(toFile(name,file))
+    const archive = await LibArchive.open(toFile(name, file))
     const obj = await archive.extractFiles();
-    console.log(obj)
     const files: { "name": string, "file": File }[] = []
 
-    for (let key of Object.keys(obj)){
-        if (obj[key] instanceof NFile){
-            files.push({ "name": key, "file": new File(new Blob([await obj[key].arrayBuffer()]),key) })
+    for (let key of Object.keys(obj)) {
+        if (obj[key] instanceof NFile) {
+            files.push({ "name": key, "file": new File(new Blob([await obj[key].arrayBuffer()]), key) })
         }
     }
     let o = []
@@ -276,20 +286,20 @@ export async function loadZipUseLibarchivejs(name: string, file: Blob | ArrayBuf
 
 
 export async function loadZipUseJSZip(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
-    return new Promise<Archive>(async(r)=>{
+    return new Promise<Archive>(async (r) => {
         log.info("加载压缩包文件 " + name + " 中...");
         const archive = await JSZip.loadAsync(file)
-        const obj:any = {};
-        for (let key of Object.keys(archive.files)){
-            if (!archive.files[key].dir){
+        const obj: any = {};
+        for (let key of Object.keys(archive.files)) {
+            if (!archive.files[key].dir) {
                 obj[archive.files[key].name] = await archive.files[key].async("arraybuffer")
             }
 
         }
         const files: { "name": string, "file": File }[] = []
-    
-        for (let key of Object.keys(obj)){
-            files.push({ "name": key, "file": new File(new Blob([obj[key]]),key) })
+
+        for (let key of Object.keys(obj)) {
+            files.push({ "name": key, "file": new File(new Blob([obj[key]]), key) })
         }
         let o = []
         for (let file of files) {

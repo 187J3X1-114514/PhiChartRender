@@ -167,7 +167,6 @@ export class ResourceManger {
     }
     async load(name: string, file: Blob | ArrayBuffer) {
         const zip = await loadZip(name, file)
-        console.log(zip)
         for (let f of zip.files) {
             let file = f[1]
             file.name = name + "/" + file.name
@@ -202,7 +201,6 @@ export class ResourceManger {
             }))
 
         }
-        console.log(this)
     }
     async getFilesByType(type: FileType) {
         let list = []

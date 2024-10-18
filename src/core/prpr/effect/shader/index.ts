@@ -66,7 +66,6 @@ export default class Shader {
                 uni = this.uniformsAll[name].value
             }
         }
-        console.log(this)
     }
     static from(shaderText: string, name: string, vars?: any) {
         return new Shader(shaderText, name, vars);

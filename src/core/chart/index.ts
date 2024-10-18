@@ -297,7 +297,7 @@ export default class Chart {
 }
 
 
-function arrangeLineEvents(events: any) {
+export function arrangeLineEvents(events: any) {
     let oldEvents = events.slice();
     let newEvents2 = [];
     let newEvents = [{ // 以 -99 开始
@@ -377,7 +377,7 @@ function arrangeLineEvents(events: any) {
 }
 
 
-function arrangeSingleValueLineEvents(events: any) {
+export function arrangeSingleValueLineEvents(events: any) {
     let oldEvents = events.slice();
     let newEvents = [oldEvents.shift()];
 

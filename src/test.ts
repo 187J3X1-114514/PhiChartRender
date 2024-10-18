@@ -1,4 +1,4 @@
-import 'mdui/mdui.css'
+/*import 'mdui/mdui.css'
 import { Button, Card, Select, MenuItem } from 'mdui';
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { ResourceManger } from './core/resource';
@@ -106,3 +106,105 @@ sbtn.addEventListener("click", async () => {
 })
 
 document.body.append(c)
+*/
+import 'mdui/mdui.css'
+import './styles.css'
+import 'mdui/components/icon.js';
+import { reqFullSc } from './ui';
+import './ui/main';
+import { buildAllJudgeLineData, buildColorValueEventData, buildEventLayerData, buildJudgeLineData, buildOtherEventData, buildStringValueEventData, ChartFile, readAllJudgeLineData, readEventLayerData, readJudgeLineData, readOtherEventData, readStringValueEventData } from './file/chart';
+import { ReadBufferDataView, WriteBufferDataView } from './file/data_view';
+document.documentElement.addEventListener("click", () => {
+    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
+})
+
+import { ResourceManger } from "./core/resource";
+import Chart from './core/chart';
+import { PlayS } from './ui/play/play';
+import { Application } from 'pixi.js';
+import Game from './core/game';
+import { topAppBar, BACKGROUND, ResPack } from './ui/main';
+
+const resM = new ResourceManger()
+await resM.load("test.zip", await (await fetch("test")).blob());
+console.log(resM)
+function download(buff: ArrayBuffer) {
+
+    let url = window.URL.createObjectURL(new Blob([buff], { type: "arraybuffer" }))
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = url;
+    link.setAttribute('download', 'out.phi.chart');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+}
+
+let chartBf = await ChartFile.from(resM.files[resM.charts["11938463.json"]!.chart] as Chart)
+download(chartBf)
+let chart = resM.charts["11938463.json"]!
+console.log(resM.files[resM.charts["11938463.json"]!.chart],await ChartFile.read(chartBf))
+
+
+await chart.blur(40)
+let game = new Game()
+let app = new Application()
+await app.init({
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
+    autoDensity: true,
+    antialias: true,
+    backgroundAlpha: 1,
+    preference: "webgpu",
+    hello: true,
+    resizeTo: document.documentElement,
+    resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : 1
+})
+await game.init({
+    app: app,
+    render: {
+        resizeTo: document.documentElement
+    },
+    chart: chart!,
+    assets: ResPack.Assets,
+    zipFiles: resM,
+    settings: {
+        autoPlay: true, shader: true, showInputPoint: false, showFPS: false, bgDim: 0.3
+    }
+})
+let r = new ResizeObserver(() => { game!.resize(true) })
+r.observe(app!.canvas)
+game.createSprites()
+
+topAppBar.style.display = "none"
+document.body.style.paddingTop = "0px"
+app!.canvas.classList.add("push-in")
+app!.canvas.classList.add("game")
+BACKGROUND.pause()
+setTimeout(() => {
+    game!.start()
+    app!.canvas.classList.remove("push-in")
+}, 620)
+
+/*
+let wb = new WriteBufferDataView()
+buildStringValueEventData(wb,{
+    startTime:-1110.564,
+    endTime:5456.554645,
+    value:"Now, the thoughts keep to linger on飞得更高风格士大夫电风扇😅😅😅"
+})
+buildStringValueEventData(wb,{
+    startTime:-1110.564,
+    endTime:5456.554645,
+    value:"Now, the thou飞得更高风格士大夫电风扇😅😅😅"
+})
+let cc = wb.build()
+let wb1 = new WriteBufferDataView()
+wb1.setArrayBuffer(cc)
+let rb = new ReadBufferDataView(new DataView(wb1.build()))
+let aaaa = rb.getArrayBuffer()
+let rb2 = new ReadBufferDataView(new DataView(aaaa.buffer))
+console.log(readStringValueEventData(rb2))
+console.log(readStringValueEventData(rb2))
+*/

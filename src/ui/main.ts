@@ -47,7 +47,6 @@ async function setThemeP(a: string) {
                 })
                 break
             case "auto":
-                console.log(await get_theme())
                 if (await get_theme() == 0) {
                     await RUN_RS_FN("set_theme", {
                         hwnd: MAINWINDOW_HWND,

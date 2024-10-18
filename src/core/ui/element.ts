@@ -265,7 +265,6 @@ export class UIElement {
                 case attachUI.ComboNumber:
                     this.x = size.width * this.settings.X
                     this.y = size.height * this.settings.Y
-                    console.log(this.x,this.y)
                     this.textStyle!.fontSize = size.baseFontSize * 1.1 * this.settings.scaleX + "px"
                     break
                 case attachUI.Combo:

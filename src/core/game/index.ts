@@ -262,7 +262,6 @@ export default class Game {
         if (!this.isFirst) { this.restart(); return }
         if (!this.render) return;
         if (!this.chart.music) throw new Error('You must have a music to play');
-        console.log(this)
         this.effects.cleanShader()
         this.renders.UIContainer.interactive = true
         this.renders.mainContainer.interactive = true

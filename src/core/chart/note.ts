@@ -3,6 +3,7 @@ import { Container, Sprite, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import WAudio from '../audio';
 import { PhiAssets, ResourceManger } from '../resource';
+import { jsonNoteData, NoteParam } from './types/note';
 
 
 export default class Note {
@@ -37,8 +38,10 @@ export default class Note {
     public baseScale: number = 1
     public judgelineX?: number
     public judgelineY?: number
-    public sprite: Sprite|Container;
-    constructor(params: any) {
+    public sprite: Sprite | Container;
+    public params: NoteParam
+    constructor(params: NoteParam) {
+        this.params = params
         this.id = verify.number(params.id, -1, 0);
         this.type = verify.number(params.type, 1, 1, 4);
         this.time = verify.number(params.time, -1); // Note 开始时间
@@ -59,11 +62,9 @@ export default class Note {
         this.useOfficialSpeed = verify.bool(params.useOfficialSpeed, false);
         this.texture = (params.texture && params.texture != '') ? params.texture : null;
         this.hitsound = (params.hitsound && params.hitsound != '') ? params.hitsound : null;
-        this.judgeline = params.judgeline;
+        this.judgeline = params.judgeline!;
 
         this.sprite = new Sprite();
-
-        if (!this.judgeline) throw new Error('Note must have a judgeline');
 
         this.reset();
     }
@@ -258,6 +259,61 @@ export default class Note {
                 }
             }
         }
+    }
+    exportToJson() {
+        return { ...this.params, holdTimeLength: 0, endPosition: 0, judgeline: this.judgeline.id } as jsonNoteData /*{
+            id: this.id,
+            type: this.type,
+            time: this.time,
+            holdTime: this.holdTime,
+            holdTimeLength: this.holdTimeLength,
+            speed: this.speed,
+            floorPosition: this.floorPosition,
+            holdLength: this.holdLength,
+            endPosition: this.endPosition,
+            positionX: this.positionX,
+            basicAlpha: this.basicAlpha,
+            visibleTime: this.visibleTime,
+            yOffset: this.yOffset,
+            xScale: this.xScale,
+            isAbove: this.isAbove,
+            isFake: this.isFake,
+            isMulti: this.isMulti,
+            useOfficialSpeed: this.useOfficialSpeed,
+            judgeline: this.judgeline.id,
+            texture: this.texture == null ? undefined : this.texture,
+            hitsound: typeof this.hitsound == "string" ? this.hitsound : undefined
+        } as jsonNoteData*/
+    }
+    static from(data: jsonNoteData) {
+        let note = new Note(data as any);
+        /*
+        note.id = data.id;
+        note.type = data.type;
+        note.time = data.time;
+        note.holdTime = data.holdTime;
+        note.holdTimeLength = data.holdTimeLength;
+        note.speed = data.speed;
+        note.floorPosition = data.floorPosition;
+        note.holdLength = data.holdLength;
+        note.endPosition = data.endPosition;
+        note.positionX = data.positionX;
+        note.basicAlpha = data.basicAlpha;
+        note.visibleTime = data.visibleTime;
+        note.yOffset = data.yOffset;
+        note.xScale = data.xScale;
+        note.isAbove = data.isAbove;
+        note.isFake = data.isFake;
+        note.isMulti = data.isMulti;
+        note.useOfficialSpeed = data.useOfficialSpeed;
+        note.judgeline = data.judgeline as any;
+        note.texture = data.texture as any; 
+        note.hitsound = typeof data.hitsound == "string" ? data.hitsound : null;*/
+        note.judgelineX = undefined
+        note.judgelineY = undefined
+        note.outScreen = undefined
+
+        return note
     }
 };
 

@@ -356,7 +356,6 @@ export async function openDebug() {
         uimanger.calcTime()
     })
     const resize = (w: number, h: number) => {
-        console.log(uimanger)
         //进度条
         let PBarW = w
         let PBarH = 12

@@ -7,6 +7,7 @@ import { floorPositionEvent, Event, valueEvent } from './baseEvents';
 import { PhiAssets, ResourceManger } from '../resource';
 import { SizerData } from '../types/params';
 import { chart_log } from './convert';
+import { jsonEventLayer, jsonJudgeLineData } from './types/judgeLine';
 const blackJudgeLine = (() => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
@@ -22,6 +23,7 @@ const blackJudgeLine = (() => {
 export default class Judgeline {
     id: number;
     texture: any;
+    textureName?: string;
     isText: boolean;
     parentLine: Judgeline;
     zIndex: number;
@@ -68,6 +70,7 @@ export default class Judgeline {
     constructor(params: any) {
         this.id = verify.number(params.id, -1, 0);
         this.texture = params.texture ? params.texture : null;
+        this.textureName = params.texture
         this.parentLine = params.parentLine || params.parentLine === 0 ? params.parentLine : null;
         this.zIndex = verify.number(params.zIndex, 0);
         this.isCover = verify.bool(params.isCover, true);
@@ -168,8 +171,7 @@ export default class Judgeline {
             this.eventLayers[0].speed.push({
                 startTime: 0,
                 endTime: 1e4,
-                start: 1,
-                end: 1
+                value: 1
             });
         }
 
@@ -266,12 +268,14 @@ export default class Judgeline {
     }
 
     createSprite(texture: PhiAssets, zipFiles: ResourceManger, rp = "") {
+        this.textureName = undefined
         if (!this.isText) {
+            this.textureName = this.texture
             let tex
             if (this.texture) {
                 tex = zipFiles.get(rp + "/" + this.texture) as Texture
                 if (tex) {
-                    
+
                 } else {
                     chart_log.warn(`ID为${this.id}的判定线的材质获取失败，名称 ${this.texture} 完整路径 ${rp + "/" + this.texture}`)
                     tex = texture.judgeLine
@@ -430,6 +434,52 @@ export default class Judgeline {
             (this.sprite as Sprite).texture = blackJudgeLine
             this.wasBlack = true
         }
+    }
+
+    exportToJson() {
+        let eventlayers: jsonEventLayer[] = []
+        for (let el of this.eventLayers) {
+            eventlayers.push(el.exportToJson())
+        }
+        let judgeLine: jsonJudgeLineData = {
+            id: this.id,
+            texture: this.textureName!,
+            isText: this.isText,
+            parentLine: this.parentLine != null ? this.parentLine.id : undefined!,
+            zIndex: this.zIndex,
+            isCover: this.isCover,
+            useOfficialScale: this.useOfficialScale,
+            text: this.text!,
+            eventLayers: eventlayers,
+            floorPositions: this.floorPositions,
+            extendEvent: this.extendEvent,
+            noteControls: this.noteControls,
+            attachUI: this.attachUI!
+        }
+        return judgeLine
+    }
+
+    static from(data: jsonJudgeLineData) {
+        let jl = new Judgeline({})
+        jl.id = data.id
+        jl.texture = data.texture
+        jl.isText = data.isText
+        jl.parentLine = data.parentLine as any
+        jl.zIndex = data.zIndex
+        jl.isCover = data.isCover
+        jl.useOfficialScale = data.useOfficialScale
+        jl.text = data.text
+        let evls = []
+        for (let d of data.eventLayers) {
+            evls.push(EventLayer.from(d))
+        }
+        jl.eventLayers = evls
+        jl.floorPositions = data.floorPositions
+        jl.extendEvent = data.extendEvent
+        jl.noteControls = data.noteControls
+        jl.attachUI = data.attachUI
+        jl.reset()
+        return jl
     }
 
 }

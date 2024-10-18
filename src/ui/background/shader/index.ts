@@ -38,7 +38,6 @@ export class Shader {
             },
             //sampler2DUniform: sampler2DUniform
         })
-        console.log(this.filter, this.uniformsAll, vars)
     }
     update(uniforms: { [key: string]: any[] | number | any }) {
         for (const name in uniforms) {

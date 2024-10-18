@@ -1,7 +1,8 @@
-import { Event, valueAndEvent } from "./baseEvents";
+import { Event, valueEvent } from "./baseEvents";
+import { jsonEventLayer } from "./types/judgeLine";
 
 export default class EventLayer {
-    public speed: valueAndEvent[] = []//{ startTime: number, endTime: number, start?: number, end?: number, value?: number }[] = [];
+    public speed: valueEvent[] = []//{ startTime: number, endTime: number, start?: number, end?: number, value?: number }[] = [];
     public moveX: Event[] = [];
     public moveY: Event[] = [];
     public alpha: Event[] = [];
@@ -72,4 +73,25 @@ export default class EventLayer {
         //}
         return [originValue, false];
     }
+
+    exportToJson(){
+        return {
+            speed:this.speed,
+            moveX: this.moveX,
+            moveY: this.moveY,
+            alpha: this.alpha,
+            rotate:this.rotate,
+        } as jsonEventLayer
+    }
+
+    static from(data:jsonEventLayer){
+        let ev = new EventLayer()
+        ev.speed = data.speed
+        ev.alpha = data.alpha
+        ev.moveX = data.moveX
+        ev.moveY = data.moveY
+        ev.rotate = data.rotate
+        return ev
+    }
+    
 }
