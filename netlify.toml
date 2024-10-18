@@ -1,4 +1,9 @@
 [[redirects]]
-  from = "/phira-file/*"
+  from = "/phira-api/*"
   to = "https://api.phira.cn/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/phira-file/*"
+  to = "https://phira-cdn.5wyxi.com/:splat"
   status = 200
