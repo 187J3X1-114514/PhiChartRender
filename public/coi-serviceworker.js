@@ -49,6 +49,7 @@ if (self.__TAURI__ == undefined) {
                             newHeaders.set("Cross-Origin-Resource-Policy", "cross-origin");
                         }
                         newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+                        newHeaders.set("Access-Control-Allow-Origin","*")
                         return new Response(response.body, {
                             status: response.status,
                             statusText: response.statusText,

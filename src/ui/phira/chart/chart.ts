@@ -1,7 +1,7 @@
 import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem } from "mdui";
 import { dialog } from "mdui/functions/dialog.js";
 import { PhiraAPI, PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
-import { PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
+import { buildPhriaApiURL, PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
 import { ResPack, account, navigationDrawer } from "../../main";
 import { PlayS } from "../../play/play";
 import { File } from "../../../core/file";
@@ -99,7 +99,7 @@ export class ChartPage {
             await this.searchChart()
             this.searchBtn.disabled = false
             this.searchBtn.loading = false
-        
+
         })
 
     }
@@ -136,7 +136,7 @@ export class ChartPage {
         load.style.position = 'absolute'
         load.style.zIndex = "10"
         rootCard.clickable = true
-        i.src = PHIRA_API_BASE_URL_NO_CORS2 + data.illustration.split("/").pop() + ".thumbnail"
+        i.src = buildPhriaApiURL(data.illustration.replace("https://api.phira.cn/","") + ".thumbnail")
         let level = new Chip()
         level.elevated = true
         level.appendChild((() => {
@@ -248,19 +248,22 @@ export class ChartPage {
         this.load.classList.remove("hide")
         var r
         const f = async () => {
-            const srcUrl = data.file.replace("https://api.phira.cn/files/", PHIRA_API_BASE_URL_NO_CORS2);
-            const url = (PHIRA_API_CORS + data.file).replace("https://api.phira.cn/files/", PHIRA_API_BASE_URL_NO_CORS2);
+            
+            const srcUrl = data.file.replace("https://api.phira.cn/", "");
+            const url = buildPhriaApiURL(srcUrl);
             try {
+                this.api.fetch(url)
                 r = await fetch(
                     url,
                     { method: "GET", headers: { 'Authorization': 'Bearer ' + account!.userToken } }
                 )
+                console.log(r)
                 return
             } catch {
                 dialog(
                     {
                         headline: "错误",
-                        description: "在尝试获取铺面时发生错误，URL：" + (PHIRA_API_CORS + data.file).replace("https://api.phira.cn/files/", PHIRA_API_BASE_URL_NO_CORS2),
+                        description: "在尝试获取铺面时发生错误，URL：" + url,
                         actions: [
                             {
                                 text: "返回",
@@ -280,11 +283,18 @@ export class ChartPage {
                             {
                                 text: "手动下载",
                                 onClick: async () => {
-                                    const link = document.createElement('a');
-                                    link.href = srcUrl;
-                                    link.download = "phira-"+data.name+"-"+data.id+".zip";
-                                    link.target = "_blank";
-                                    link.click(); },
+                                    const link = document.createElement('a')
+                                    link.href = srcUrl
+                                    link.download = "phira-" + data.name + "-" + data.id + ".zip"
+                                    link.target = "_blank"
+                                    link.click()
+                                    this.load.classList.add("hide")
+                                    this.root!.classList.add("push-in")
+                                    setTimeout(() => {
+                                        this.root!.classList.remove("push-in")
+                                    }, 800)
+                                    this.root.classList.remove("hide")
+                                },
                             }
                         ]
                     }
@@ -312,7 +322,7 @@ export class ChartPage {
         c.start()
     }
 
-    remove(){
+    remove() {
         this.root.remove()
         this.load.remove()
     }

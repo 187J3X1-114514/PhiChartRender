@@ -8,7 +8,6 @@ export { __hor_glow as hor_glow };
 import { default as __background_gargantua_a_shader } from './background_gargantua_a.glsl?raw';
 export { __background_gargantua_a_shader as background_gargantua_a_shader };
 import { default as __background_glow } from './background_glow.glsl?raw';
-import { AdvancedFilter } from './AdvancedFilter';
 export { __background_glow as background_glow };
 import { default as __background_gargantua_b_shader } from './background_gargantua_b.glsl?raw';
 export { __background_gargantua_b_shader as background_gargantua_b_shader };

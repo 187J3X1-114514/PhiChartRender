@@ -104,16 +104,18 @@ export class PhiraAPI {
         })
     }
     async getAvatar() {
-        return await new Promise<string>((r) => {
-            let imageUrl = this.userInfo["avatar"]
-            let headers = new Headers();
-            headers.append('Authorization', 'Bearer ' + this.userToken);
-
-            this.fetch(API_URL.PHIRA_API_CORS + imageUrl,
+        return await new Promise<string>(async(r) => {
+            let imageUrl:string = this.userInfo["avatar"]
+            this.fetch(API_URL.buildPhriaApiURL(imageUrl.replace("https://api.phira.cn/","")),
                 'GET',
-                headers,
+                {},
+                undefined
             )
-                .then(response => response.blob())
+                .then(response => {
+                    console.log(response)
+                    console.log(response.headers.entries())
+                    return response.blob()
+                })
                 .then(blob => {
                     r(new Promise((resolve, _reject) => {
                         const fileReader = new FileReader();
@@ -131,10 +133,10 @@ export class PhiraAPI {
 
         })
     }
-    fetch(url: string, method?: string, headers?: any, body?: any) {
+    fetch(url: string, method?: string, headers?: any, body?: any,noredirect:boolean=false) {
         return fetch(
             url,
-            { method: method, headers: { ...headers, 'Authorization': 'Bearer ' + this.userToken }, body: body })
+            { method: method, headers: { ...headers, 'Authorization': 'Bearer ' + this.userToken }, body: body,...(noredirect?{redirect:"manual"}:{}) })
     }
     async reLogin() {
         let r: { [key: string]: any } = {}
