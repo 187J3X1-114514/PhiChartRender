@@ -77,7 +77,7 @@ export default class Game {
         this.zipFiles = params.zipFiles || new ResourceManger();
         let chart
         try {
-            chart = params.chart.get(this.zipFiles)
+            chart = params.chart
             this.chart = chart.chart;
             this.chart.bg = chart.illustration
             this.chart.music = chart.music

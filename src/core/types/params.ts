@@ -1,5 +1,5 @@
 import { Application } from "pixi.js"
-import { ChartInfo } from "../chart/chartinfo"
+import { ChartData } from "../chart/chartinfo"
 import { ResourceManger } from "../resource"
 import { PhiAssets } from "../resource/resource_pack"
 import { PrprExtra } from "../prpr/prpr"
@@ -15,7 +15,7 @@ export interface GameParams {
         view?: HTMLCanvasElement,
         resizeTo?: HTMLElement
     },
-    chart: ChartInfo,
+    chart: ChartData,
     assets: PhiAssets,
     effects?: PrprExtra,
     zipFiles?: ResourceManger,

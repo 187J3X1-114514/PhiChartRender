@@ -16,11 +16,13 @@ export class PrprExtra {
     private game?: Game
     public effects: Effect[] = []
     public videos: PrprVideo[] | PrPrExtraVideo[] = []
+    public hasShader:boolean = false
     private sizer: SizerData = {} as any
     static from(json: any) {
         let prpr = new this()
         if (json.effects) prpr.effects = this.PrprEffectReader(json);
         if (json.videos) prpr.videos = this.PrprVideoReader(json);
+        if (prpr.effects.length == 0) prpr.hasShader = true
         return prpr
     }
 
@@ -135,7 +137,9 @@ export class PrprExtra {
         for (const effect of this.effects) effect.reset();
     }
     static get none(): PrprExtra {
-        return PrprExtra.from({})
+        let _ = PrprExtra.from({})
+        _.hasShader = true
+        return _
     }
     formatShader(text: string) {
         let shaderTextList = text.split("\n")

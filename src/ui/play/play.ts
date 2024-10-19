@@ -1,10 +1,9 @@
-import { ChartInfo } from "../../core/chart/chartinfo";
+import { ChartData, ChartInfo } from "../../core/chart/chartinfo";
 import Game from "../../core/game";
 import { ResourceManger, ResourcePack } from "../../core/resource";
 import { File } from "../../core/file";
 import { Application } from "pixi.js";
-import {  topAppBar,BACKGROUND } from "../main";
-import { GameParams } from "../../core/types/params";
+import { topAppBar, BACKGROUND } from "../main";
 
 export class PlayS {
     private res: ResourceManger
@@ -13,6 +12,7 @@ export class PlayS {
     private app?: Application
     private file: File[]
     private resp: ResourcePack
+    private chart_data?:ChartData
     private end: () => void
     constructor(file: File | File[] | ChartInfo, resp: ResourcePack, resm: ResourceManger = new ResourceManger()) {
         this.res = resm
@@ -26,7 +26,7 @@ export class PlayS {
     setOnEnd(f: () => void) {
         this.end = f
     }
-    async load(autoPlay:boolean=false) {
+    async load(autoPlay: boolean = false) {
         if (this.chart == undefined) {
             for (let f of this.file) {
                 if (f.extension.toLowerCase() == "zip") {
@@ -42,23 +42,24 @@ export class PlayS {
         await this.chart!.blur(40)
         this.game = new Game()
         this.app = new Application()
+        this.chart_data = this.chart!.get(this.res)
         await this.app.init({
             width: document.documentElement.clientWidth,
             height: document.documentElement.clientHeight,
             autoDensity: true,
             antialias: true,
             backgroundAlpha: 1,
-            preference: "webgl",
             hello: true,
             resizeTo: document.documentElement,
-            resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : 1
+            resolution: window.devicePixelRatio,
+            preference: navigator.gpu && this.chart_data!.prpr == undefined ?"webgpu":"webgl"
         })
         await this.game.init({
             app: this.app,
             render: {
                 resizeTo: document.documentElement
             },
-            chart: this.chart!,
+            chart: this.chart_data!,
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {

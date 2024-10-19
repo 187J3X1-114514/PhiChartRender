@@ -77,7 +77,7 @@ export class ChartInfo {
             music: resMan.get(this.music) as WAudio,
             illustration: resMan.get(this.illustration) as Texture,
             prpr: resMan.get(this.dir + '/' + "extra.json")
-        }
+        } as any as ChartData
 
     }
     static async from(file: File, resManger: ResourceManger) {
@@ -169,4 +169,11 @@ function loadTxtChartInfo(str: string) {
         throw "铺面信息格式错误"
         return undefined
     }
+}
+
+export interface ChartData{
+    chart: Chart;
+    music: WAudio;
+    illustration: Texture;
+    prpr: PrprExtra;
 }
