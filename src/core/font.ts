@@ -1,9 +1,9 @@
-export const fontPath = "assets/font/font.woff"
-export const fontPathPhi = "assets/font/font_phi.woff"
+export const fontPath = "https://187j3x1-114514.github.io/PhiChartRender/assets/font/font.woff"
+export const fontPathPhi = "https://187j3x1-114514.github.io/PhiChartRender/assets/font/font_phi.woff"
 export const OutGameFontName = "Font,phi"
 export const InGameFontName = "phi,Font"
 
-const emojiFont = new FontFace("Fluent UI Emoji Flat", "url(assets/font/emoji.woff2)",{
+const emojiFont = new FontFace("Fluent UI Emoji Flat", "url(https://187j3x1-114514.github.io/PhiChartRender/assets/font/emoji.woff2)",{
     display:"swap",
     style:"normal",
     weight:"normal"
