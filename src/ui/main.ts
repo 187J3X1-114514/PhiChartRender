@@ -94,7 +94,7 @@ export const tabLocal = document.getElementById("tab-local")! as NavigationRailI
 uModeBtn()
 
 let zip: Zip
-zip = await loadZip("resource.zip", await(await fetch("https://187j3x1-114514.github.io/PhiChartRender/assets/pack/resource")).blob())
+zip = await loadZip("resource.zip", await(await fetch("assets/pack/resource")).blob())
 export const ResPack = await ResourcePack.load(zip)
 
 for (let e of document.getElementsByClassName("arrow")) {
