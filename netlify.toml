@@ -7,3 +7,13 @@
   from = "/phira-file/*"
   to = "https://phira-cdn.5wyxi.com/:splat"
   status = 200
+
+[[redirects]]
+  from = "/phira-TermsOfUse"
+  to = "https://raw.githubusercontent.com/TeamFlos/phira-web/refs/heads/main/src/TermsOfUse.vue"
+  status = 200
+
+[[redirects]]
+  from = "/phira-PrivacyPolicy"
+  to = "https://raw.githubusercontent.com/TeamFlos/phira-web/refs/heads/main/src/PrivacyPolicy.vue"
+  status = 200
