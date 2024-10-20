@@ -1,50 +1,37 @@
 {
-    "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-    "build": {
-        "beforeBuildCommand": "pnpm run build",
-        "beforeDevCommand": "pnpm run dev",
-        "frontendDist": "../dist",
-        "devUrl": "http://localhost:1420/"
-    },
-    "bundle": {
-        "active": false,
-        "category": "DeveloperTool",
-        "copyright": "",
-        "targets": "all",
-        "externalBin": [],
-        "icon": [
-            "icons/32x32.png",
-            "icons/128x128.png",
-            "icons/128x128@2x.png",
-            "icons/icon.icns",
-            "icons/icon.ico"
-        ],
-        "resources": []
-    },
-    "productName": "Phigros Simulator Plus",
-    "version": "0.0.3",
-    "identifier": "com.phisimplus.tauri",
-    "plugins": {
-    },
-    "app": {
-        "withGlobalTauri": true,
-        "windows": [
-            {
-                "title": "Phigros Simulator Plus+++++++++++++",
-                "width": 1280,
-                "height": 720,
-                "transparent": true,
-                "resizable": true,
-                "label": "main",
-                "url": "index.html"
-            }
-        ],
-        "security": {
-            "capabilities": ["main"],
-            "csp":null
-            
-        }
-
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Phigros Simulator Plus",
+  "version": "0.0.3",
+  "identifier": "dev.phisimplus.tauri",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173/",
+    "beforeDevCommand": "pnpm run dev",
+    "beforeBuildCommand": "pnpm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "phigros_sim_plus",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
     }
-
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
 }

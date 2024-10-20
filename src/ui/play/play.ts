@@ -44,14 +44,14 @@ export class PlayS {
         this.app = new Application()
         this.chart_data = this.chart!.get(this.res)
         await this.app.init({
-            width: document.documentElement.clientWidth,
-            height: document.documentElement.clientHeight,
-            autoDensity: true,
+            //width: document.documentElement.clientWidth,
+            //height: document.documentElement.clientHeight,
+            //autoDensity: true,
             antialias: true,
-            backgroundAlpha: 1,
+            //backgroundAlpha: 1,
             hello: true,
             resizeTo: document.documentElement,
-            resolution: window.devicePixelRatio,
+            //resolution: window.devicePixelRatio,
             preference: navigator.gpu && this.chart_data!.prpr == undefined ?"webgpu":"webgl"
         })
         await this.game.init({

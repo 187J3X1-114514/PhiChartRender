@@ -1,6 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
-import { WebviewWindow, getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-import Cookies from 'js-cookie'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { newLogger } from '../core/log'
 export const ON_TAURI = (window as any).__TAURI__ != undefined
 const log = newLogger("Tauri")

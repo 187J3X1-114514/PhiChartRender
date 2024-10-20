@@ -1,6 +1,6 @@
 import { Button, Checkbox, CircularProgress, Dialog, TextField } from "mdui";
 import { PhiraAPI, loginResult } from "../../api/phira";
-import Cookies from 'js-cookie'
+import * as DB from "../data"
 import md5 from 'md5-js'
 import * as CryptoJS from 'crypto-js'
 import protocolPage from "./terms_of_use";
@@ -137,7 +137,7 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 newCancelButton.innerText = "好"
                 dialog.append(newCancelButton)
                 if (api.api) {
-                    Cookies.set("phira", checkKeepPassword.checked ? genCookie(emailInput.value, passwordInput.value) : "null", { expires: 365 })
+                    DB.setInfoData("phira", checkKeepPassword.checked ? genCookie(emailInput.value, passwordInput.value) : "null")
                 }
                 newCancelButton.addEventListener("click", () => {
                     dialog.open = false
@@ -152,9 +152,9 @@ export default async function loginPage(t: Element): Promise<loginResult> {
             }
 
         })
-        if (Cookies.get("phira")) {
+        if (await DB.checkInfoData("phira")) {
             try {
-                let p = getCookie(Cookies.get("phira")!)
+                let p = getCookie(await DB.getInfoData("phira")!)
                 if (p.email != "" && p.password != "") {
                     emailInput.value = p.email
                     passwordInput.value = p.password

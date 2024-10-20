@@ -3,18 +3,18 @@
   "version": "v0.0.3",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "netlify dev",
     "build": "vite build",
     "preview": "vite preview",
     "build:tauri": ""
   },
   "dependencies": {
     "7z-wasm": "^1.1.0",
-    "@ffmpeg/ffmpeg": "^0.12.6",
+    "@ffmpeg/ffmpeg": "^0.12.10",
     "@ffmpeg/util": "^0.12.1",
-    "@fingerprintjs/fingerprintjs": "^3",
+    "@fingerprintjs/fingerprintjs": "^3.4.2",
     "@mdui/icons": "^1.0.2",
-    "@pixi/sound": "^6.0.0",
+    "@pixi/sound": "^6.0.1",
     "@tauri-apps/api": "2.0.0-beta.15",
     "@tauri-apps/plugin-fs": "2.0.0-beta.7",
     "@tauri-apps/plugin-global-shortcut": "2.0.0-beta.7",
@@ -32,23 +32,24 @@
     "js-yaml": "^4.1.0",
     "jszip": "^3.10.1",
     "libarchive.js": "^2.0.2",
+    "localforage": "^1.10.0",
     "md5-js": "0.0.3",
     "mdui": "^2.1.2",
-    "pixi-filters": "^6.0.4",
-    "pixi.js": "^8.4.1",
+    "pixi-filters": "^6.0.5",
+    "pixi.js": "^8.5.1",
     "stackblur-canvas": "^2.7.0",
-    "tslog": "^4.9.2",
-    "vite-plugin-top-level-await": "^1.4.1"
+    "tslog": "^4.9.3",
+    "vite-plugin-top-level-await": "^1.4.4"
   },
   "devDependencies": {
     "@netlify/edge-functions": "^2.11.0",
-    "@tauri-apps/cli": "2.0.0-beta.22",
+    "@tauri-apps/cli": "2.0.3",
     "@types/crypto-js": "^4.2.2",
     "@types/js-cookie": "^3.0.6",
     "@types/js-yaml": "^4.0.9",
     "internal-ip": "^7.0.0",
     "netlify-cli": "^17.37.1",
-    "typescript": "^5.0.2",
-    "vite": "^5.0.0"
+    "typescript": "^5.6.3",
+    "vite": "^5.4.9"
   }
 }

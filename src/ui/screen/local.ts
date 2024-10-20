@@ -47,6 +47,7 @@ export class LocalScreen extends BaseScreen {
                     i.innerText = ress.charts[key]!.chart + ": " + ress.charts[key]!.src.name
                     s.append(i)
                 }
+                console.log(ress)
             }, undefined, true)
         })
         sbtn.addEventListener("click", async () => {

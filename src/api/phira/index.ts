@@ -104,9 +104,9 @@ export class PhiraAPI {
         })
     }
     async getAvatar() {
-        return await new Promise<string>(async(r) => {
-            let imageUrl:string = this.userInfo["avatar"]
-            this.fetch(API_URL.buildPhriaApiURL(imageUrl.replace("https://api.phira.cn/","")),
+        return await new Promise<string>(async (r) => {
+            let imageUrl: string = this.userInfo["avatar"]
+            this.fetch(API_URL.buildPhriaApiURL(imageUrl.replace("https://api.phira.cn/", "")),
                 'GET',
                 {},
                 undefined
@@ -133,10 +133,10 @@ export class PhiraAPI {
 
         })
     }
-    fetch(url: string, method?: string, headers?: any, body?: any,noredirect:boolean=false) {
+    fetch(url: string, method?: string, headers?: any, body?: any, noredirect: boolean = false) {
         return fetch(
             url,
-            { method: method, headers: { ...headers, 'Authorization': 'Bearer ' + this.userToken }, body: body,...(noredirect?{redirect:"manual"}:{}) })
+            { method: method, headers: { ...headers, 'Authorization': 'Bearer ' + this.userToken }, body: body, ...(noredirect ? { redirect: "manual" } : {}) })
     }
     async reLogin() {
         let r: { [key: string]: any } = {}

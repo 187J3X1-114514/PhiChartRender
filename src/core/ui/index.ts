@@ -128,34 +128,32 @@ export default class UIManger implements baseUIManger {
     calcTime(currentTime: number) {
         this.calcOtherAni()
         this.drawPauseBtnOutLine()
-        if (!this.game._isPaused) {
-            this.element.Combo.calcTime(currentTime, this.size!)
-            this.element.ComboNumber.calcTime(currentTime, this.size!)
-            this.element.Score.calcTime(currentTime, this.size!)
-            this.element.Name.calcTime(currentTime, this.size!)
-            this.element.Level.calcTime(currentTime, this.size!)
-            this.element.Pause.calcTime(currentTime, this.size!)
-            {
-                if ((+this.game.judgement.score.text.combo) > 2) {
-                    this.element.ComboNumber.setText(this.game.judgement.score.text.combo)
-                    this.element.Combo.setText(this.game._settings.autoPlay ? "AUTOPLAY" : "COMBO")
-                } else {
-                    this.element.ComboNumber.setText(' ')
-                    this.element.Combo.setText(' ')
-                }
+        this.element.Combo.calcTime(currentTime, this.size!)
+        this.element.ComboNumber.calcTime(currentTime, this.size!)
+        this.element.Score.calcTime(currentTime, this.size!)
+        this.element.Name.calcTime(currentTime, this.size!)
+        this.element.Level.calcTime(currentTime, this.size!)
+        this.element.Pause.calcTime(currentTime, this.size!)
+        {
+            if ((+this.game.judgement.score.text.combo) > 2) {
+                this.element.ComboNumber.setText(this.game.judgement.score.text.combo)
+                this.element.Combo.setText(this.game._settings.autoPlay ? "AUTOPLAY" : "COMBO")
+            } else {
+                this.element.ComboNumber.setText(' ')
+                this.element.Combo.setText(' ')
             }
-
-            this.element.Score.setText(this.game.judgement.score.text.score)
-            this.element.Name.setText(this.chart.info.name)
-            this.element.Level.setText(this.chart.info.difficult)
         }
+
+        this.element.Score.setText(this.game.judgement.score.text.score)
+        this.element.Name.setText(this.chart.info.name)
+        this.element.Level.setText(this.chart.info.difficult)
     }
     private drawPauseBtnOutLine() {
         this.PauseBtnOutLine.clear()
         this.PauseBtnOutLine.x = this.element.Pause.sprite.x
         this.PauseBtnOutLine.y = this.element.Pause.sprite.y
         let p = 0
-        if ((performance.now() - this.PauseBtnLastClickTime)<=700){
+        if ((performance.now() - this.PauseBtnLastClickTime) <= 700) {
             p = 1 - ((performance.now() - this.PauseBtnLastClickTime) / 700)
         }
         if (p < 0) p = 0
@@ -164,7 +162,7 @@ export default class UIManger implements baseUIManger {
         this.PauseBtnOutLine.fill({
             color: 0, alpha: 0.0
         })
-        this.PauseBtnOutLine.stroke({ width: this.size!.lineHeightScale*3*0.6, color: 0xA9A9A9, alpha: alpha });
+        this.PauseBtnOutLine.stroke({ width: this.size!.lineHeightScale * 3 * 0.6, color: 0xA9A9A9, alpha: alpha });
 
 
     }

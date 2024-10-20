@@ -44,8 +44,8 @@
         <mdui-list>
             <mdui-collapse accordion id="phira-drawer" class="collapse-rail hide">
                 <mdui-collapse-item>
-                    <mdui-list-item rounded slot="header" icon="class">分区<mdui-icon slot="end-icon"
-                            class="arrow" name="expand_more"></mdui-icon></mdui-list-item>
+                    <mdui-list-item rounded slot="header" icon="class">分区<mdui-icon slot="end-icon" class="arrow"
+                            name="expand_more"></mdui-icon></mdui-list-item>
                     <div style="margin-left: 2.5em;">
                         <mdui-list-item rounded id="class-chart-1">已上架</mdui-list-item>
                         <mdui-list-item rounded id="class-chart-2">未上架</mdui-list-item>
@@ -68,16 +68,17 @@
             </mdui-collapse>
         </mdui-list>
     </mdui-navigation-drawer>
-    <mdui-navigation-rail  value="loc" id="navigation-rail">
+    <mdui-navigation-rail value="loc" id="navigation-rail">
         <div class="navigation-rail-blur"></div>
         <mdui-button-icon icon="menu" slot="top" id="top-app-bar-menu"></mdui-button-icon>
-        <mdui-button-icon icon="bug_report" slot="bottom"  id="debug-btn"></mdui-button-icon>
+        <mdui-button-icon icon="bug_report" slot="bottom" id="debug-btn"></mdui-button-icon>
         <mdui-button-icon icon="settings" slot="bottom"></mdui-button-icon>
         <mdui-tooltip placement="right" slot="bottom" content="查看源码">
-            <mdui-button-icon icon="source" onclick='window.open("https://github.com/187J3X1-114514/PhiChartRender")'></mdui-button-icon>
+            <mdui-button-icon icon="source"
+                onclick='window.open("https://github.com/187J3X1-114514/PhiChartRender")'></mdui-button-icon>
         </mdui-tooltip>
-        
-        
+
+
 
 
         <mdui-navigation-rail-item icon="cloud" class="black-font" id="tab-phira"
@@ -138,6 +139,16 @@
         </div>
     </div>
     -->
+    <mdui-dialog fullscreen id="protocolDialog1">
+        <div id="protocolText1"></div>
+        <mdui-button id="protocolNO1" slot="action" variant="tonal">拒绝</mdui-button>
+        <mdui-button id="protocolYES1" slot="action" disabled variant="tonal">同意</mdui-button>
+    </mdui-dialog>
+    <mdui-dialog fullscreen id="protocolDialog2">
+        <div id="protocolText2"></div>
+        <mdui-button id="protocolNO2" slot="action" variant="tonal">拒绝</mdui-button>
+        <mdui-button id="protocolYES2" slot="action" disabled variant="tonal">同意</mdui-button>
+    </mdui-dialog>
 </body>
 
 </html>

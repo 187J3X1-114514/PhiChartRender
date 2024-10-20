@@ -10,6 +10,9 @@ const PHIRA_API_URL_CHART = PHIRA_API_BASE_URL_NO_CORS + "chart"
 const PHIRA_API_URL_GETCHART = PHIRA_API_BASE_URL + "chart/"
 const PHIRA_PROTOCOL2 = "https://phira.moe/privacy-policy"
 const PHIRA_PROTOCOL1 = "https://phira.moe/terms-of-use"
+export const PHIRA_PROTOCOL1_TEXT = "https://phisimplus.netlify.app/phira-TermsOfUse"
+export const PHIRA_PROTOCOL2_TEXT = "https://phisimplus.netlify.app/phira-PrivacyPolicy"
+
 export function buildPhriaApiURL(p:string){
     if (document.URL.startsWith("http://localhost:")){
         return "http://localhost:8888/proxy/phira-api+"+p

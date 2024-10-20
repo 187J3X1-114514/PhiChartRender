@@ -1,4 +1,5 @@
 import { BUILD_ENV, BUILDTIME, GIT_HASH, PACKAGE_JSON } from "./env";
+import * as DB from "./data"
 document.getElementById("top-app-bar-title")!.innerText += (' V' + PACKAGE_JSON.version.split('v').pop())
 let v = '' + PACKAGE_JSON.version.split('v').pop()
 let nv = `V${v}-${GIT_HASH.slice(0, 7).toLocaleUpperCase()}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
@@ -11,15 +12,16 @@ import { Zip, loadZip } from "../core/file";
 import { ResourcePack } from "../core/resource";
 import Cookies from 'js-cookie'
 import { Theme } from "mdui/internal/theme";
-
 import { loadFont } from "../core/font";
+await loadFont()
 import { get_theme, main, MAINWINDOW_HWND, ON_TAURI, RUN_RS_FN } from "./tauri";
 import { openDebug } from "./debug/ui_pos";
 import { background } from "./background/background";
 import { LocalScreen } from "./screen/local";
 import { ChartPage } from "./phira/chart/chart";
 
-await loadFont()
+
+
 const UI_HTML = `    
 
 `
@@ -94,7 +96,7 @@ export const tabLocal = document.getElementById("tab-local")! as NavigationRailI
 uModeBtn()
 
 let zip: Zip
-zip = await loadZip("resource.zip", await(await fetch("assets/pack/resource")).blob())
+zip = await loadZip("resource.zip", await DB.getOrCreateCacheDATA("assets/pack/resource"))
 export const ResPack = await ResourcePack.load(zip)
 
 for (let e of document.getElementsByClassName("arrow")) {

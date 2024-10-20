@@ -17,3 +17,9 @@
   from = "/phira-PrivacyPolicy"
   to = "https://raw.githubusercontent.com/TeamFlos/phira-web/refs/heads/main/src/PrivacyPolicy.vue"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Resource-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"

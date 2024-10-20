@@ -10,6 +10,7 @@ import { ResourceManger } from '../resource/resource_manger';
 import { printImage } from '../utils';
 import UIManger from '../ui';
 import { PrprExtra } from '../prpr/prpr';
+import { boolean } from 'io-ts';
 
 const uk = (undefined as unknown) as any
 const ukObj = ({} as unknown) as any
@@ -458,9 +459,8 @@ export default class Game {
             this.judgement.resizeSprites(this.renders.sizer, this._isEnded);
             this.chart.resizeSprites(this.renders.sizer, this._isEnded);
             this.effects.resize(this.renders.sizer)
+            this.calcTick(true)
         }
-        //if (this.renders.videoContainer.children[0]) this.renders.videoContainer.scale.x = this.renders.sizer.width / this.renders.videoContainer.children[0].width
-        //if (this.renders.videoContainer.children[0]) this.renders.videoContainer.scale.y = this.renders.sizer.height / this.renders.videoContainer.children[0].height
     }
 
     gameTimeInSec() {
@@ -498,11 +498,11 @@ export default class Game {
         if (!this.functions[type]) return;
         this.functions[type].forEach((callback: (a: any) => any) => callback(this));
     }
-    calcTick() {
+    calcTick(force:boolean = false) {
         let currentTime = this.chart.music.currentTime - (this.chart.offset + this._settings.offset);
-        this.calcTickByCurrentTime(currentTime)
+        this.calcTickByCurrentTime(currentTime,force)
     }
-    calcTickByCurrentTime(currentTime: number) {
+    calcTickByCurrentTime(currentTime: number,force:boolean = false) {
         let { chart, judgement, functions, processors, sprites, renders } = this;
         if (currentTime + (this.chart.offset + this._settings.offset) >= this.chart.music.duration && this._animateStatus == 1) {
             this.gameEndCallback()
@@ -517,8 +517,7 @@ export default class Game {
             case 1:
                 {
                     this.effects.calcTime(currentTime)
-                    if (!this._isPaused) {
-
+                    if (!this._isPaused || force) {
                         for (let i = 0, length = chart.bpmList.length; i < length; i++) {
                             let bpm = chart.bpmList[i];
 
@@ -539,8 +538,6 @@ export default class Game {
                             for (let x = 0, length = processors.note.length; x < length; x++) processors.note[x](note, currentTime);
                             judgement.calcNote(currentTime, note);
                         };
-
-
                         judgement.calcTick(currentTime);
                         for (let x = 0, length = functions.tick.length; x < length; x++) functions.tick[x](this, currentTime);
                     }

@@ -131,3 +131,5 @@ dist
 
 # Local Netlify folder
 .netlify
+src-tauri/gen
+_src-tauri

@@ -5,6 +5,7 @@ import { buildPhriaApiURL, PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from ".
 import { ResPack, account, navigationDrawer } from "../../main";
 import { PlayS } from "../../play/play";
 import { File } from "../../../core/file";
+import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID, getOrCreateCacheDATACallback } from "../../data";
 const NONE_IMG = await (async () => {
     let c = document.createElement("canvas")
     let ctx = c.getContext("2d")!
@@ -127,16 +128,57 @@ export class ChartPage {
         rootCard.style.transition = 'opacity 0.6s ease'
         rootCard.style.aspectRatio = '8/5'
         rootCard.classList.add("chart-illustration")
-        const i = new Image()
-        i.src = NONE_IMG
         let load = new LinearProgress()
         load.style.top = '0px'
         load.style.left = '0px'
         load.style.width = '100%'
         load.style.position = 'absolute'
         load.style.zIndex = "10"
-        rootCard.clickable = true
-        i.src = buildPhriaApiURL(data.illustration.replace("https://api.phira.cn/","") + ".thumbnail")
+        const i = new Image()
+        rootCard.clickable = true;
+        (async()=>{
+            const srcUrl = data.illustration.replace("https://api.phira.cn/", "") + ".thumbnail"
+            const url = buildPhriaApiURL(srcUrl);
+            let blob: Blob | undefined = undefined
+            if (await checkCacheDATA(url.replace("https://api.phira.cn/files/",""))) {
+                blob = await getCacheDATA(url.replace("https://api.phira.cn/files/",""))
+            } else {
+                await new Promise(async (r) => {
+                    let tempi = new Image()
+                    tempi.setAttribute('crossorigin', 'anonymous');
+                    tempi.src = url
+                    tempi.onload = async() => {
+                        const bmp = await createImageBitmap(tempi)
+                        const canvas = document.createElement('canvas')
+                        canvas.width = bmp.width
+                        canvas.height = bmp.height
+                        const ctx = canvas.getContext('2d')!
+                        ctx.drawImage(bmp,0,0)
+                        blob = await new Promise<Blob>((res) => canvas.toBlob(res as any))
+                        await addCacheDATA(url, blob)
+                        r(null)
+                    }
+                    tempi.onerror = ()=>{
+                        i.src = NONE_IMG
+                        r(null)
+                    }
+                })
+            }
+            if (blob != undefined) i.src = URL.createObjectURL(blob);
+        })()
+        i.onload = async () => {
+            load.remove();
+        };
+        i.onerror = () => {
+            load.remove();
+            i.remove()
+        }
+        i.addEventListener('dragstart', (event) => {
+            event.preventDefault()
+        });
+        i.addEventListener('contextmenu', (event) => {
+            event.preventDefault()
+        });
         let level = new Chip()
         level.elevated = true
         level.appendChild((() => {
@@ -175,22 +217,9 @@ export class ChartPage {
             return p
         })())
         level.classList.add("top-right")
-        i.addEventListener('dragstart', (event) => {
-            event.preventDefault()
-        });
-        i.addEventListener('contextmenu', (event) => {
-            event.preventDefault()
-        });
         rootCard.addEventListener('select', (event) => {
             event.preventDefault()
         });
-        i.onload = () => {
-            load.remove();
-        };
-        i.onerror = () => {
-            load.remove();
-            i.remove()
-        }
         rootCard.appendChild(i)
         rootCard.appendChild(level)
         rootCard.appendChild(info)
@@ -227,10 +256,10 @@ export class ChartPage {
         while (this.cards!.firstChild) {
             this.cards!.removeChild(this.cards!.firstChild!)
         }
-        this.load.classList.remove("hide")
-        r.results.forEach(async (v) => {
+        for (let v of r.results){
             await this.genChartCard(v)
-        })
+        }
+        this.load.classList.remove("hide")
         let a = setInterval(() => {
             let c = true
             for (let b of this.cards!.getElementsByTagName("mdui-card")) {
@@ -248,7 +277,7 @@ export class ChartPage {
         this.load.classList.remove("hide")
         var r
         const f = async () => {
-            
+
             const srcUrl = data.file.replace("https://api.phira.cn/", "");
             const url = buildPhriaApiURL(srcUrl);
             try {
@@ -257,7 +286,6 @@ export class ChartPage {
                     url,
                     { method: "GET", headers: { 'Authorization': 'Bearer ' + account!.userToken } }
                 )
-                console.log(r)
                 return
             } catch {
                 dialog(
@@ -302,12 +330,15 @@ export class ChartPage {
 
             }
         }
-        await f()
-
-        //let ac = await loadZip(generateRandomString(32) + ".zip", await r!.blob())
-        //let li: any[] = []
-        //ac.files.forEach((v) => { li.push(v) })
-        let c = new PlayS(new File(await r!.blob(), generateRandomString(32) + ".zip"), ResPack)
+        let b
+        if (await checkChartByPhiraID(data.id)) {
+            b = await getChartByPhiraID(data.id)
+        } else {
+            await f()
+            b = await r!.blob()
+            await addChartByPhiraID(data.id, b)
+        }
+        let c = new PlayS(new File(b, generateRandomString(32) + ".zip"), ResPack)
         c.setOnEnd(() => {
             setTimeout(() => {
                 this.root!.classList.add("push-in")

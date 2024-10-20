@@ -135,9 +135,9 @@ export class ResourceManger {
             if (__log) log.info("加载文件 ->", file.name, "完成")
             if (loadFile != undefined) {
                 let yes = true
-                for (let key in this.srcFiles) {
-                    if ((((this.srcFiles[key]!.name).split('/').pop()!.endsWith(file.name.split('/').pop()!) || file.name.split('/').pop()!.endsWith(this.srcFiles[key]!.name.split('/').pop()!)) && yes)) { yes = false }
-                }
+                //for (let key in this.srcFiles) {
+                //    if ((((this.srcFiles[key]!.name).split('/').pop()!.endsWith(file.name.split('/').pop()!) || file.name.split('/').pop()!.endsWith(this.srcFiles[key]!.name.split('/').pop()!)) && yes)) { yes = false }
+                //}
                 if (yes && (file.name != "" && file.name != undefined)) {
                     this.files[file.name] = loadFile
                     this.srcFiles[file.name] = file
