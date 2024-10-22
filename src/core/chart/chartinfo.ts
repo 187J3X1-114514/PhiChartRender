@@ -72,12 +72,16 @@ export class ChartInfo {
             difficult: this.src.level,
             md5: ""
         };
-        return {
+        let d = {
             chart: c,
             music: resMan.get(this.music) as WAudio,
             illustration: resMan.get(this.illustration) as Texture,
             prpr: resMan.get(this.dir + '/' + "extra.json")
         } as any as ChartData
+        if (!d.prpr) {
+            d.prpr = PrprExtra.from({})
+        }
+        return d
 
     }
     static async from(file: File, resManger: ResourceManger) {

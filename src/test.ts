@@ -112,12 +112,15 @@ import './styles.css'
 import 'mdui/components/icon.js';
 import { reqFullSc } from './ui';
 import './ui/main';
+
 import { buildAllJudgeLineData, buildColorValueEventData, buildEventLayerData, buildJudgeLineData, buildOtherEventData, buildStringValueEventData, ChartFile, readAllJudgeLineData, readEventLayerData, readJudgeLineData, readOtherEventData, readStringValueEventData } from './file/chart';
 import { ReadBufferDataView, WriteBufferDataView } from './file/data_view';
+import { Application, Assets, Sprite } from 'pixi.js';
+import Shader from './core/prpr/effect/shader';
 document.documentElement.addEventListener("click", () => {
     if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
 })
-
+/*
 import { ResourceManger } from "./core/resource";
 import Chart from './core/chart';
 import { PlayS } from './ui/play/play';
@@ -208,3 +211,33 @@ let rb2 = new ReadBufferDataView(new DataView(aaaa.buffer))
 console.log(readStringValueEventData(rb2))
 console.log(readStringValueEventData(rb2))
 */
+
+let app = new Application()
+await app.init({
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
+    autoDensity: true,
+    antialias: true,
+    backgroundAlpha: 1,
+    preference: "webgpu",
+    hello: true,
+    resizeTo: document.documentElement,
+    resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : 1
+})
+
+document.body.appendChild(app.canvas)
+app.canvas.classList.add("game")
+app.stage.addChild(new Sprite(await Assets.load("assets/phira.png")))
+let testShader = new Shader(Shader.presetsGL.vignette, "test", undefined, Shader.presetsWebGPU.vignette)
+let s = performance.now()
+app.ticker.add(() => {
+    testShader.update({
+        time: (performance.now() - s) / 1000,
+        screenSize: [document.documentElement.clientWidth, document.documentElement.clientHeight],
+        color: [0, 0, 0, 1],
+        extend: 0.25,
+        radius: 15
+    })
+})
+
+app.stage.filters = [testShader.filter]

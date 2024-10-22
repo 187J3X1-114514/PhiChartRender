@@ -10,7 +10,7 @@ function assetFileName(chunkInfo: any): string {
         return 'O.o.css'
     }
     if (n!.endsWith('.js')) {
-        return 'O.o-[hash].js'
+        return 'O.o.js'
     }
     return 'assets/[name][extname]'
 }

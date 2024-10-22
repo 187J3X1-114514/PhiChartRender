@@ -18,6 +18,7 @@ const blackJudgeLine = (() => {
     const result = Texture.from(canvas);
     return result;
 })();
+var TEXT_RESOLUTION = 3
 
 
 export default class Judgeline {
@@ -300,6 +301,7 @@ export default class Judgeline {
             this.sprite = new Text({
                 text: "", style: this.spriteStyle
             });
+            (this.sprite as Text).resolution = TEXT_RESOLUTION
         }
 
         this.sprite.anchor.set(0.5);

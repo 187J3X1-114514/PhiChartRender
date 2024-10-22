@@ -15,9 +15,10 @@ void main() {
     float new_power = (2.0 * 3.141592 / (2.0 * sqrt(dot(m, m)))) * power;
     float bind = new_power > 0.0 ? sqrt(dot(m, m)) : (aspect < 1.0 ? m.x : m.y);
     vec2 nuv;
-    if(new_power > 0.0)
+    if(new_power > 0.0) {
         nuv = m + normalize(d) * tan(r * new_power) * bind / tan(bind * new_power);
-    else
+    } else {
         nuv = m + normalize(d) * atan(r * -new_power * 10.0) * bind / atan(-new_power * bind * 10.0);
+    }
     gl_FragColor = texture2D(uTexture, vec2(nuv.x, nuv.y * aspect));
 }

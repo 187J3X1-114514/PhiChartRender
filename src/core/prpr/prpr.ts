@@ -16,13 +16,13 @@ export class PrprExtra {
     private game?: Game
     public effects: Effect[] = []
     public videos: PrprVideo[] | PrPrExtraVideo[] = []
-    public hasShader:boolean = false
+    public hasShader: boolean = true
     private sizer: SizerData = {} as any
     static from(json: any) {
         let prpr = new this()
         if (json.effects) prpr.effects = this.PrprEffectReader(json);
         if (json.videos) prpr.videos = this.PrprVideoReader(json);
-        if (prpr.effects.length == 0) prpr.hasShader = true
+        if (prpr.effects.length == 0) prpr.hasShader = false
         return prpr
     }
 
@@ -118,8 +118,9 @@ export class PrprExtra {
             effect.shader = effect.shader as string
             let shaderName = effect.shader //(effect.shader.startsWith("/")) ? game.chart.rootPath + effect.shader : 
             let shaderRaw = this.getShaderText(shaderName)
+            let shaderRawGPU = this.getShaderTextGPU(shaderName)
             if (shaderRaw) {
-                effect.shader = Shader.from(shaderRaw, shaderName, e.vars)
+                effect.shader = Shader.from(shaderRaw, shaderName, e.vars, shaderRawGPU)
             } else {
                 this.effects.splice(this.effects.indexOf(effect), 1)
                 log.warn("没有发现名为", shaderName, "的着色器文件，当前加载的文件列表：", game.zipFiles.getFileList())
@@ -138,7 +139,7 @@ export class PrprExtra {
     }
     static get none(): PrprExtra {
         let _ = PrprExtra.from({})
-        _.hasShader = true
+        _.hasShader = false
         return _
     }
     formatShader(text: string) {
@@ -172,14 +173,31 @@ export class PrprExtra {
             let _name = nl.join('').split('.')[0]
             switch (_name.toLowerCase()) { //着色器兼容
                 case "bloom":
-                    return (Shader.presets as any)['bloom']
+                    return (Shader.presetsGL as any)['bloom']
                 case "movecamera":
-                    return (Shader.presets as any)['movecamera']
+                    return (Shader.presetsGL as any)['movecamera']
                 default:
                     return this.formatShader(this.game!.zipFiles.get(this.game!.chart.rootPath + name) as string)
             }
         } else {
-            return (Shader.presets as any)[name]!
+            return (Shader.presetsGL as any)[name]!
+        }
+    }
+    getShaderTextGPU(name: string) {
+        if (name.startsWith("/")) {
+            let nl = name.split('')
+            nl.splice(0, 1)
+            let _name = nl.join('').split('.')[0]
+            switch (_name.toLowerCase()) { //着色器兼容
+                case "bloom":
+                    return (Shader.presetsWebGPU as any)['bloom']
+                case "movecamera":
+                    return (Shader.presetsWebGPU as any)['movecamera']
+                default:
+                    return this.formatShader(this.game!.zipFiles.get(this.game!.chart.rootPath + name) as string)
+            }
+        } else {
+            return (Shader.presetsWebGPU as any)[name]!
         }
     }
     private static PrprVideoReader(json: PrPrExtraJSON) {

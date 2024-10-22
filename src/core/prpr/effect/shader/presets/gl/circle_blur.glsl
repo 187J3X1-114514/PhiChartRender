@@ -13,7 +13,7 @@ void main() {
     float totalBlurFactor = 0.0;
     const int numSamples = 8;
 
-    for (int i = 0; i < numSamples; i++) {
+    for(int i = 0; i < numSamples; i++) {
         float angle = float(i) * 6.28 / float(numSamples);
         vec2 offset = vec2(cos(angle), sin(angle)) * size_new;
 
@@ -21,7 +21,7 @@ void main() {
         vec3 sampleColor = texture2D(uTexture, sampleUV).rgb;
 
         float distance = length(offset) * screenSize.x;
-        float blurFactor = smoothstep(size_new-1.0, size_new+1.0, distance);
+        float blurFactor = smoothstep(size_new - 1.0, size_new + 1.0, distance);
 
         color += sampleColor * blurFactor;
 

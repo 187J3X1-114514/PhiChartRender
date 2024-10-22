@@ -170,9 +170,6 @@ export default class Game {
 
         this.ui = new UIManger(this)
         this.ui.createSprites()
-        if (!this.effects) {
-            this.effects = PrprExtra.from({})
-        }
         this.effects.setGame(this)
         this.effects.init()
         this.chart.music.reset();

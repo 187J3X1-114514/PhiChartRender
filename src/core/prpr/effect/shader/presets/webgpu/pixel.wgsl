@@ -1,5 +1,3 @@
-
-
 struct GlobalFilterUniforms {
   uInputSize:vec4<f32>,
   uInputPixel:vec4<f32>,
@@ -45,10 +43,12 @@ fn mainVertex(
    filterTextureCoord(aPosition)
   );
 }
+
 struct MyUniforms {
     time:f32,
     screenSize:vec2<f32>,
-    UVScale:vec2<f32>
+    UVScale:vec2<f32>,
+    size:f32
 }
 @group(1) @binding(0) var<uniform> my : MyUniforms;
 
@@ -57,6 +57,9 @@ fn mainFragment(
   @location(0) uv: vec2<f32>,
   @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
-    var sample = textureSample(uTexture, uSampler, uv);
+    var factor = my.screenSize / my.size;
+    var x = floor(uv.x * factor.x + 0.5) / factor.x;
+    var y = floor(uv.y * factor.y + 0.5) / factor.y;
+    var sample = textureSample(uTexture, uSampler, vec2(x, y));
     return sample;
 }

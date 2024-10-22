@@ -12,7 +12,7 @@ export class PlayS {
     private app?: Application
     private file: File[]
     private resp: ResourcePack
-    private chart_data?:ChartData
+    private chart_data?: ChartData
     private end: () => void
     constructor(file: File | File[] | ChartInfo, resp: ResourcePack, resm: ResourceManger = new ResourceManger()) {
         this.res = resm
@@ -46,13 +46,13 @@ export class PlayS {
         await this.app.init({
             //width: document.documentElement.clientWidth,
             //height: document.documentElement.clientHeight,
-            //autoDensity: true,
+            autoDensity: true,
             antialias: true,
             //backgroundAlpha: 1,
             hello: true,
             resizeTo: document.documentElement,
-            //resolution: window.devicePixelRatio,
-            preference: navigator.gpu && this.chart_data!.prpr == undefined ?"webgpu":"webgl"
+            resolution: window.devicePixelRatio,
+            preference: navigator.gpu ? "webgpu" : "webgl"
         })
         await this.game.init({
             app: this.app,
