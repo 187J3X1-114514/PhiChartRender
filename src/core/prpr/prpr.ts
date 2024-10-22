@@ -194,7 +194,7 @@ export class PrprExtra {
                 case "movecamera":
                     return (Shader.presetsWebGPU as any)['movecamera']
                 default:
-                    return this.formatShader(this.game!.zipFiles.get(this.game!.chart.rootPath + name) as string)
+                    return undefined//this.formatShader(this.game!.zipFiles.get(this.game!.chart.rootPath + name) as string)
             }
         } else {
             return (Shader.presetsWebGPU as any)[name]!

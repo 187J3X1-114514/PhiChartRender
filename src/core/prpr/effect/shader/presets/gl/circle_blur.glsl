@@ -7,7 +7,6 @@ uniform sampler2D uTexture;
 varying vec2 vTextureCoord;
 
 void main() {
-    vec2 center = vec2(0.5, 0.5);
     vec3 color = texture2D(uTexture, vTextureCoord).rgb;
     float size_new = size / 1.1;
     float totalBlurFactor = 0.0;

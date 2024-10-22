@@ -228,15 +228,13 @@ await app.init({
 document.body.appendChild(app.canvas)
 app.canvas.classList.add("game")
 app.stage.addChild(new Sprite(await Assets.load("assets/phira.png")))
-let testShader = new Shader(Shader.presetsGL.vignette, "test", undefined, Shader.presetsWebGPU.vignette)
+let testShader = new Shader(Shader.presetsGL.movecamera, "test", undefined, Shader.presetsWebGPU.movecamera)
 let s = performance.now()
 app.ticker.add(() => {
     testShader.update({
         time: (performance.now() - s) / 1000,
         screenSize: [document.documentElement.clientWidth, document.documentElement.clientHeight],
-        color: [0, 0, 0, 1],
-        extend: 0.25,
-        radius: 15
+        power: -0.1
     })
 })
 
