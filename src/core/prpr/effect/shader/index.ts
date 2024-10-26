@@ -114,3 +114,5 @@ function toArray(text?: string) {
     if (list.length == 2) return [parseFloat(list[0]), parseFloat(list[1])]
     if (list.length == 4) return [parseFloat(list[0]), parseFloat(list[1]), parseFloat(list[2]), parseFloat(list[3])]
 }
+
+export {defaultShaderGL}

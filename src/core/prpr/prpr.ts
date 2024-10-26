@@ -71,10 +71,9 @@ export class PrprExtra {
                 temp.push((effect.shader as Shader).filter)
                 rootContainer.filters = temp
             } else {
-                let temp: any = (renders.gameContainer.filters as Filter[]).slice()
+                let temp: Filter[] = (renders.gameContainer.filters as Filter[]).slice()
                 temp.push((effect.shader as Shader).filter)
                 renders.gameContainer.filters = temp
-
             }
         }
         for (let i = 0, length = this.videos.length; i < length; i++) {
@@ -104,7 +103,7 @@ export class PrprExtra {
     }
 
     cleanShader() {
-        this.game!.renders.gameContainer.filters = [DefaultShader.filter];
+        this.game!.renders.gameContainer.filters = this.game!.getDefaultShader();
         this.game!.rootContainer.filters = [DefaultShader.filter];
     }
 

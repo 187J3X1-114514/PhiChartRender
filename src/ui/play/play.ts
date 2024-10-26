@@ -52,7 +52,7 @@ export class PlayS {
             hello: true,
             resizeTo: document.documentElement,
             resolution: window.devicePixelRatio,
-            preference: navigator.gpu ? "webgpu" : "webgl"
+            preference: navigator.gpu ? "webgl" : "webgl"
         })
         this.game = await PhiGame.create({
             app: this.app,
@@ -63,7 +63,7 @@ export class PlayS {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1
+                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1,antialias:true,antialiasType:1
             }
         })
         console.log(this.app.renderer.render)
@@ -91,5 +91,8 @@ export class PlayS {
         document.body.style.paddingTop = "64px"
         this.app!.canvas.classList.add("push-out")
         this.end()
+        setTimeout(() => {
+            this.game!.destroy()
+        }, 620)
     }
 }

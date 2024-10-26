@@ -103,8 +103,8 @@ export default class UIManger implements baseUIManger {
             this.backgrounds.small.visible = true
             this.backgrounds.smallCover.visible = true
             if (size.widerScreen) {
-                let bgScaleWidth = this.game.render.screen.width / this.backgrounds.small.texture.width;
-                let bgScaleHeight = this.game.render.screen.height / this.backgrounds.small.texture.height;
+                let bgScaleWidth = this.game.app.screen.width / this.backgrounds.small.texture.width;
+                let bgScaleHeight = this.game.app.screen.height / this.backgrounds.small.texture.height;
                 let bgScale = bgScaleWidth > bgScaleHeight ? bgScaleWidth : bgScaleHeight;
 
                 this.backgrounds.big.scale.set(bgScale);

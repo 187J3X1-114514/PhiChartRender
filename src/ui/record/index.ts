@@ -60,7 +60,7 @@ export class RecordGame {
         this.game = game;
         this.totalFrame = parseInt((this.game.chart.music.duration * this.fps).toFixed())
         this.tchunks = Math.ceil(this.totalFrame / this.images_chunks)
-        this.game.render.ticker.stop()
+        this.game.app.ticker.stop()
         this.game.chart.music.volume = 0
         this.rec = new record(fps, fps * 4)
     }
@@ -69,7 +69,7 @@ export class RecordGame {
         this.cbs.push(callback)
     }
     async start_record() {
-        const gl = (this.game.render.canvas.getContext("webgl") != null ? this.game.render.canvas.getContext("webgl") : this.game.render.canvas.getContext("webgl2"))!
+        const gl = (this.game.app.canvas.getContext("webgl") != null ? this.game.app.canvas.getContext("webgl") : this.game.app.canvas.getContext("webgl2"))!
         let msg = ""
         _FFMPEG.on("log", (a) => {
             msg = msg + a.message + "\n"
@@ -80,7 +80,7 @@ export class RecordGame {
         let isC = false
         this.game.resize(true)
         this.game.start()
-        this.game.render.ticker.stop()
+        this.game.app.ticker.stop()
         let temp: Uint8Array[][] = new Array()
         for (let i = 0, length = this.tchunks; i < length; i++) temp.push([])
         const downloadBlob = (blobUrl: string, fileName: string) => {
@@ -107,11 +107,11 @@ export class RecordGame {
             target: "in-browser",
         })
         await rec.start()
-        this.rec.start_record(this.game.render.canvas, async () => {
+        this.rec.start_record(this.game.app.canvas, async () => {
             if (!isC) { ; isC = true }//; _FFMPEG.createDir("/" + this.images_path);
             this.game.calcTickByCurrentTime(this.currentTime)
             this.game.chart.music.volume = 0
-            this.game.render.render()
+            this.game.app.render()
             this.recordedFrame++
             await rec.step()
             if (this.recordedFrame >= this.totalFrame) {
