@@ -1,7 +1,7 @@
 /*import 'mdui/mdui.css'
 import { Button, Card, Select, MenuItem } from 'mdui';
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { ResourceManger } from './core/resource';
+import { ResourceManager } from './core/resource';
 import './styles.css'
 import { OutGameFontName } from './core/font';
 import 'mdui/components/icon.js';
@@ -26,7 +26,7 @@ function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: Event) 
 }
 await load_ffmpeg()
 const res = ResPack
-const ress = new ResourceManger()
+const ress = new ResourceManager()
 const fbtn = new Button()
 const ctx = document.createElement("div")
 ctx.style.width = "854px"
@@ -121,14 +121,14 @@ document.documentElement.addEventListener("click", () => {
     if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
 })
 /*
-import { ResourceManger } from "./core/resource";
+import { ResourceManager } from "./core/resource";
 import Chart from './core/chart';
 import { PlayS } from './ui/play/play';
 import { Application } from 'pixi.js';
 import Game from './core/game';
 import { topAppBar, BACKGROUND, ResPack } from './ui/main';
 
-const resM = new ResourceManger()
+const resM = new ResourceManager()
 await resM.load("test.zip", await (await fetch("test")).blob());
 console.log(resM)
 function download(buff: ArrayBuffer) {
@@ -228,13 +228,18 @@ await app.init({
 document.body.appendChild(app.canvas)
 app.canvas.classList.add("game")
 app.stage.addChild(new Sprite(await Assets.load("assets/phira.png")))
-let testShader = new Shader(Shader.presetsGL.movecamera, "test", undefined, Shader.presetsWebGPU.movecamera)
+let testShader = new Shader(Shader.presetsGL.shockwave, "test", undefined, Shader.presetsWebGPU.shockwave)
 let s = performance.now()
 app.ticker.add(() => {
     testShader.update({
         time: (performance.now() - s) / 1000,
         screenSize: [document.documentElement.clientWidth, document.documentElement.clientHeight],
-        power: -0.1
+        progress:0.2,
+        centerX:0.5,
+        centerY:0.5,
+        width:0.1,
+        distortion:1.8,
+        expand:10
     })
 })
 

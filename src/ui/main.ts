@@ -1,9 +1,19 @@
 import { BUILD_ENV, BUILDTIME, GIT_HASH, PACKAGE_JSON } from "./env";
+import { VERSION as PIXI_VERSION } from "pixi.js";
+import { STATUS, STATUSTEXT } from "./status";
 import * as DB from "./data"
+
+//////////////////////////////////////
 document.getElementById("top-app-bar-title")!.innerText += (' V' + PACKAGE_JSON.version.split('v').pop())
 let v = '' + PACKAGE_JSON.version.split('v').pop()
-let nv = `V${v}-${GIT_HASH.slice(0, 7).toLocaleUpperCase()}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
+let nv = `V${v}-${GIT_HASH.slice(0, 7).toLocaleUpperCase()}+pixi_${PIXI_VERSION}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
 document.getElementById("info")!.innerText = nv
+//////////////////////////////////////
+import { loadFont } from "../core/font";
+STATUS.setStatus("加载字体中")
+await loadFont()
+STATUS.setStatus("")
+STATUS.setStatusInfo("")
 
 import { Avatar, ButtonIcon, Dropdown, MenuItem, NavigationDrawer, getTheme, setTheme, CircularProgress, LinearProgress, NavigationRail, Collapse, NavigationRailItem } from "mdui"
 import loginPage from "./phira/login"
@@ -12,8 +22,6 @@ import { Zip, loadZip } from "../core/file";
 import { ResourcePack } from "../core/resource";
 import Cookies from 'js-cookie'
 import { Theme } from "mdui/internal/theme";
-import { loadFont } from "../core/font";
-await loadFont()
 import { get_theme, main, MAINWINDOW_HWND, ON_TAURI, RUN_RS_FN } from "./tauri";
 import { openDebug } from "./debug/ui_pos";
 import { background } from "./background/background";
@@ -21,11 +29,9 @@ import { LocalScreen } from "./screen/local";
 import { ChartPage } from "./phira/chart/chart";
 
 
-
 const UI_HTML = `    
 
 `
-document.getElementById("start-o")!.classList.remove("black");
 async function setThemeP(a: string) {
     if (a != "auto") {
         document.body.style.setProperty("--color", a == "light" ? "#000000" : "#FFFFFF")
@@ -95,10 +101,13 @@ export const tabRec = document.getElementById("tab-rec")! as NavigationRailItem
 export const tabLocal = document.getElementById("tab-local")! as NavigationRailItem
 uModeBtn()
 
+STATUS.setStatus("加载资源中")
 let zip: Zip
+STATUS.setStatusInfo("assets/pack/resource")
 zip = await loadZip("resource.zip", await DB.getOrCreateCacheDATA("assets/pack/resource"))
 export const ResPack = await ResourcePack.load(zip)
-
+STATUS.setStatus("")
+STATUS.setStatusInfo("")
 for (let e of document.getElementsByClassName("arrow")) {
     var el = (e as HTMLElement).parentElement as HTMLElement
     el.addEventListener("click", () => {
@@ -112,7 +121,6 @@ for (let e of document.getElementsByClassName("arrow")) {
 export const BACKGROUND = await background.init()
 
 var cp: ChartPage | undefined = undefined;
-load.classList.add("hide")
 tabPhira.addEventListener("click", async () => {
     if (cp != undefined) {
         cp.root.classList.add("push-out-y")
@@ -343,3 +351,15 @@ classChart3.addEventListener("click", () => {
     navigationDrawer.open = false
     cp!.searchChart()
 })
+
+//////////////////////////////////////////////////////////////////////////////
+setTimeout(()=>{
+    load.classList.add("hide")
+    document.getElementById("start-o")!.classList.remove("black");
+    setTimeout(()=>{
+        document.getElementById("start-o")!.remove()
+        STATUSTEXT.classList.toggle("status-text-onload")
+        STATUSTEXT.classList.toggle("status-text-done")
+    },300)
+},100)
+

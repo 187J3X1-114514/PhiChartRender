@@ -6,7 +6,7 @@ import { Container, AnimatedSprite, Texture, Sprite } from 'pixi.js';
 import Chart from '../chart';
 import { SizerData } from '../types/params';
 import Note from '../chart/note';
-import WAudio from '../audio';
+import Audio from '../audio';
 
 const particleCountPerClickAnim = 4;
 
@@ -170,11 +170,11 @@ export default class Judgement {
         temp.forEach((v) => {
             let st = (v as any).startTime
             let tf = v.totalFrames
-            let cf = Math.round(((this.currentTime - st)/1000) / ((tf / 60)/tf))
+            let cf = Math.round(((this.currentTime - st) / 1000) / ((tf / 60) / tf))
             if (cf >= tf) {
                 v.destroy()
-                this.anims.splice(this.anims.indexOf(v),1)
-             } else {
+                this.anims.splice(this.anims.indexOf(v), 1)
+            } else {
                 v.currentFrame = cf
             }
             v.alpha = 1 - (v.currentFrame / v.totalFrames);
@@ -246,7 +246,7 @@ export default class Judgement {
 
     playHitsound(note: Note) {
         if (!this._hitsound) return;
-        if (note.hitsound) (note.hitsound as WAudio).play();
+        if (note.hitsound) (note.hitsound as Audio).play();
         else {
             switch (note.type) {
                 case 1:

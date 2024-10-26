@@ -2,24 +2,14 @@ import SevenZip, { SevenZipModule } from "7z-wasm";
 import { File } from './file'
 import { newLogger } from '../log'
 import { mimeTypes } from './minetype';
-import { join, NFile } from './utils';
+import { join, NativeFile } from './utils';
 import { Archive as LibArchive } from 'libarchive.js';
 import JSZip from "jszip"
-//LibArchive.init({
-//    workerUrl: 'assets/dep/worker-bundle.js'
-//});
+import { generateRandomString } from "../random";
+
 
 
 const log = newLogger("Zip")
-function generateRandomString(length: number): string {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters.charAt(randomIndex);
-    }
-    return result;
-}
 export class _7zip {
     public js7z: SevenZipModule = {} as any
     public isRuning: boolean = false
@@ -201,14 +191,24 @@ export class _7zip {
 }
 export var isInit7zip = false
 export var _7ZIP = undefined as any
-
+export var isInitLibArchive = false
 export async function init7ZIP() {
-    
+
     if (_7ZIP == undefined) {
         log.info("初始化7-zip中")
         _7ZIP = await _7zip.create()
     }
     isInit7zip = true
+}
+
+export async function initLibArchive() {
+    if (!isInitLibArchive) {
+        log.info("初始化LibArchive中")
+        LibArchive.init({
+            workerUrl: 'assets/dep/worker-bundle.js'
+        });
+    }
+    isInitLibArchive = true
 }
 
 export class Archive {
@@ -255,22 +255,23 @@ export async function loadZipUse7zWASM(name: string, file: Blob | ArrayBuffer): 
 function toFile(name: string, file: Blob | ArrayBuffer) {
     let nfile
     if (file instanceof Blob) {
-        nfile = new NFile([file], name)
+        nfile = new NativeFile([file], name)
     } else {
-        nfile = new NFile([new Blob([file])], name)
+        nfile = new NativeFile([new Blob([file])], name)
     }
     return nfile
 
 }
 
 export async function loadZipUseLibarchivejs(name: string, file: Blob | ArrayBuffer): Promise<Archive> {
+    await initLibArchive()
     log.info("加载压缩包文件 " + name + " 中...")
     const archive = await LibArchive.open(toFile(name, file))
     const obj = await archive.extractFiles();
     const files: { "name": string, "file": File }[] = []
 
     for (let key of Object.keys(obj)) {
-        if (obj[key] instanceof NFile) {
+        if (obj[key] instanceof NativeFile) {
             files.push({ "name": key, "file": new File(new Blob([await obj[key].arrayBuffer()]), key) })
         }
     }

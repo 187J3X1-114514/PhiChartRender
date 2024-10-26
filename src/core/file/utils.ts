@@ -39,7 +39,7 @@ function dirname(p: string): string {
 
     return head;
 }
-const NFile = File
+const NativeFile = File
 export {
-    join,dirname,NFile
+    join,dirname,NativeFile
 }

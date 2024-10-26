@@ -3,17 +3,17 @@ import Effect from './effect/index'
 import utils from '../chart/convert/utils';
 import PrPrExtraJSON, { PrPrExtraVideo } from './types';
 import { RePhiEditEasing } from '../chart/easing';
-import Game from '../game';
+import PhiGame from '../game';
 import Shader, { DefaultShader } from './effect/shader';
 import { Filter, Texture } from 'pixi.js';
 import { newLogger } from '../log';
 import { PrprVideo } from './video';
 import { SizerData } from '../types/params';
 import { join } from '../file/utils';
-import { effectEvent } from '../chart/baseEvents';
+import { rpeEvent } from '../chart/baseEvents';
 const log = newLogger("prpr拓展")
 export class PrprExtra {
-    private game?: Game
+    private game?: PhiGame
     public effects: Effect[] = []
     public videos: PrprVideo[] | PrPrExtraVideo[] = []
     public hasShader: boolean = true
@@ -26,7 +26,7 @@ export class PrprExtra {
         return prpr
     }
 
-    setGame(game: Game) {
+    setGame(game: PhiGame) {
         this.game = game
     }
 
@@ -49,14 +49,14 @@ export class PrprExtra {
         }
         this.cleanShader()
         let effects = this.effects
-        let { renders, render } = this.game!;
+        let { renders , rootContainer } = this.game!;
         for (let i = 0, length = effects.length; i < length; i++) {
             const effect = effects[i];
             if (effect.shader === null) continue;
             if (effect.endTime < currentTime) {
                 if (!effect.isGlobal) {
-                    let index = (render.stage.filters as Filter[]).indexOf((effect.shader as Shader).filter);
-                    if (index > -1) (render.stage.filters as Filter[]).slice(index, 1)
+                    let index = (rootContainer.filters as Filter[]).indexOf((effect.shader as Shader).filter);
+                    if (index > -1) (rootContainer.filters as Filter[]).slice(index, 1)
                 } else {
                     let index = (renders.gameContainer.filters as Filter[]).indexOf((effect.shader as Shader).filter);
                     if (index > -1) (renders.gameContainer.filters as Filter[]).slice(index, 1)
@@ -67,9 +67,9 @@ export class PrprExtra {
 
             effect.calcTime(currentTime, renders.sizer.shaderScreenSize);
             if (effect.isGlobal) {
-                let temp: any = (render.stage.filters as Filter[]).slice()
+                let temp: any = (rootContainer.filters as Filter[]).slice()
                 temp.push((effect.shader as Shader).filter)
-                render.stage.filters = temp
+                rootContainer.filters = temp
             } else {
                 let temp: any = (renders.gameContainer.filters as Filter[]).slice()
                 temp.push((effect.shader as Shader).filter)
@@ -105,7 +105,7 @@ export class PrprExtra {
 
     cleanShader() {
         this.game!.renders.gameContainer.filters = [DefaultShader.filter];
-        this.game!.render.stage.filters = [DefaultShader.filter];
+        this.game!.rootContainer.filters = [DefaultShader.filter];
     }
 
     init() {
@@ -331,7 +331,7 @@ export class PrprExtra {
                 });
                 for (const name in _effect.vars) {
                     if (_effect.vars[name] instanceof Array) {
-                        let _values: effectEvent[] = _effect.vars[name].slice();
+                        let _values: rpeEvent[] = _effect.vars[name].slice();
                         if (_values[0]?.startTime && _values[0]?.end instanceof Array && _values.length > 0) {
                             delete _effect.vars[name]
                             for (let i = 0, length = (_values[0].start as number[]).length; i < length; i++) {

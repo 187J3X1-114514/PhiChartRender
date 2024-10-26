@@ -1,10 +1,11 @@
 
 import * as t from "io-ts"
 import * as pixi from 'pixi.js'
-import WAudio from '../audio/index'
+import Audio from '../audio/index'
 import { Zip } from "../file"
 import { loadTextures } from "./utils"
 import { newLogger } from "../log"
+import { STATUS } from "../../ui/status"
 const log = newLogger("Resource Pack")
 export interface ResourcePackInfo {
     hitFx: {
@@ -91,10 +92,10 @@ export interface PhiAssets {
     judgeLine: pixi.Texture
 
     sound: {
-        tap: WAudio
-        drag: WAudio
-        hold: WAudio
-        flick: WAudio
+        tap: Audio
+        drag: Audio
+        hold: Audio
+        flick: Audio
     }
     __src_sound: {
         tap: Blob
@@ -183,6 +184,7 @@ export class ResourcePack {
         log.info('开始加载资源包 -> ' + zip.name)
         var texture
         var textureBase
+        STATUS.setStatusInfo("hold")
         texture = await loadTextures(zip.get(info.note.hold[0])!)
         const rectangleholdE = new pixi.Rectangle(0, 0, texture.width, info.holdAtlas[0]);
         const holdE = new pixi.Texture({
@@ -211,9 +213,13 @@ export class ResourcePack {
             source: texture.source, frame: rectangleholdMHB
         })
         log.info('hold(有多押)音符加载完成')
+
+        STATUS.setStatusInfo("judgeLine")
         texture = await createImageBitmap(await zip.get(info.judgeLine.image)?.getBlob()!)
         const judgeLine = pixi.Texture.from(texture)
         log.info('判定线加载完成')
+
+        STATUS.setStatusInfo("note")
         const note = {
             hold: {
                 head: holdH,
@@ -233,6 +239,8 @@ export class ResourcePack {
             flick: await loadTextures(zip.get(info.note.flick[0])!)
         }
         log.info('所有Note加载完成')
+
+        STATUS.setStatusInfo("sound")
         const __src_noteSound = {
             tap: (await zip.get(info.sound.tap!)?.getBlob())!,
             drag: (await zip.get(info.sound.drag!)?.getBlob())!,
@@ -240,17 +248,18 @@ export class ResourcePack {
             hold: (await zip.get(info.sound.hold!)?.getBlob())!
         }
         const noteSound = {
-            tap: await WAudio.from(await __src_noteSound.tap.arrayBuffer()),
-            drag: await WAudio.from(await __src_noteSound.drag.arrayBuffer()),
-            flick: await WAudio.from(await __src_noteSound.flick.arrayBuffer()),
-            hold: await WAudio.from(await __src_noteSound.hold.arrayBuffer())
+            tap: await Audio.from(await __src_noteSound.tap.arrayBuffer()),
+            drag: await Audio.from(await __src_noteSound.drag.arrayBuffer()),
+            flick: await Audio.from(await __src_noteSound.flick.arrayBuffer()),
+            hold: await Audio.from(await __src_noteSound.hold.arrayBuffer())
         }
 
         log.info('音效加载完成')
+
+        STATUS.setStatusInfo("hitEffect")
         let HitFxW
         let HitFxH
         var textureList = []
-
         textureBase = pixi.Texture.from(await createImageBitmap(await zip.get(info.hitFx.image)!.getBlob()))
         HitFxW = textureBase.width / info.hitFx.width
         HitFxH = textureBase.height / info.hitFx.height

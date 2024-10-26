@@ -28,7 +28,7 @@ export class PhiraAPI {
     static async login(email: string, password: string) {
         return new Promise<loginResult>(async (r__) => {
             let st = performance.now()
-            let r: { [key: string]: any } = {}
+            let result: { [key: string]: any } = {}
             let loginJson
             let fetchResult: any
             let fetchJSON
@@ -56,19 +56,19 @@ export class PhiraAPI {
                 })
                 fetchJSON = await fetchResult.json()
             } catch (e) {
-                r["api"] = undefined
-                r["status"] = fetchResult.status
-                r["error"] = e
-                r["ok"] = false
-                return r as loginResult
+                result["api"] = undefined
+                result["status"] = fetchResult.status
+                result["error"] = e
+                result["ok"] = false
+                return result as loginResult
             }
 
             if (!fetchResult.ok) {
-                r["api"] = undefined
-                r["status"] = fetchResult.status
-                r["error"] = fetchJSON["error"]
-                r["ok"] = false
-                return r as loginResult
+                result["api"] = undefined
+                result["status"] = fetchResult.status
+                result["error"] = fetchJSON["error"]
+                result["ok"] = false
+                return result as loginResult
             }
             loginJson = fetchJSON
             try {
@@ -81,32 +81,32 @@ export class PhiraAPI {
                 })
                 fetchJSON = await fetchResult.json()
             } catch (e) {
-                r["api"] = undefined
-                r["status"] = fetchResult.status
-                r["error"] = e
-                r["ok"] = false
-                return r as loginResult
+                result["api"] = undefined
+                result["status"] = fetchResult.status
+                result["error"] = e
+                result["ok"] = false
+                return result as loginResult
             }
 
             if (!fetchResult.ok) {
-                r["api"] = undefined
-                r["status"] = fetchResult.status
-                r["error"] = fetchJSON["error"]
-                r["ok"] = false
-                return r as loginResult
+                result["api"] = undefined
+                result["status"] = fetchResult.status
+                result["error"] = fetchJSON["error"]
+                result["ok"] = false
+                return result as loginResult
             }
             meJson = fetchJSON
-            r["api"] = new this(loginJson, { name: meJson["name"], email: email, password: password }, meJson)
-            r["status"] = 200
-            r["error"] = ""
-            r["ok"] = true
-            r__(r as loginResult)
+            result["api"] = new this(loginJson, { name: meJson["name"], email: email, password: password }, meJson)
+            result["status"] = 200
+            result["error"] = ""
+            result["ok"] = true
+            r__(result as loginResult)
         })
     }
     async getAvatar() {
         return await new Promise<string>(async (r) => {
             let imageUrl: string = this.userInfo["avatar"]
-            this.fetch(API_URL.buildPhriaApiURL(imageUrl.replace("https://api.phira.cn/", "")),
+            this.fetch(API_URL.proxyPhriaApiURL(imageUrl.replace("https://api.phira.cn/", "")),
                 'GET',
                 {},
                 undefined

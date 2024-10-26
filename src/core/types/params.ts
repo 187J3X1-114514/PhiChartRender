@@ -1,6 +1,6 @@
 import { Application } from "pixi.js"
 import { ChartData } from "../chart/chartinfo"
-import { ResourceManger } from "../resource"
+import { ResourceManager } from "../resource"
 import { PhiAssets } from "../resource/resource_pack"
 import { PrprExtra } from "../prpr/prpr"
 
@@ -18,7 +18,7 @@ export interface GameParams {
     chart: ChartData,
     assets: PhiAssets,
     effects?: PrprExtra,
-    zipFiles?: ResourceManger,
+    zipFiles?: ResourceManager,
     settings: {
         audioOffset?: number,
         hitsound?: boolean,

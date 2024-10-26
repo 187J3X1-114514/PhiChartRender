@@ -1,7 +1,7 @@
 import { Texture } from "pixi.js"
-import WAudio from "../audio"
+import Audio from "../audio"
 import Chart from "."
-import { ResourceManger } from "../resource"
+import { ResourceManager } from "../resource"
 import * as yaml from 'js-yaml'
 import { File } from "../file"
 import * as StackBlur from 'stackblur-canvas';
@@ -53,7 +53,7 @@ export class ChartInfo {
     public src: PhiraChartInfo | RPEChartInfo
     public type: string = "rpe"
     private dir: string = ""
-    private resManger?: ResourceManger
+    private resManger?: ResourceManager
     private constructor(c: string, m: string, i: string, src: PhiraChartInfo | RPEChartInfo, p: PrprExtra = undefined as any) {
         this.chart = c
         this.illustration = i
@@ -61,7 +61,7 @@ export class ChartInfo {
         this.src = src
         this.prpr = p
     }
-    get(resMan: ResourceManger) {
+    get(resMan: ResourceManager) {
         (resMan.get(this.chart) as Chart).rootPath = this.dir
         let c = resMan.get(this.chart) as Chart
         c.info = {
@@ -74,7 +74,7 @@ export class ChartInfo {
         };
         let d = {
             chart: c,
-            music: resMan.get(this.music) as WAudio,
+            music: resMan.get(this.music) as Audio,
             illustration: resMan.get(this.illustration) as Texture,
             prpr: resMan.get(this.dir + '/' + "extra.json")
         } as any as ChartData
@@ -84,7 +84,7 @@ export class ChartInfo {
         return d
 
     }
-    static async from(file: File, resManger: ResourceManger) {
+    static async from(file: File, resManger: ResourceManager) {
         var data: any
         var t: ChartInfo
         switch (file.extension) {
@@ -177,7 +177,7 @@ function loadTxtChartInfo(str: string) {
 
 export interface ChartData{
     chart: Chart;
-    music: WAudio;
+    music: Audio;
     illustration: Texture;
     prpr: PrprExtra;
 }

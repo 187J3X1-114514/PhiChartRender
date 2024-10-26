@@ -1,24 +1,11 @@
 import { newLogger } from '../log'
 import { IMediaInstance, Sound, sound } from '@pixi/sound';
-const log = newLogger("WAudio")
+import { generateRandomString } from '../random';
+const log = newLogger("Audio")
 sound.disableAutoPause = true
-function generateRandomString(length: number): string {
-    try {
-        return self.crypto.randomUUID()
-    } catch {
-        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
 
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            result += characters.charAt(randomIndex);
-        }
 
-        return result;
-    }
-}
-
-export default class WAudio {
+export default class Audio {
     private soundName: string
     private sound: Sound
     private soundPlay?: IMediaInstance
@@ -29,17 +16,15 @@ export default class WAudio {
         this.soundName = n
         this.sound = s
     }
-    static async from(src: any): Promise<WAudio> {
-        let n = generateRandomString(32)
+    static async from(src: any,soundName:string=generateRandomString(32)): Promise<Audio> {
         return await new Promise((r) => {
             let _ = performance.now()
-            let m = new this(n, sound.add(n, {
+            let m = new this(soundName, sound.add(soundName, {
                 source: src, preload: true, loaded: () => { 
-                    log.debug("添加音频",n,"用时",(performance.now()-_).toFixed(0)+"ms")
+                    log.debug("添加音频",soundName,"用时",(performance.now()-_).toFixed(0)+"ms")
                     r(m) 
                 }
             }))
-
         })
     }
     reset() {

@@ -26,7 +26,7 @@ export async function loadTextures(src: string | HTMLImageElement | File): Promi
 export async function loadText(file: File) {
     return await (await file.getBlob()).text()
 }
-
+//可解压的文件类型
 const SFILES = [
     "7z",
     "apfs",
@@ -146,7 +146,7 @@ const SFILES = [
     "tzst"
 ]
 
-export function isArchive(name: string|undefined) {
+export function isArchive(name: string | undefined) {
     if (name) {
         if (SFILES.includes(name.toLowerCase())) {
             return true

@@ -4,8 +4,8 @@ import { Sprite, Graphics, Text, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import Note from './note';
 import { bpmEvent } from './baseEvents';
-import WAudio from '../audio';
-import { PhiAssets, ResourceManger } from '../resource';
+import Audio from '../audio';
+import { PhiAssets, ResourceManager } from '../resource';
 import { SizerData } from '../types/params';
 export default class Chart {
     judgelines: Judgeline[]
@@ -13,7 +13,7 @@ export default class Chart {
     bpmList: bpmEvent[]
     offset: number
     isLineTextureReaded: boolean
-    music: WAudio
+    music: Audio
     info: {
         name: string,
         artist: string,
@@ -52,7 +52,7 @@ export default class Chart {
         this.sprites = {};
     }
 
-    static async from(rawChart: any, music?: WAudio, _chartInfo = {}, _chartLineTexture = []) {
+    static async from(rawChart: any, music?: Audio, _chartInfo = {}, _chartLineTexture = []) {
         let chart: Chart | null = null;
         let chartInfo: any = _chartInfo;
         if (typeof rawChart == 'object') {
@@ -158,7 +158,7 @@ export default class Chart {
         if (isReaded) this.isLineTextureReaded = true;
     }
 
-    createSprites(stage: any, size: any, textures: PhiAssets, _uiStage: any = null, zipFiles = new ResourceManger(), _speed = 1, _bgDim = 0.5, multiNoteHL = true, debug = false) {
+    createSprites(stage: any, size: any, textures: PhiAssets, _uiStage: any = null, zipFiles = new ResourceManager(), _speed = 1, _bgDim = 0.5, multiNoteHL = true, debug = false) {
         this.judgelines.forEach((judgeline, _index) => {
             judgeline.createSprite(textures, zipFiles, this.rootPath);
 
@@ -189,15 +189,6 @@ export default class Chart {
 
     resizeSprites(size: any, isEnded: any) {
         this.renderSize = size;
-
-        //if (this.sprites.bg) {
-        //    let bgScaleWidth = this.renderSize.width / this.sprites.bg.texture.width;
-        //    let bgScaleHeight = this.renderSize.height / this.sprites.bg.texture.height;
-        //    let bgScale = bgScaleWidth > bgScaleHeight ? bgScaleWidth : bgScaleHeight;
-        //    this.sprites.bg.scale.set(bgScale);
-        //    this.sprites.bg.position.set(this.renderSize.width / 2, this.renderSize.height / 2);
-        //}
-
         if (this.judgelines && this.judgelines.length > 0) {
             this.judgelines.forEach((judgeline) => {
                 if (!judgeline.sprite) return;

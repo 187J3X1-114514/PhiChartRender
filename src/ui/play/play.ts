@@ -1,20 +1,20 @@
 import { ChartData, ChartInfo } from "../../core/chart/chartinfo";
-import Game from "../../core/game";
-import { ResourceManger, ResourcePack } from "../../core/resource";
+import PhiGame from "../../core/game";
+import { ResourceManager, ResourcePack } from "../../core/resource";
 import { File } from "../../core/file";
 import { Application } from "pixi.js";
 import { topAppBar, BACKGROUND } from "../main";
 
 export class PlayS {
-    private res: ResourceManger
+    private res: ResourceManager
     private chart?: ChartInfo
-    private game?: Game
+    private game?: PhiGame
     private app?: Application
     private file: File[]
     private resp: ResourcePack
     private chart_data?: ChartData
     private end: () => void
-    constructor(file: File | File[] | ChartInfo, resp: ResourcePack, resm: ResourceManger = new ResourceManger()) {
+    constructor(file: File | File[] | ChartInfo, resp: ResourcePack, resm: ResourceManager = new ResourceManager()) {
         this.res = resm
         this.file = file instanceof Array ? file : (file instanceof ChartInfo ? [] : [file])
         this.resp = resp
@@ -40,21 +40,21 @@ export class PlayS {
             }
         }
         await this.chart!.blur(40)
-        this.game = new Game()
+        
         this.app = new Application()
         this.chart_data = this.chart!.get(this.res)
         await this.app.init({
             //width: document.documentElement.clientWidth,
             //height: document.documentElement.clientHeight,
             autoDensity: true,
-            antialias: true,
+            antialias: false,
             //backgroundAlpha: 1,
             hello: true,
             resizeTo: document.documentElement,
             resolution: window.devicePixelRatio,
             preference: navigator.gpu ? "webgpu" : "webgl"
         })
-        await this.game.init({
+        this.game = await PhiGame.create({
             app: this.app,
             render: {
                 resizeTo: document.documentElement
@@ -66,6 +66,7 @@ export class PlayS {
                 autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1
             }
         })
+        console.log(this.app.renderer.render)
         let r = new ResizeObserver(() => { this.game!.resize(true) })
         r.observe(this.app!.canvas)
         this.game.createSprites()

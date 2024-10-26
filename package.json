@@ -3,7 +3,7 @@
   "version": "v0.0.3",
   "type": "module",
   "scripts": {
-    "dev": "netlify dev",
+    "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "build:tauri": ""

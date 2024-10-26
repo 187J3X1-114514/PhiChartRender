@@ -1,5 +1,3 @@
-import { loadText } from "../resource/utils"
-
 export enum FileType {
     JSON,
     SOUND,
@@ -100,8 +98,6 @@ export class File {
         }
     }
     async async<T extends OutputType>(type: T): Promise<OutputByType[T]> {
-
-
         const file = this.file as Blob
         switch (type) {
             case 'base64':

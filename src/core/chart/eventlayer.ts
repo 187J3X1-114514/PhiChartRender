@@ -2,7 +2,7 @@ import { Event, valueEvent } from "./baseEvents";
 import { jsonEventLayer } from "./types/judgeLine";
 
 export default class EventLayer {
-    public speed: valueEvent[] = []//{ startTime: number, endTime: number, start?: number, end?: number, value?: number }[] = [];
+    public speed: valueEvent[] = []
     public moveX: Event[] = [];
     public moveY: Event[] = [];
     public alpha: Event[] = [];
@@ -38,10 +38,6 @@ export default class EventLayer {
         let _posY = this.valueCalculator(this.moveY, currentTime, this.moveYOriginValue || this._posY);
         let _alpha = this.valueCalculator(this.alpha, currentTime, this.alphaOriginValue || this._alpha);
         let _rotate = this.valueCalculator(this.rotate, currentTime, this.rotateOriginValue || this._rotate);
-        //let _posX = this.valueCalculator(this.moveX, currentTime, this._posX || this.moveXOriginValue);
-        //let _posY = this.valueCalculator(this.moveY, currentTime, this._posY || this.moveYOriginValue);
-        //let _alpha = this.valueCalculator(this.alpha, currentTime, this._alpha || this.alphaOriginValue);
-        //let _rotate = this.valueCalculator(this.rotate, currentTime, this._rotate || this.rotateOriginValue);
         this._posX = _posX[0]
         this._posY = _posY[0]
         this._alpha = _alpha[0]
@@ -68,9 +64,6 @@ export default class EventLayer {
 
             return [event.start * timePercentStart + event.end * timePercentEnd, true];
         }
-        //if (events[_eventIndex - 1]) {
-        //    return events[_eventIndex - 1].end;
-        //}
         return [originValue, false];
     }
 

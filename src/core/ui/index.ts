@@ -1,7 +1,7 @@
 import { SizerData } from '../types/params';
 import Chart from '../chart';
 import { UIElement } from './element';
-import Game from '../game';
+import PhiGame from '../game';
 import { Container, Graphics, Sprite } from 'pixi.js';
 import { defaultUISettings } from './settings';
 import { attachUI, UISettings, UIElementSettings, baseUIManger } from "../types/ui"
@@ -15,7 +15,7 @@ export default class UIManger implements baseUIManger {
         Name: UIElement,
         Level: UIElement,
     }
-    private game: Game
+    private game: PhiGame
     private size?: SizerData
     private PauseBtnLastClickCount: number = 0
     private PauseBtnLastClickTime: number = 0
@@ -27,7 +27,7 @@ export default class UIManger implements baseUIManger {
     } = {
             big: new Sprite(), small: new Sprite(), bigCover: new Graphics(), smallCover: new Graphics()
         }
-    constructor(game: Game, settings: UISettings = defaultUISettings) {
+    constructor(game: PhiGame, settings: UISettings = defaultUISettings) {
         let chart = game.chart
         this.chart = game.chart
         this.game = game
@@ -73,7 +73,7 @@ export default class UIManger implements baseUIManger {
         this.backgrounds.bigCover.zIndex = -7
         this.backgrounds.small.zIndex = -6
         this.backgrounds.smallCover.zIndex = -5
-        this.game.render.stage.addChild(this.backgroundContainer)
+        this.game.rootContainer.addChild(this.backgroundContainer)
         this.backgroundContainer.addChild(this.backgrounds.big)
         this.game.renders.gameContainer.addChild(this.backgrounds.small)
         this.backgroundContainer.addChild(this.backgrounds.bigCover)

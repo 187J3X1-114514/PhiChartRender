@@ -32,7 +32,7 @@ export interface valueAndEvent extends baseEvent {
     value?: number
 }
 
-export interface effectEvent {
+export interface rpeEvent {
     startTime: number[],
     endTime: number[],
     easingType: number,

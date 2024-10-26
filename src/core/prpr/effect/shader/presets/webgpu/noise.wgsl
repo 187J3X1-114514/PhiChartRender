@@ -53,8 +53,8 @@ struct MyUniforms {
 }
 @group(1) @binding(0) var<uniform> my : MyUniforms;
 
-fn random(pos: vec2<f32>) -> vec2<f32> {
-	return fract(sin(vec2<f32>(dot(pos, vec2<f32>(12.9898, 78.233)), dot(pos, vec2<f32>(-148.998, -65.233)))) * 43758.547);
+fn random_(pos: vec2<f32>) -> vec2<f32> {
+	return fract(sin(vec2<f32>(dot(pos, vec2<f32>(12.9898, 78.233)), dot(pos, vec2<f32>(-148.998, -65.233)))) * 43758.5453);
 }
 
 @fragment
@@ -62,6 +62,7 @@ fn mainFragment(
   @location(0) uv: vec2<f32>,
   @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
-	let new_uv: vec2<f32> = uv + (random(uv + vec2<f32>(my.seed, 0.)) - vec2<f32>(0.5, 0.5)) * my.power;
-    return textureSample(uTexture,uSampler, new_uv);
+  var r = random_(uv + vec2<f32>(my.seed, 0.))/9000;
+	let new_uv: vec2<f32> = uv + (r * my.power);
+  return textureSample(uTexture,uSampler, new_uv);
 }

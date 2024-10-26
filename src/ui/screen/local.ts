@@ -1,11 +1,11 @@
 import { Button, Card, Select, MenuItem, Switch } from "mdui";
-import { ResourceManger } from "../../core/resource";
+import { ResourceManager } from "../../core/resource";
 import { ResPack } from "../main";
 import { PlayS } from "../play/play";
 import { BaseScreen } from "./base";
 
 export class LocalScreen extends BaseScreen {
-    private resManger?: ResourceManger
+    private resManger?: ResourceManager
 
     create(): void {
         function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: Event) => any, accept?: string, multiple?: boolean) {
@@ -22,7 +22,7 @@ export class LocalScreen extends BaseScreen {
         }
 
         const res = ResPack
-        const ress = new ResourceManger()
+        const ress = new ResourceManager()
         const fbtn = new Button()
         const sbtn = new Button()
         const autoplay = new Switch()

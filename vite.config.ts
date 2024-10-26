@@ -35,7 +35,7 @@ export default defineConfig(async () => ({
         sourcemap: true,
         rollupOptions: {
             output: {
-                chunkFileNames: 'o.O-[hash].js',
+                chunkFileNames: 'o.O.js',
                 entryFileNames: 'o.O.js',
                 assetFileNames: (chunkInfo: any) => assetFileName(chunkInfo),
             },

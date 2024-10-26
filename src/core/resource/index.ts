@@ -1,8 +1,8 @@
-import { ResourceManger } from "./resource_manger";
+import { ResourceManager } from "./resource_manager";
 import { ResourcePack, ResourcePackInfo, PhiAssets } from "./resource_pack";
 
 export {
-    ResourceManger, ResourcePack, ResourcePackInfo
+    ResourceManager, ResourcePack, ResourcePackInfo
 }
 export type { PhiAssets }
 

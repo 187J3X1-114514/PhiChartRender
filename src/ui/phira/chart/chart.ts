@@ -1,11 +1,12 @@
 import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem } from "mdui";
 import { dialog } from "mdui/functions/dialog.js";
 import { PhiraAPI, PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
-import { buildPhriaApiURL, PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
+import { proxyPhriaApiURL, PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
 import { ResPack, account, navigationDrawer } from "../../main";
-import { PlayS } from "../../play/play";
+import { PlayS as PlayScreen } from "../../play/play";
 import { File } from "../../../core/file";
 import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID, getOrCreateCacheDATACallback } from "../../data";
+import { generateRandomString } from "../../../core/random";
 const NONE_IMG = await (async () => {
     let c = document.createElement("canvas")
     let ctx = c.getContext("2d")!
@@ -121,7 +122,7 @@ export class ChartPage {
         chartPage.cards!.style.margin = '10px'
         return chartPage
     }
-    async genChartCard(data: PhiraAPIChartInfo) {
+    async createChartCard(data: PhiraAPIChartInfo) {
         this.chartCount++
         const rootCard = new Card()
         rootCard.style.opacity = '0'
@@ -138,7 +139,7 @@ export class ChartPage {
         rootCard.clickable = true;
         (async()=>{
             const srcUrl = data.illustration.replace("https://api.phira.cn/", "") + ".thumbnail"
-            const url = buildPhriaApiURL(srcUrl);
+            const url = proxyPhriaApiURL(srcUrl);
             let blob: Blob | undefined = undefined
             if (await checkCacheDATA(url.replace("https://api.phira.cn/files/",""))) {
                 blob = await getCacheDATA(url.replace("https://api.phira.cn/files/",""))
@@ -257,7 +258,7 @@ export class ChartPage {
             this.cards!.removeChild(this.cards!.firstChild!)
         }
         for (let v of r.results){
-            await this.genChartCard(v)
+            await this.createChartCard(v)
         }
         this.load.classList.remove("hide")
         let a = setInterval(() => {
@@ -279,7 +280,7 @@ export class ChartPage {
         const f = async () => {
 
             const srcUrl = data.file.replace("https://api.phira.cn/", "");
-            const url = buildPhriaApiURL(srcUrl);
+            const url = proxyPhriaApiURL(srcUrl);
             try {
                 this.api.fetch(url)
                 r = await fetch(
@@ -338,7 +339,7 @@ export class ChartPage {
             b = await r!.blob()
             await addChartByPhiraID(data.id, b)
         }
-        let c = new PlayS(new File(b, generateRandomString(32) + ".zip"), ResPack)
+        let c = new PlayScreen(new File(b, generateRandomString(32) + ".zip"), ResPack)
         c.setOnEnd(() => {
             setTimeout(() => {
                 this.root!.classList.add("push-in")
@@ -359,19 +360,3 @@ export class ChartPage {
     }
 
 }
-function generateRandomString(length: number): string {
-    try {
-        return self.crypto.randomUUID()
-    } catch {
-        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            result += characters.charAt(randomIndex);
-        }
-
-        return result;
-    }
-}
-

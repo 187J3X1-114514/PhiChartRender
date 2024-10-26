@@ -4,7 +4,7 @@ import { Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import EventLayer from './eventlayer';
 import * as font from '../font'
 import { floorPositionEvent, Event, valueEvent } from './baseEvents';
-import { PhiAssets, ResourceManger } from '../resource';
+import { PhiAssets, ResourceManager } from '../resource';
 import { SizerData } from '../types/params';
 import { chart_log } from './convert';
 import { jsonEventLayer, jsonJudgeLineData } from './types/judgeLine';
@@ -18,7 +18,7 @@ const blackJudgeLine = (() => {
     const result = Texture.from(canvas);
     return result;
 })();
-var TEXT_RESOLUTION = 3
+export var TEXT_RESOLUTION = 3
 
 
 export default class Judgeline {
@@ -268,7 +268,7 @@ export default class Judgeline {
         return result;
     }
 
-    createSprite(texture: PhiAssets, zipFiles: ResourceManger, rp = "") {
+    createSprite(texture: PhiAssets, zipFiles: ResourceManager, rp = "") {
         this.textureName = undefined
         if (!this.isText) {
             this.textureName = this.texture

@@ -1,16 +1,21 @@
 import { Texture } from "pixi.js"
 import { File, FileType, loadZip } from "../file"
-import WAudio from "../audio"
+import Audio from "../audio"
 import { loadText, isArchive } from "./utils"
 import { newLogger } from "../log"
 import Chart from "../chart"
 import { ChartInfo } from "../chart/chartinfo"
 import { PrprExtra } from "../prpr/prpr"
+import { generateRandomString } from "../random"
+
+/*
+  这坨屎以后会重写
+*/
 
 const log = newLogger("Resource Manger")
 
-export class ResourceManger {
-    public files: { [key: string]: Texture | WAudio | Chart | PrprExtra | string | undefined }
+export class ResourceManager {
+    public files: { [key: string]: Texture | Audio | Chart | PrprExtra | string | undefined }
     public srcFiles: { [key: string]: File | undefined }
     public charts: { [key: string]: ChartInfo | undefined }
     constructor() {
@@ -18,13 +23,13 @@ export class ResourceManger {
         this.srcFiles = {}
         this.charts = {}
     }
-    destroy(){
+    destroy() {
         this.files = {}
         this.srcFiles = {}
         this.charts = {}
     }
     async add(file: File, __log = true) {
-        let loadFile: Texture | WAudio | Chart | PrprExtra | undefined | string = undefined
+        let loadFile: Texture | Audio | Chart | PrprExtra | undefined | string = undefined
         await fixType(file)
         try {
             switch (file.type) {
@@ -85,7 +90,7 @@ export class ResourceManger {
                 case FileType.SOUND:
                     try {
 
-                        loadFile = await WAudio.from(await file.async("arraybuffer"))
+                        loadFile = await Audio.from(await file.async("arraybuffer"))
                     } catch (e) {
                         log.error("加载音频出错 ->", e, "源文件 ->", file.name)
                     }
@@ -215,21 +220,6 @@ export class ResourceManger {
             keys.push(key)
         }
         return keys
-    }
-}
-function generateRandomString(length: number): string {
-    try {
-        return self.crypto.randomUUID()
-    } catch {
-        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            result += characters.charAt(randomIndex);
-        }
-
-        return result;
     }
 }
 

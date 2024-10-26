@@ -1,6 +1,6 @@
 //●REC
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import Game from '../../core/game'
+import PhiGame from '../../core/game'
 import { loadZip } from '../../core/file';
 import { Recorder, Encoders } from "canvas-record";
 
@@ -45,7 +45,7 @@ class record {
 }
 export class RecordGame {
     public fps: number
-    public game: Game
+    public game: PhiGame
     public totalFrame: number
     public recordedFrame: number = 0
     public rec: record
@@ -55,7 +55,7 @@ export class RecordGame {
 
     public chunks = 0
     public tchunks = 0
-    constructor(fps: number, game: Game) {
+    constructor(fps: number, game: PhiGame) {
         this.fps = fps
         this.game = game;
         this.totalFrame = parseInt((this.game.chart.music.duration * this.fps).toFixed())

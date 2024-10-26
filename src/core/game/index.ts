@@ -5,20 +5,22 @@ import { Application, Container, Sprite, Graphics, Text, TextStyle, Ticker } fro
 import * as font from '../font'
 import Chart from '../chart';
 import { GameParams, GameSettings, SizerData } from '../types/params';
-import WAudio from '../audio';
-import { ResourceManger } from '../resource/resource_manger';
+import Audio from '../audio';
+import { ResourceManager } from '../resource/resource_manager';
 import { printImage } from '../utils';
 import UIManger from '../ui';
 import { PrprExtra } from '../prpr/prpr';
-import { boolean } from 'io-ts';
 
 const uk = (undefined as unknown) as any
 const ukObj = ({} as unknown) as any
-export default class Game {
-    sprites: any//{ [key: string]: Sprite }
+export default class PhiGame {
+    sprites: {
+        progressBar: Graphics,
+        fakeJudgeline: Sprite
+    } = ukObj
     chart: Chart = uk
     effects: PrprExtra = uk
-    zipFiles: ResourceManger = uk
+    zipFiles: ResourceManager = uk
     _audioOffset = 0;
     _animateStatus = NaN;
     _gameStartTime = NaN;
@@ -63,10 +65,9 @@ export default class Game {
     private isFirst = true
     public musicStartTime: number = 0
     ui: UIManger = uk
+    public rootContainer = new Container()
     //private _params: GameParams = uk
-
-    constructor() { }
-    async init(_params: GameParams) {
+    private async init(_params: GameParams) {
 
         let params = { ..._params };
         if (!params.render) params.render = {};
@@ -75,7 +76,7 @@ export default class Game {
         /* ===== 加载谱面基本信息 ===== */
 
         this.assets = params.assets;
-        this.zipFiles = params.zipFiles || new ResourceManger();
+        this.zipFiles = params.zipFiles || new ResourceManager();
         let chart
         try {
             chart = params.chart
@@ -100,10 +101,9 @@ export default class Game {
         /* ===== 创建 render ===== */
         this.render = params.app
         this.renders.parentNode = (params.render.resizeTo ? params.render.resizeTo : (params.render.view ? params.render.view.parentNode : this.render.canvas.parentNode))! as HTMLElement;
-        this.render.stage.width
         // 创建舞台主渲染区
         this.renders.mainContainer.zIndex = 10;
-        this.render.stage.addChild(this.renders.mainContainer);
+        this.rootContainer.addChild(this.renders.mainContainer);
 
         // 创建游戏精灵容器
         this.renders.gameContainer = new Container();
@@ -119,9 +119,10 @@ export default class Game {
         this.renders.videoContainer.zIndex = -5;
         this.renders.gameContainer.addChild(this.renders.videoContainer);
 
+        //this.render.stage.addChild(this.rootContainer);
+
         // 创建舞台主渲染区可见范围
         this.renders.mainContainerMask = new Graphics();
-        //this.renders.mainContainerMask.cacheAsBitmap = true;
 
         /* ===== 创建判定 ===== */
         this.judgement = new Judgement({
@@ -139,7 +140,6 @@ export default class Game {
             autoPlay: verify.bool(params.settings.autoPlay, false)
         });
 
-        this.sprites = {};
         this.functions = {
             start: [],
             tick: [],
@@ -187,6 +187,7 @@ export default class Game {
 
     createSprites() {
         this.render.stage.eventMode = "static"
+        this.rootContainer.eventMode = "static"
         this.renders.gameContainer.eventMode = "static"
         this.renders.mainContainer.eventMode = "static"
         this.renders.UIContainer.eventMode = "static"
@@ -246,7 +247,7 @@ export default class Game {
         this.renders.gameContainer.sortChildren();
         this.renders.UIContainer.sortChildren();
         this.renders.mainContainer.sortChildren();
-        this.render.stage.sortChildren();
+        this.rootContainer.sortChildren();
         this.resize();
         this.ui.backgroundContainer.zIndex = 9999999
         this.sprites.progressBar.x = this.sprites.progressBar.width
@@ -259,7 +260,7 @@ export default class Game {
     start() {
         if (!this.isFirst) { this.restart(); return }
         if (!this.render) return;
-        if (!this.chart.music) throw new Error('You must have a music to play');
+        if (!this.chart.music) throw new Error('歌呢？');
         this.effects.cleanShader()
         this.renders.UIContainer.interactive = true
         this.renders.mainContainer.interactive = true
@@ -294,7 +295,7 @@ export default class Game {
             if (!note.sprite) continue;
 
             note.sprite.alpha = 0;
-            if (note.hitsound) (note.hitsound as WAudio).volume = this.judgement._hitsoundVolume;
+            if (note.hitsound) (note.hitsound as Audio).volume = this.judgement._hitsoundVolume;
         };
 
         for (const name in this.judgement.sounds) {
@@ -338,7 +339,6 @@ export default class Game {
         this.render.ticker.add(() => this.calcTick());
         if (this._settings.showAPStatus) this.sprites.fakeJudgeline.tint = 0xFFECA0;
         this.sprites.fakeJudgeline.visible = true;
-
         for (const judgeline of this.chart.judgelines) {
             if (!judgeline.sprite) continue;
 
@@ -495,11 +495,11 @@ export default class Game {
         if (!this.functions[type]) return;
         this.functions[type].forEach((callback: (a: any) => any) => callback(this));
     }
-    calcTick(force:boolean = false) {
+    calcTick(force: boolean = false) {
         let currentTime = this.chart.music.currentTime - (this.chart.offset + this._settings.offset);
-        this.calcTickByCurrentTime(currentTime,force)
+        this.calcTickByCurrentTime(currentTime, force)
     }
-    calcTickByCurrentTime(currentTime: number,force:boolean = false) {
+    calcTickByCurrentTime(currentTime: number, force: boolean = false) {
         let { chart, judgement, functions, processors, sprites, renders } = this;
         if (currentTime + (this.chart.offset + this._settings.offset) >= this.chart.music.duration && this._animateStatus == 1) {
             this.gameEndCallback()
@@ -615,5 +615,10 @@ export default class Game {
         return result;
     }
 
+    static async create(params: GameParams){
+        const game = new this()
+        await game.init(params)
+        return game
+    }
 }
 

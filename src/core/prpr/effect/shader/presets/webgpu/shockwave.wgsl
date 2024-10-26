@@ -62,23 +62,26 @@ fn mainFragment(
   @location(0) uv: vec2<f32>,
   @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
-    let aspect: f32 = my.screenSize.y / my.screenSize.x;
+  let aspect: f32 = my.screenSize.y / my.screenSize.x;
 	var center: vec2<f32> = vec2<f32>(my.centerX, my.centerY);
 	center.y = (center.y - 0.5) * aspect + 0.5;
 	var tex_coord: vec2<f32> = uv;
 	tex_coord.y = (tex_coord.y - 0.5) * aspect + 0.5;
 	let dist: f32 = distance(tex_coord, center);
-    var gl_FragColor:vec4<f32> = vec4<f32>(0.0);
+  var gl_FragColor:vec4<f32> = vec4<f32>(0.0);
+  var new_uv = vec2<f32>(tex_coord.x, (tex_coord.y - 0.5) / aspect + 0.5);
+  let dx = dpdx(new_uv);
+  let dy = dpdx(new_uv);
 	if (my.progress - my.width <= dist && dist <= my.progress + my.width) {
 		let diff: f32 = dist - my.progress;
 		let scale_diff: f32 = 1. - pow(abs(diff * my.expand), my.distortion);
 		let dt: f32 = diff * scale_diff;
 		let dir: vec2<f32> = normalize(tex_coord - center);
 		tex_coord = tex_coord + (dir * dt / (my.progress * dist * 40.));
-		gl_FragColor = textureSample(uTexture, uSampler, vec2<f32>(tex_coord.x, (tex_coord.y - 0.5) / aspect + 0.5));
+		gl_FragColor = textureSampleGrad(uTexture, uSampler, new_uv,dx,dy);
 		gl_FragColor = gl_FragColor + (gl_FragColor * scale_diff / (my.progress * dist * 40.));
 	} else { 
-		gl_FragColor = textureSample(uTexture, uSampler, vec2<f32>(tex_coord.x, (tex_coord.y - 0.5) / aspect + 0.5));
-    }
-    return gl_FragColor;
+		gl_FragColor = textureSampleGrad(uTexture, uSampler, new_uv,dx,dy);
+  }
+  return gl_FragColor;
 }

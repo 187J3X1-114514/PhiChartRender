@@ -455,13 +455,18 @@ mdui-navigation-rail {
 }
 
 #start-o.black {
-    background-color: black;
+    opacity: 1;
+}
+#start-o{
+    opacity: 0;
     position: fixed;
     top: 0;
     left: 0;
-    width: 999999rem;
-    height: 999999rem;
-    z-index: 100000;
+    width: 999vw;
+    height: 999vh;
+    z-index: 10000;
+    background-color: black;
+    transition: opacity 0.3s ease-in;
 }
 
 .phira-text {
@@ -779,4 +784,21 @@ mdui-navigation-drawer {
         transform: translateY(700px);
         opacity: 0;
     }
+}
+
+.status-text-onload{
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 10001;
+    opacity: 0.4;
+    font-size: clamp(0.625rem, 0.625rem + 0.28vw, 0.813rem);
+    color: rgb(255, 255, 255);
+    background: unset;
+    user-select: none;
+    font-size: medium;
+    font-weight: bolder;
+    font-family: Font, phi;
+    text-align: right;
+
 }

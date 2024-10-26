@@ -16,6 +16,5 @@ export async function reqFullSc() {
     }
     if (getOppositeOrientation() == "landscape") { //怪了
         (screen as any).orientation.lock("landscape")
-
     }
 }

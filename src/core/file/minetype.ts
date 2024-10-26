@@ -79,7 +79,7 @@ const mimeTypes = {
         "3g2": "video/3gpp2",
         "7z": "application/x-7z-compressed"
     },
-    getType(name: string) {
+    getType(name: string):string {
         return (mimeTypes.types as any)[name.split('.').pop() ? name.split('.').pop()! : "54641VD"]
     }
 };

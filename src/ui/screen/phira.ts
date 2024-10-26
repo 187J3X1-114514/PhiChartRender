@@ -1,12 +1,12 @@
 import { Button, Card, Select, MenuItem } from "mdui";
-import { ResourceManger } from "../../core/resource";
+import { ResourceManager } from "../../core/resource";
 import { account, app, reqLogin, ResPack } from "../main";
 import { PlayS } from "../play/play";
 import { BaseScreen } from "./base";
 import { ChartPage } from "../phira/chart/chart";
 
 export class PhiraScreen extends BaseScreen {
-    private resManger?: ResourceManger
+    private resManger?: ResourceManager
 
     async create(): Promise<void> {
         await reqLogin()
