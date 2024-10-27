@@ -62,6 +62,6 @@ export enum attachUI {
     Level,
 }
 
-export abstract class baseUIManger{
+export abstract class baseUIManager{
     abstract getUIElementSettings(type:attachUI):UIElementSettings
 }

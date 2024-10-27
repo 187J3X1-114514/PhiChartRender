@@ -8,7 +8,7 @@ import * as StackBlur from 'stackblur-canvas';
 import { PrprExtra } from "../prpr/prpr"
 import { printImage } from "../utils"
 
-interface PhiraChartInfo extends BaseChartInfo {
+export interface PhiraChartInfo extends BaseChartInfo {
     id: number
     uploader: number
     difficulty: number
@@ -31,13 +31,13 @@ interface PhiraChartInfo extends BaseChartInfo {
     updated: Date
     chartUpdated: Date
 }
-interface BaseChartInfo {
+export interface BaseChartInfo {
     name: string
     music: string
     illustration: string
     chart: string
 }
-interface RPEChartInfo extends BaseChartInfo {
+export interface RPEChartInfo extends BaseChartInfo {
     RPEVersion: number
     charter: string
     composer: string
@@ -52,9 +52,9 @@ export class ChartInfo {
     public prpr: PrprExtra
     public src: PhiraChartInfo | RPEChartInfo
     public type: string = "rpe"
-    private dir: string = ""
-    private resManger?: ResourceManager
-    private constructor(c: string, m: string, i: string, src: PhiraChartInfo | RPEChartInfo, p: PrprExtra = undefined as any) {
+    public dir: string = ""
+    public resManager?: ResourceManager
+    constructor(c: string, m: string, i: string, src: PhiraChartInfo | RPEChartInfo, p: PrprExtra = undefined as any) {
         this.chart = c
         this.illustration = i
         this.music = m
@@ -79,26 +79,26 @@ export class ChartInfo {
             prpr: resMan.get(this.dir + '/' + "extra.json")
         } as any as ChartData
         if (!d.prpr) {
-            d.prpr = PrprExtra.from({})
+            d.prpr = PrprExtra.from({} as any)
         }
         return d
 
     }
-    static async from(file: File, resManger: ResourceManager) {
+    static async from(file: File, resManager: ResourceManager) {
         var data: any
         var t: ChartInfo
         switch (file.extension) {
             case "yml":
                 data = (yaml.load(await file.async("text")) as PhiraChartInfo) as any
                 t = new this(data.chart, data.music, data.illustration, data)
-                t.resManger = resManger
+                t.resManager = resManager
                 t.type = "phira"
                 return t
             case "json":
                 data = JSON.parse(await file.async("text"))
                 if (data.formatVersion) {
                     return new this("", "", "", (undefined as unknown) as any)
-                } else{
+                } else {
                     data = data.META
                 }
                 let newData = {
@@ -113,7 +113,7 @@ export class ChartInfo {
                     chart: file.name,
                 } as RPEChartInfo
                 t = new this(newData.chart, newData.music, newData.illustration, newData)
-                t.resManger = resManger
+                t.resManager = resManager
                 t.type = "rpe"
                 return t
             case "txt":
@@ -129,10 +129,10 @@ export class ChartInfo {
                     music: _txt_info.Song,
                     illustration: _txt_info.Picture,
                     chart: _txt_info.Chart
-                    
+
                 } as RPEChartInfo
                 t = new this(_newData.chart, _newData.music, _newData.illustration, _newData)
-                t.resManger = resManger
+                t.resManager = resManager
                 t.type = "txt"
                 return t
             default:
@@ -146,7 +146,7 @@ export class ChartInfo {
         this.dir = path
     }
     async blur(r: number) {
-        const img = (this.resManger!.get(this.illustration) as Texture)._source.resource as ImageBitmap
+        const img = (this.resManager!.get(this.illustration) as Texture)._source.resource as ImageBitmap
         const c = document.createElement("canvas")
         const ctx = c.getContext("2d")!
         c.width = img.width
@@ -154,7 +154,7 @@ export class ChartInfo {
         ctx.drawImage(img, 0, 0)
         StackBlur.canvasRGB(c, 0, 0, img.width, img.height, r)
         const newImg = Texture.from(await createImageBitmap(c))
-        this.resManger!.files[this.illustration] = newImg
+        this.resManager!.files[this.illustration] = newImg
     }
 }
 function loadTxtChartInfo(str: string) {
@@ -162,20 +162,19 @@ function loadTxtChartInfo(str: string) {
     if (list[0].includes("#")) {
         let Data: any = {}
         list.slice(1).forEach((line) => {
-            try{
+            try {
                 let _ = line.split(":")
                 Data[_[0].trim()] = _[1].trim()
-            }catch{}
+            } catch { }
         })
         return Data
     } else {
         printImage(0.5)
         throw "铺面信息格式错误"
-        return undefined
     }
 }
 
-export interface ChartData{
+export interface ChartData {
     chart: Chart;
     music: Audio;
     illustration: Texture;

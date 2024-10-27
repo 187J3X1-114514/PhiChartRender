@@ -11,18 +11,21 @@ import { PrprVideo } from './video';
 import { SizerData } from '../types/params';
 import { join } from '../file/utils';
 import { rpeEvent } from '../chart/baseEvents';
+import { deepCopy } from '../utils';
 const log = newLogger("prpr拓展")
 export class PrprExtra {
     private game?: PhiGame
     public effects: Effect[] = []
     public videos: PrprVideo[] | PrPrExtraVideo[] = []
     public hasShader: boolean = true
+    public src: PrPrExtraJSON = {} as any
     private sizer: SizerData = {} as any
-    static from(json: any) {
+    static from(json: PrPrExtraJSON) {
         let prpr = new this()
         if (json.effects) prpr.effects = this.PrprEffectReader(json);
         if (json.videos) prpr.videos = this.PrprVideoReader(json);
         if (prpr.effects.length == 0) prpr.hasShader = false
+        prpr.src = deepCopy(json)
         return prpr
     }
 
@@ -49,7 +52,7 @@ export class PrprExtra {
         }
         this.cleanShader()
         let effects = this.effects
-        let { renders , rootContainer } = this.game!;
+        let { renders, rootContainer } = this.game!;
         for (let i = 0, length = effects.length; i < length; i++) {
             const effect = effects[i];
             if (effect.shader === null) continue;
@@ -137,7 +140,7 @@ export class PrprExtra {
         for (const effect of this.effects) effect.reset();
     }
     static get none(): PrprExtra {
-        let _ = PrprExtra.from({})
+        let _ = PrprExtra.from({} as any)
         _.hasShader = false
         return _
     }

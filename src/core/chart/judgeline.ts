@@ -462,7 +462,7 @@ export default class Judgeline {
     }
 
     static from(data: jsonJudgeLineData) {
-        let jl = new Judgeline({})
+        let jl = new Judgeline(data)
         jl.id = data.id
         jl.texture = data.texture
         jl.isText = data.isText

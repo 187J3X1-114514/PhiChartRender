@@ -35,9 +35,9 @@ export interface valueAndEvent extends baseEvent {
 export interface rpeEvent {
     startTime: number[],
     endTime: number[],
-    easingType: number,
-    easingLeft: number,
-    easingRight: number,
+    easingType?: number,
+    easingLeft?: number,
+    easingRight?: number,
     start: number[] | number,
     end: number[] | number
 }

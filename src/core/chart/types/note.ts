@@ -20,31 +20,29 @@ export interface extendNoteData extends noteData {
 
 }
 export interface jsonNoteData {
-    id: number
-    type: number
-    time: number
-    holdTime: number
-    holdTimeLength: number
-    speed: number
-    floorPosition: number
-    holdLength: number
-    endPosition: number
-    positionX: number
-    basicAlpha: number
-    visibleTime: number
-    yOffset: number
-    xScale: number
-    isAbove: boolean
+    id: number,
+    type: number,
+    time: number,
+    holdTime: number,
+    speed: number,
+    floorPosition: number,
+    holdLength: number,
+    positionX: number,
+    basicAlpha: number,
+    visibleTime: number,
+    yOffset: number,
+    xScale: number,
+    isAbove: boolean,
+    isMulti: boolean,
     isFake: boolean
-    isMulti: boolean
-    useOfficialSpeed: boolean
-    judgeline: number
-    texture?: string
-    hitsound?: string
+    judgeline: Judgeline | number,
+    useOfficialSpeed: boolean,
+    texture: string,
+    hitsound: string,
+    lineId: number
 }
 
 export interface NoteParam {
-
     id?: number,
     type?: number,
     time?: number,
@@ -65,5 +63,4 @@ export interface NoteParam {
     texture?: string,
     hitsound?: string,
     lineId?: number
-
 }

@@ -8,7 +8,7 @@ import { GameParams, GameSettings, SizerData } from '../types/params';
 import Audio from '../audio';
 import { ResourceManager } from '../resource/resource_manager';
 import { printImage } from '../utils';
-import UIManger from '../ui';
+import UIManager from '../ui';
 import { PrprExtra } from '../prpr/prpr';
 import { Antialiasing } from '../antialiasing';
 import { DefaultShader } from '../prpr/effect/shader';
@@ -66,7 +66,7 @@ export default class PhiGame {
     private lastFPS: number = 0
     private isFirst = true
     public musicStartTime: number = 0
-    ui: UIManger = uk
+    ui: UIManager = uk
     public rootContainer = new Container()
     private _params: GameParams = uk
     private antialiasing: Antialiasing = uk
@@ -173,7 +173,7 @@ export default class PhiGame {
         };
         this.renderTarget = new RenderTarget()
         this.antialiasing = new Antialiasing(this.app)
-        this.ui = new UIManger(this)
+        this.ui = new UIManager(this)
         this.ui.createSprites()
         this.effects.setGame(this)
         this.effects.init()

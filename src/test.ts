@@ -113,20 +113,25 @@ import 'mdui/components/icon.js';
 import { reqFullSc } from './ui';
 import './ui/main';
 
-import { buildAllJudgeLineData, buildColorValueEventData, buildEventLayerData, buildJudgeLineData, buildOtherEventData, buildStringValueEventData, ChartFile, readAllJudgeLineData, readEventLayerData, readJudgeLineData, readOtherEventData, readStringValueEventData } from './file/chart';
+import { ChartFile } from './file/chart';
 import { ReadBufferDataView, WriteBufferDataView } from './file/data_view';
-import { Application, Assets, Sprite } from 'pixi.js';
 import Shader from './core/prpr/effect/shader';
+import { PrPrExtraEffect, PrPrExtraVideo } from './core/prpr/types';
+import { buildEffectData, buildVideoEventData, PrprExtraFile, readEffectData, readVideoEventData } from './file/prpr';
+import { rpeEvent } from './core/chart/baseEvents';
+import { buildRpeEventData, readRpeEventData } from './file/event';
+import { PrprExtra } from './core/prpr/prpr';
 document.documentElement.addEventListener("click", () => {
     if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
 })
-/*
+
 import { ResourceManager } from "./core/resource";
 import Chart from './core/chart';
 import { PlayS } from './ui/play/play';
 import { Application } from 'pixi.js';
 import Game from './core/game';
 import { topAppBar, BACKGROUND, ResPack } from './ui/main';
+import { ChartPack } from './file/chart_pack';
 
 const resM = new ResourceManager()
 await resM.load("test.zip", await (await fetch("test")).blob());
@@ -144,14 +149,13 @@ function download(buff: ArrayBuffer) {
 
 }
 
-let chartBf = await ChartFile.from(resM.files[resM.charts["11938463.json"]!.chart] as Chart)
+let chartBf = await ChartPack.from(resM)
 download(chartBf)
-let chart = resM.charts["11938463.json"]!
-console.log(resM.files[resM.charts["11938463.json"]!.chart],await ChartFile.read(chartBf))
 
-
+let resm = await ChartPack.read(chartBf)
+let chart = resm.chartInfo
+console.log(resM,resm)
 await chart.blur(40)
-let game = new Game()
 let app = new Application()
 await app.init({
     width: document.documentElement.clientWidth,
@@ -164,14 +168,14 @@ await app.init({
     resizeTo: document.documentElement,
     resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : 1
 })
-await game.init({
+let game = await Game.create({
     app: app,
     render: {
         resizeTo: document.documentElement
     },
-    chart: chart!,
+    chart: chart!.get(resm.resourceManager),
     assets: ResPack.Assets,
-    zipFiles: resM,
+    zipFiles: resm.resourceManager,
     settings: {
         autoPlay: true, shader: true, showInputPoint: false, showFPS: false, bgDim: 0.3
     }
@@ -191,27 +195,6 @@ setTimeout(() => {
 }, 620)
 
 /*
-let wb = new WriteBufferDataView()
-buildStringValueEventData(wb,{
-    startTime:-1110.564,
-    endTime:5456.554645,
-    value:"Now, the thoughts keep to linger on飞得更高风格士大夫电风扇😅😅😅"
-})
-buildStringValueEventData(wb,{
-    startTime:-1110.564,
-    endTime:5456.554645,
-    value:"Now, the thou飞得更高风格士大夫电风扇😅😅😅"
-})
-let cc = wb.build()
-let wb1 = new WriteBufferDataView()
-wb1.setArrayBuffer(cc)
-let rb = new ReadBufferDataView(new DataView(wb1.build()))
-let aaaa = rb.getArrayBuffer()
-let rb2 = new ReadBufferDataView(new DataView(aaaa.buffer))
-console.log(readStringValueEventData(rb2))
-console.log(readStringValueEventData(rb2))
-*/
-
 let app = new Application()
 await app.init({
     width: document.documentElement.clientWidth,
@@ -243,4 +226,120 @@ app.ticker.add(() => {
     })
 })
 
-app.stage.filters = [testShader.filter]
+app.stage.filters = [testShader.filter]*/
+/*
+let test = {
+    start: [
+        0,
+        0,
+        1
+    ],
+    end: [
+        542,
+        0,
+        1
+    ],
+    shader: "vignette",
+    vars: {
+        "extend": [
+            {
+                startTime: [
+                    0,
+                    0,
+                    1
+                ],
+                endTime: [
+                    15,
+                    0,
+                    1
+                ],
+                easingType: 1,
+                start: 0.25,
+                end: 0.25
+            },
+            {
+                startTime: [
+                    15,
+                    0,
+                    1
+                ],
+                endTime: [
+                    20,
+                    0,
+                    1
+                ],
+                easingType: 4,
+                start: 0.25,
+                end: 0
+            }
+        ],
+        "radius": [
+            {
+                startTime: [
+                    0,
+                    0,
+                    1
+                ],
+                endTime: [
+                    15,
+                    0,
+                    1
+                ],
+                easingType: 1,
+                start: 15,
+                end: 15
+            },
+            {
+                startTime: [
+                    152,
+                    0,
+                    1
+                ],
+                endTime: [
+                    158,
+                    0,
+                    1
+                ],
+                easingType: 1,
+                start: 15,
+                end: 25
+            }
+        ]
+    }
+} as PrPrExtraEffect
+let wview = new WriteBufferDataView()
+buildEffectData(wview, test)
+let buf = wview.build()
+console.log(buf, test)
+
+let rview = new ReadBufferDataView(new DataView(buf))
+console.log(readEffectData(rview))
+
+/*
+let test = {
+    easingLeft: 0.0,
+    easingRight: 1.0,
+    easingType: 1,
+    end: 128,
+    endTime: [1, 0, 1],
+    start: 514,
+    startTime: [0, 0, 1]
+} as rpeEvent
+
+let wview = new WriteBufferDataView()
+buildRpeEventData(wview,test)
+let buf = wview.build()
+console.log(buf,test)
+
+let rview = new ReadBufferDataView(new DataView(buf))
+console.log(readRpeEventData(rview))*/
+/*
+let d = await(await fetch("extra.json")).json()
+
+let pr = PrprExtra.from(d)
+
+let D = await PrprExtraFile.from(pr)
+console.log(D)
+let D_ = await PrprExtraFile.read(D)
+console.log(pr.src)
+console.log(D_.src)*/

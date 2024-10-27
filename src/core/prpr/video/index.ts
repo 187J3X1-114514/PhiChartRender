@@ -24,7 +24,7 @@ export class PrprVideo {
         pv.scaleType = data.scale as any
         pv.alpha = data.alpha as any
         pv.dim = data.dim as any
-        pv.start = data.time as number
+        pv.start = data.time as any as number
         pv.end = pv.start + pv.video.duration
         pv.sprite = new Container()
         pv.videoSprite = new Sprite(tex)

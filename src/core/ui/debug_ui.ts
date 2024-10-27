@@ -2,9 +2,9 @@ import { SizerData } from '../types/params';
 import { UIElement } from './element';
 import { defaultUISettings } from './settings';
 import { Container } from 'pixi.js';
-import { attachUI, UISettings, UIElementSettings, baseUIManger } from "../types/ui"
+import { attachUI, UISettings, UIElementSettings, baseUIManager } from "../types/ui"
 
-export default class debugUIManger implements baseUIManger {
+export default class debugUIManger implements baseUIManager {
     public element: {
         Pause: UIElement,
         ComboNumber: UIElement,

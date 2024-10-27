@@ -145,9 +145,9 @@ AUTOPLAY模式游玩
 此项目中与Phira相关的api使用未经TeamFlos直接允许，若TeamFlos不允许此项目调用相关api接口可以通过issues联系我，我会立即删除有关代码。
 
 ## TODO
-* 修复WebGPU着色器错误 noise.wgsl shockwave.wgsl
+* 修复WebGPU着色器错误 shockwave.wgsl
 * 铺面缓存 *(已完成)*
-* 新的铺面格式
+* 新的铺面格式 *(已完成)*
 * 录制铺面
 * prpr的铺面拓展编辑
 

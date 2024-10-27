@@ -4,8 +4,8 @@ import { UIElement } from './element';
 import PhiGame from '../game';
 import { Container, Graphics, Sprite } from 'pixi.js';
 import { defaultUISettings } from './settings';
-import { attachUI, UISettings, UIElementSettings, baseUIManger } from "../types/ui"
-export default class UIManger implements baseUIManger {
+import { attachUI, UISettings, UIElementSettings, baseUIManager } from "../types/ui"
+export default class UIManager implements baseUIManager {
     private chart: Chart
     public element: {
         Pause: UIElement,

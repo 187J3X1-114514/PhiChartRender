@@ -1,12 +1,11 @@
 import Chart, { arrangeLineEvents, arrangeSingleValueLineEvents } from "../core/chart";
-import { jsonEventLayer, jsonJudgeLineData } from "../core/chart/types/judgeLine";
-import { number, text } from "../core/verify";
-import { bpmEvent, Event, floorPositionEvent, valueAndEvent, valueEvent } from "../core/chart/baseEvents";
+import {  jsonJudgeLineData } from "../core/chart/types/judgeLine";
+import {  text } from "../core/verify";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
 import { jsonNoteData } from "../core/chart/types/note";
 import Judgeline from "../core/chart/judgeline";
 import Note from "../core/chart/note";
-import { gzipSync,decompressSync } from 'fflate';
+import { buildFloorPositionEventData, buildColorValueEventData, buildEventData, buildStringValueEventData, readFloorPositionEventData, readColorValueEventData, readEventData, readStringValueEventData, buildEventLayerData, readEventLayerData, buildBpmEventData, readBpmEventData } from "./event";
 
 export function buildJudgeLineData(view: WriteBufferDataView, data: jsonJudgeLineData) {
     view.setInt32(data.id)
@@ -37,179 +36,6 @@ export function readJudgeLineData(view: ReadBufferDataView): jsonJudgeLineData {
     data.attachUI = data.attachUI == "" ? undefined! : data.attachUI
     return data
 }
-
-export function buildEventData(view: WriteBufferDataView, data: Event) {
-    view.setFloat64(data.startTime)
-    view.setFloat64(data.endTime)
-    view.setFloat64(data.start)
-    view.setFloat64(data.end)
-
-}
-
-export function readEventData(view: ReadBufferDataView): Event {
-    let data: Event = {} as any;
-    data.startTime = view.getFloat64()
-    data.endTime = view.getFloat64()
-    data.start = view.getFloat64()
-    data.end = view.getFloat64()
-    return data
-}
-
-export function buildValueAndEventData(view: WriteBufferDataView, data: valueAndEvent) {
-    view.setFloat64(data.startTime)
-    view.setFloat64(data.endTime)
-    view.setFloat64(number(data.start, 0))
-    view.setFloat64(number(data.end, 0))
-    view.setFloat64(number(data.value, 0))
-}
-
-export function readValueAndEventData(view: ReadBufferDataView): valueAndEvent {
-    let data: valueAndEvent = {} as any;
-    data.startTime = view.getFloat64()
-    data.endTime = view.getFloat64()
-    data.start = view.getFloat64()
-    data.end = view.getFloat64()
-    data.value = view.getFloat64()
-    return data
-}
-
-export function buildFloorPositionEventData(view: WriteBufferDataView, data: floorPositionEvent) {
-    view.setFloat64(data.startTime)
-    view.setFloat64(data.endTime)
-    view.setFloat64(data.floorPosition)
-
-}
-
-export function readFloorPositionEventData(view: ReadBufferDataView): floorPositionEvent {
-    let data: floorPositionEvent = {} as any;
-    data.startTime = view.getFloat64()
-    data.endTime = view.getFloat64()
-    data.floorPosition = view.getFloat64()
-    return data
-}
-
-export function buildNumberValueEventData(view: WriteBufferDataView, data: valueEvent) {
-    view.setFloat64(data.startTime)
-    view.setFloat64(data.endTime)
-    view.setFloat64(data.value)
-
-}
-
-export function readNumberValueEventData(view: ReadBufferDataView): valueEvent {
-    let data: valueEvent = {} as any;
-    data.startTime = view.getFloat64()
-    data.endTime = view.getFloat64()
-    data.value = view.getFloat64()
-    return data
-}
-
-export function buildColorValueEventData(view: WriteBufferDataView, data: valueEvent) {
-    view.setFloat64(data.startTime)
-    view.setFloat64(data.endTime)
-    view.setFloat64(data.value[0])
-    view.setFloat64(data.value[1])
-    view.setFloat64(data.value[2])
-    view.setFloat64(data.value[3])
-
-}
-
-export function readColorValueEventData(view: ReadBufferDataView): valueEvent {
-    let data: valueEvent = {} as any;
-    data.startTime = view.getFloat64()
-    data.endTime = view.getFloat64()
-    data.value = [view.getFloat64(), view.getFloat64(), view.getFloat64(), view.getFloat64()]
-    return data
-}
-
-export function buildStringValueEventData(view: WriteBufferDataView, data: valueEvent) {
-    view.setFloat64(data.startTime)
-    view.setFloat64(data.endTime)
-    view.setString(data.value)
-
-}
-
-export function readStringValueEventData(view: ReadBufferDataView): valueEvent {
-    let data: valueEvent = {} as any;
-    data.startTime = view.getFloat64()
-    data.endTime = view.getFloat64()
-    data.value = view.getString()
-    return data
-}
-
-export function buildEventLayerData(view: WriteBufferDataView, data: jsonEventLayer) {
-    view.setInt32(data.speed.length)
-    view.setInt32(data.moveX.length)
-    view.setInt32(data.moveY.length)
-    view.setInt32(data.alpha.length)
-    view.setInt32(data.rotate.length)
-    for (let e of data.speed) {
-        let br = new WriteBufferDataView()
-        buildNumberValueEventData(br, e)
-        view.setArrayBuffer(br.build())
-        br = undefined as any;
-    }
-    for (let e of data.moveX) {
-        let br = new WriteBufferDataView()
-        buildEventData(br, e)
-        view.setArrayBuffer(br.build())
-        br = undefined as any;
-    }
-    for (let e of data.moveY) {
-        let br = new WriteBufferDataView()
-        buildEventData(br, e)
-        view.setArrayBuffer(br.build())
-        br = undefined as any;
-    }
-    for (let e of data.alpha) {
-        let br = new WriteBufferDataView()
-        buildEventData(br, e)
-        view.setArrayBuffer(br.build())
-        br = undefined as any;
-    }
-    for (let e of data.rotate) {
-        let br = new WriteBufferDataView()
-        buildEventData(br, e)
-        view.setArrayBuffer(br.build())
-        br = undefined as any;
-    }
-}
-
-export function readEventLayerData(view: ReadBufferDataView): jsonEventLayer {
-    let data: jsonEventLayer = {
-        speed: [],
-        moveX: [],
-        moveY: [],
-        alpha: [],
-        rotate: []
-    } as any;
-    let speedLength = view.getInt32()
-    let moveXLength = view.getInt32()
-    let moveYLength = view.getInt32()
-    let alphaLength = view.getInt32()
-    let rotateLength = view.getInt32()
-    for (let i = 0, length = speedLength; i < length; i++) {
-        let buf = view.getArrayBuffer()
-        data.speed.push(readNumberValueEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
-    }
-    for (let i = 0, length = moveXLength; i < length; i++) {
-        let buf = view.getArrayBuffer()
-        data.moveX.push(readEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
-    }
-    for (let i = 0, length = moveYLength; i < length; i++) {
-        let buf = view.getArrayBuffer()
-        data.moveY.push(readEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
-    }
-    for (let i = 0, length = alphaLength; i < length; i++) {
-        let buf = view.getArrayBuffer()
-        data.alpha.push(readEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
-    }
-    for (let i = 0, length = rotateLength; i < length; i++) {
-        let buf = view.getArrayBuffer()
-        data.rotate.push(readEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
-    }
-    return data
-}
-
 
 export function buildOtherEventData(view: WriteBufferDataView, data: jsonJudgeLineData) {
     view.setInt32(data.floorPositions.length)
@@ -370,11 +196,9 @@ export function buildNoteData(view: WriteBufferDataView, data: jsonNoteData) {
     view.setInt8(data.type)
     view.setFloat64(data.time)
     view.setFloat64(data.holdTime)
-    view.setFloat64(data.holdTimeLength)
     view.setFloat64(data.speed)
     view.setFloat64(data.floorPosition)
     view.setFloat64(data.holdLength)
-    view.setFloat64(data.endPosition)
     view.setFloat64(data.positionX)
     view.setFloat64(data.basicAlpha)
     view.setFloat64(data.visibleTime)
@@ -384,7 +208,7 @@ export function buildNoteData(view: WriteBufferDataView, data: jsonNoteData) {
     view.setBool(data.isFake)
     view.setBool(data.isMulti)
     view.setBool(data.useOfficialSpeed)
-    view.setInt32(data.judgeline)
+    view.setInt32((data.judgeline as any).id ? (data.judgeline as any).id : data.judgeline)
     view.setString(text(data.texture, ""))
     view.setString(text(data.hitsound, ""))
 
@@ -397,11 +221,9 @@ export function readNoteData(view: ReadBufferDataView): jsonNoteData {
     data.type = view.getInt8();
     data.time = view.getFloat64();
     data.holdTime = view.getFloat64();
-    data.holdTimeLength = view.getFloat64();
     data.speed = view.getFloat64();
     data.floorPosition = view.getFloat64();
     data.holdLength = view.getFloat64();
-    data.endPosition = view.getFloat64();
     data.positionX = view.getFloat64();
     data.basicAlpha = view.getFloat64();
     data.visibleTime = view.getFloat64();
@@ -417,30 +239,6 @@ export function readNoteData(view: ReadBufferDataView): jsonNoteData {
     data.texture = data.texture == "" ? undefined! : data.texture
     data.hitsound = data.hitsound == "" ? undefined! : data.hitsound
     return data;
-}
-
-export function buildBpmEventData(view: WriteBufferDataView, data: bpmEvent) {
-    view.setFloat64(data.startTime)
-    view.setFloat64(data.endTime)
-    view.setFloat64(data.bpm)
-    view.setFloat64(data.holdBetween)
-
-}
-
-export function readBpmEventData(view: ReadBufferDataView): bpmEvent {
-    let data: bpmEvent = {} as any;
-    data.startTime = view.getFloat64()
-    data.endTime = view.getFloat64()
-    data.bpm = view.getFloat64()
-    data.holdBetween = view.getFloat64()
-    return data
-}
-
-function toArrayBuffer(d: Uint8Array | ArrayBuffer) {
-    if (d instanceof Uint8Array) {
-        return d.buffer
-    }
-    return d
 }
 
 export class ChartFile {
@@ -483,14 +281,11 @@ export class ChartFile {
         }
         /////////////////////////////
         let buf = view.build()
-        return gzipSync(new Uint8Array(buf), {
-            level: 9,
-            mem: 12
-        }).buffer
+        return buf
     }
 
     static async read(file: Uint8Array | ArrayBuffer) {
-        let buf = decompressSync(file instanceof Uint8Array ? file : new Uint8Array(file)).buffer;
+        let buf = file instanceof Uint8Array ? file.buffer : file
         let chart = new Chart()
         let view = new ReadBufferDataView(new DataView(buf))
         chart.offset = view.getFloat64()
@@ -542,7 +337,7 @@ export class ChartFile {
         });
         chart.readLineTextureInfo([]);
         chart.sortJudgelines()
-        const getJudgeLineByID = (id: number) => {
+        const getJudgeLineByID = (id: any) => {
             for (let jl of chart.judgelines) {
                 if (jl.id == id) {
                     return jl
@@ -553,10 +348,21 @@ export class ChartFile {
                     return jl
                 }
             }
-            return undefined
+            return id
         }
-        chart.judgelines.forEach((judgeline) => {
-            judgeline.parentLine = getJudgeLineByID(judgeline as any)!
+        chart.judgelines.forEach((judgeline: any, _judgelineIndex: any, judgelines: any) => {
+            if (!isNaN(judgeline.parentLine) && judgeline.parentLine >= 0) {
+                let parentLineId = judgeline.parentLine;
+                judgeline.parentLine = null;
+
+                for (const parentLine of judgelines) {
+                    if (parentLine.id == parentLineId) {
+                        judgeline.parentLine = parentLine;
+                        break;
+                    }
+                }
+            }
+            else judgeline.parentLine = null;
         });
         chart.notes.forEach((note) => {
             note.judgeline = getJudgeLineByID(note.judgeline as any)!

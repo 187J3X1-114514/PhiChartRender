@@ -261,7 +261,7 @@ export default class Note {
         }
     }
     exportToJson() {
-        return { ...this.params, holdTimeLength: 0, endPosition: 0, judgeline: this.judgeline.id } as jsonNoteData
+        return { ...this.params, judgeline: this.judgeline.id } as jsonNoteData
     }
     static from(data: jsonNoteData) {
         let note = new Note(data as any);

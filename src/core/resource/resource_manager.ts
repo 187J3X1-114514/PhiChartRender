@@ -7,6 +7,7 @@ import Chart from "../chart"
 import { ChartInfo } from "../chart/chartinfo"
 import { PrprExtra } from "../prpr/prpr"
 import { generateRandomString } from "../random"
+import { ChartPack } from "../../file/chart_pack"
 
 /*
   这坨屎以后会重写
@@ -130,12 +131,25 @@ export class ResourceManager {
                     try {
                         loadFile = await file.async("text")
                     } catch (e) {
-                        log.error("加载图片出错 ->", e, " 源文件 ->", file.name)
+                        log.error("加载着色器出错 ->", e, " 源文件 ->", file.name)
+                    }
+                    break
+                case FileType.CHARTPACK:
+                    try {
+                        log.info("加载铺面包中 ->", file.name)
+                        loadFile = undefined
+                        let pack = await ChartPack.read(await file.async("arraybuffer"))
+                        this.files = { ...this.files, ...pack.resourceManager.files }
+                        this.srcFiles = { ...this.srcFiles, ...pack.resourceManager.srcFiles }
+                        this.charts = { ...this.charts, ...pack.resourceManager.charts }
+                    } catch (e) {
+                        log.error("加载铺面包出错 ->", e, " 源文件 ->", file.name)
                     }
                     break
                 case FileType.UNKNOWN:
                     log.warn("未知类型 ->", file.name)
                     break
+
             }
             if (__log) log.info("加载文件 ->", file.name, "完成")
             if (loadFile != undefined) {
@@ -233,14 +247,18 @@ async function fixType(file: File) {
         JSON.parse(t)
         file.type = FileType.JSON
     } catch {
-        if (file.type == FileType.CHART || file.type == FileType.JSON) {
-            if (Number.isNaN(parseInt(t.split("\n")[0]))) {
-                file.type = FileType.CHARTINFO
-            } else {
-                file.type = FileType.CHART
-                file.extension = "pec"
+        if (await ChartPack.check(await file.async("arraybuffer"))) {
+            file.type = FileType.CHARTPACK
+        } else {
+
+            if (file.type == FileType.CHART || file.type == FileType.JSON) {
+                if (Number.isNaN(parseInt(t.split("\n")[0]))) {
+                    file.type = FileType.CHARTINFO
+                } else {
+                    file.type = FileType.CHART
+                    file.extension = "pec"
+                }
             }
         }
-
     }
 }

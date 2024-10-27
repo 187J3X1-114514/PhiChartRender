@@ -6,7 +6,8 @@ export enum FileType {
     IMG,
     UNKNOWN,
     CHART,
-    SHADER
+    SHADER,
+    CHARTPACK
 }
 
 export class File {

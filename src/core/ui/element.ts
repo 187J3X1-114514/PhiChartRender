@@ -5,7 +5,7 @@ import { Sprite, Text, TextStyle } from 'pixi.js';
 import { SizerData } from '../types/params';
 import { pauseButton } from './tex';
 import Judgeline from '../chart/judgeline';
-import { attachUI,UIElementSettings,baseUIManger } from "../types/ui"
+import { attachUI,UIElementSettings,baseUIManager } from "../types/ui"
 
 export class UIElement {
     private eventLayers: EventLayer[];
@@ -36,8 +36,8 @@ export class UIElement {
     public offsetY: number = 0
     public baseAlpha: number = 1
     public settings:UIElementSettings = undefined as any
-    private uiManger: baseUIManger
-    private constructor(type: attachUI, ui: baseUIManger) {
+    private uiManger: baseUIManager
+    private constructor(type: attachUI, ui: baseUIManager) {
         this.eventLayers = []
         this.uiManger = ui
         this.extendEvent = {
@@ -56,7 +56,7 @@ export class UIElement {
         })()
         this.isText = this.type == attachUI.Pause ? false : true
     }
-    static from(opt: Judgeline | attachUI, ui: baseUIManger): UIElement {
+    static from(opt: Judgeline | attachUI, ui: baseUIManager): UIElement {
         let e
         if (!(opt instanceof Judgeline)) {
             e = new this(opt, ui)
