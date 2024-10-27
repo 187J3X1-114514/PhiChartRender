@@ -1,0 +1,17 @@
+{
+    "baseDir": "i18n",
+    "languages": {
+        "zh-CN": {
+            "showName": "简体中文",
+            "url": "zh_cn.json"
+        },
+        "en-US": {
+            "showName": "English(US)",
+            "url": "en_us.json"
+        },
+        "en": {
+            "showName": "English(US)",
+            "url": "en_us.json"
+        }
+    }
+}

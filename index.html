@@ -29,12 +29,14 @@
                 </mdui-avatar>
                 <mdui-menu>
                     <mdui-menu-item id="avatar-dropdown-1"> <mdui-icon slot="end-icon" name="login"></mdui-icon>
-                        <span slot="end-text">登陆Phira账户</span></mdui-menu-item>
+                        <span slot="end-text"
+                            id="avatar-dropdown-1-text">$${*html.login.phira.in*}$$</span></mdui-menu-item>
                     <mdui-menu-item id="avatar-dropdown-2"> <mdui-icon slot="end-icon" name="logout"></mdui-icon>
-                        <span slot="end-text">登出Phira账户</span></mdui-menu-item>
+                        <span slot="end-text"
+                            id="avatar-dropdown-2-text">$${*html.login.phira.out*}$$</span></mdui-menu-item>
                 </mdui-menu>
             </mdui-dropdown>
-            <h4 style="display:inline;" id="avatar-name">未登录</h4>
+            <h4 style="display:inline;" id="avatar-name">$${*ui.text.not_login*}$$</h4>
         </div>
 
 
@@ -44,27 +46,28 @@
         <mdui-list>
             <mdui-collapse accordion id="phira-drawer" class="collapse-rail hide">
                 <mdui-collapse-item>
-                    <mdui-list-item rounded slot="header" icon="class">分区<mdui-icon slot="end-icon" class="arrow"
-                            name="expand_more"></mdui-icon></mdui-list-item>
+                    <mdui-list-item rounded slot="header" icon="class"><span
+                            id="html.phira.class-chart">$${*html.phira.class-chart*}$$</span><mdui-icon slot="end-icon"
+                            class="arrow" name="expand_more"></mdui-icon></mdui-list-item>
                     <div style="margin-left: 2.5em;">
-                        <mdui-list-item rounded id="class-chart-1">已上架</mdui-list-item>
-                        <mdui-list-item rounded id="class-chart-2">未上架</mdui-list-item>
-                        <mdui-list-item rounded id="class-chart-3">特殊</mdui-list-item>
+                        <mdui-list-item rounded id="class-chart-1">$${*html.phira.class-chart-1*}$$</mdui-list-item>
+                        <mdui-list-item rounded id="class-chart-2">$${*html.phira.class-chart-2*}$$</mdui-list-item>
+                        <mdui-list-item rounded id="class-chart-3">$${*html.phira.class-chart-3*}$$</mdui-list-item>
                     </div>
 
                 </mdui-collapse-item>
             </mdui-collapse>
             <div id="rec-drawer" class="collapse-rail hide">
                 <mdui-list-item rounded nonclickable class="dev-text">
-                    <span>
-                        正在开发
+                    <span id="rec-dev-text">
+                        $${*html.dev*}$$
                     </span>
 
                 </mdui-list-item>
             </div>
             <mdui-collapse accordion id="loc-drawer" class="collapse-rail">
-                <mdui-list-item rounded id="loc-drawer-1" icon="clear">清除所有加载的铺面</mdui-list-item>
-                <mdui-list-item rounded id="loc-drawer-1" icon="folder">查看当前已加载的文件</mdui-list-item>
+                <mdui-list-item rounded id="loc-drawer-1" icon="clear">$${*html.chart.clear*}$$</mdui-list-item>
+                <mdui-list-item rounded id="loc-drawer-2" icon="folder">$${*html.chart.view*}$$</mdui-list-item>
             </mdui-collapse>
         </mdui-list>
     </mdui-navigation-drawer>
@@ -73,7 +76,7 @@
         <mdui-button-icon icon="menu" slot="top" id="top-app-bar-menu"></mdui-button-icon>
         <mdui-button-icon icon="bug_report" slot="bottom" id="debug-btn"></mdui-button-icon>
         <mdui-button-icon icon="settings" slot="bottom"></mdui-button-icon>
-        <mdui-tooltip placement="right" slot="bottom" content="查看源码">
+        <mdui-tooltip placement="right" slot="bottom" content="$${*html.src*}$$" id="src-text-tooltip">
             <mdui-button-icon icon="source"
                 onclick='window.open("https://github.com/187J3X1-114514/PhiChartRender")'></mdui-button-icon>
         </mdui-tooltip>
@@ -82,11 +85,11 @@
 
 
         <mdui-navigation-rail-item icon="cloud" class="black-font" id="tab-phira"
-            value="phira"><span>Phira</span></mdui-navigation-rail-item>
+            value="phira"><span>$${*html.tab.phira*}$$</span></mdui-navigation-rail-item>
         <mdui-navigation-rail-item icon="videocam" class="black-font" id="tab-rec"
-            value="rec"><span>录制</span></mdui-navigation-rail-item>
+            value="rec"><span>$${*html.tab.rec*}$$</span></mdui-navigation-rail-item>
         <mdui-navigation-rail-item icon="insert_drive_file" value="loc" id="tab-local"
-            class="black-font"><span>本地</span></mdui-navigation-rail-item>
+            class="black-font"><span>$${*html.tab.local*}$$</span></mdui-navigation-rail-item>
     </mdui-navigation-rail>
     <div id="app" class="left-all"></div>
     <span class="info" id="info">{{VES}}</span>
@@ -94,17 +97,38 @@
         import { dialog, alert } from "mdui"
         import { snackbar } from 'mdui/functions/snackbar.js';
         import Cookies from 'js-cookie'
-        (() => {
-            try {
-                new SharedArrayBuffer(4)
-                return
-            } catch {
-                if (self.__TAURI__ != undefined) {
-                    return
-                }
+        import { I18N } from "./src/ui/i18n"
+        document.getElementById("tab-phira").getElementsByTagName("span")[0].innerText = I18N.get("html.tab.phira")
+        document.getElementById("tab-rec").getElementsByTagName("span")[0].innerText = I18N.get("html.tab.rec")
+        document.getElementById("tab-local").getElementsByTagName("span")[0].innerText = I18N.get("html.tab.local")
+        document.getElementById("loc-drawer-1").innerText = I18N.get("html.chart.clear")
+        document.getElementById("loc-drawer-2").innerText = I18N.get("html.chart.view")
+        document.getElementById("rec-dev-text").innerText = I18N.get("html.dev")
+
+        document.getElementById("class-chart-1").innerText = I18N.get("html.phira.class-chart-1")
+        document.getElementById("class-chart-2").innerText = I18N.get("html.phira.class-chart-2")
+        document.getElementById("class-chart-3").innerText = I18N.get("html.phira.class-chart-3")
+        document.getElementById("html.phira.class-chart").innerText = I18N.get("html.phira.class-chart")
+
+        document.getElementById("avatar-dropdown-1-text").innerText = I18N.get("html.login.phira.in")
+        document.getElementById("avatar-dropdown-2-text").innerText = I18N.get("html.login.phira.out")
+        document.getElementById("avatar-name").innerText = I18N.get("ui.text.not_login")
+        document.getElementById("protocolNO1").innerText = I18N.get("ui.screen.phira.terms_of_use.text.no")
+        document.getElementById("protocolYES1").innerText = I18N.get("html.protocol.yes")
+        document.getElementById("protocolNO2").innerText = I18N.get("ui.screen.phira.terms_of_use.text.no")
+        document.getElementById("protocolYES2").innerText = I18N.get("html.protocol.yes")
+
+        document.getElementById("src-text-tooltip").setAttribute("content", I18N.get("html.src"))
+        
+
+        try {
+            new SharedArrayBuffer(4)
+        } catch {
+            if (self.__TAURI__ != undefined) {
+            } else {
                 if (!Cookies.get("isreload") == 1) {
                     snackbar({
-                        message: "检测到当前无法使用多线程功能，将在10秒后自动刷新页面，你也可以手动刷新页面，如果刷新后仍然出现此提升请反馈这个问题。"
+                        message: I18N.get("html.thread.error.a")
                     })
                     setTimeout(() => {
                         Cookies.set("isreload", "1")
@@ -112,13 +136,12 @@
                     }, 10000)
                 } else {
                     snackbar({
-                        message: "仍然无法使用多线程功能，将关闭多线程功能"
+                        message: I18N.get("html.thread.error.b")
                     })
                 }
-
-
             }
-        })()
+        }
+
     </script>
     <!--
     <div id="phira-main" class="left-all hide">
@@ -141,13 +164,15 @@
     -->
     <mdui-dialog fullscreen id="protocolDialog1">
         <div id="protocolText1"></div>
-        <mdui-button id="protocolNO1" slot="action" variant="tonal">拒绝</mdui-button>
-        <mdui-button id="protocolYES1" slot="action" disabled variant="tonal">同意</mdui-button>
+        <mdui-button id="protocolNO1" slot="action"
+            variant="tonal">$${*ui.screen.phira.terms_of_use.text.no*}$$</mdui-button>
+        <mdui-button id="protocolYES1" slot="action" disabled variant="tonal">$${*html.protocol.yes*}$$</mdui-button>
     </mdui-dialog>
     <mdui-dialog fullscreen id="protocolDialog2">
         <div id="protocolText2"></div>
-        <mdui-button id="protocolNO2" slot="action" variant="tonal">拒绝</mdui-button>
-        <mdui-button id="protocolYES2" slot="action" disabled variant="tonal">同意</mdui-button>
+        <mdui-button id="protocolNO2" slot="action"
+            variant="tonal">$${*ui.screen.phira.terms_of_use.text.no*}$$</mdui-button>
+        <mdui-button id="protocolYES2" slot="action" disabled variant="tonal">$${*html.protocol.yes*}$$</mdui-button>
     </mdui-dialog>
 </body>
 

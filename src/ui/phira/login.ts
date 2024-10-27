@@ -5,16 +5,17 @@ import md5 from 'md5-js'
 import * as CryptoJS from 'crypto-js'
 import protocolPage from "./terms_of_use";
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import { I18N } from "../i18n";
 const fpPromise = await FingerprintJS.load()
 var id = await fpPromise.get()
-setInterval(async()=>{
+setInterval(async () => {
     id = await fpPromise.get()
-},15*60*60*1000)
+}, 15 * 60 * 60 * 1000)
 const DID = await genID()
 export default async function loginPage(t: Element): Promise<loginResult> {
     const dialog = new Dialog()
     dialog.classList.add("close-on-overlay-click")
-    dialog.headline = "登录Phira账号"
+    dialog.headline = I18N.get("ui.screen.phira.login.text.login")
     const dialogInput = document.createElement("form")
     dialogInput.slot = "description"
     //email#####################################
@@ -24,12 +25,12 @@ export default async function loginPage(t: Element): Promise<loginResult> {
     emailInput.addEventListener("input", () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (emailRegex.test(emailInput.value)) {
-            emailInputHelp.innerText = emailInput.value + "是一个电子邮箱😊"
+            emailInputHelp.innerText = emailInput.value + I18N.get("ui.screen.phira.login.tip.email")
             emailInputHelp.style.color = "unset"
             emailInput.style.color = "unset"
         }
     })
-    emailInput.label = "电子邮箱"
+    emailInput.label = I18N.get("ui.screen.phira.login.text.email")
     emailInput.placeholder = "example@uk.com"
     emailInput.type = "email"
     emailInput.append(emailInputHelp)
@@ -46,11 +47,11 @@ export default async function loginPage(t: Element): Promise<loginResult> {
             passwordInputHelp.innerText = ""
             passwordInputHelp.style.color = "unset"
         } else {
-            passwordInputHelp.innerText = "密码太短了"
+            passwordInputHelp.innerText = I18N.get("ui.screen.phira.login.tip.password_warn")
             passwordInputHelp.style.color = "#f2b8b5"
         }
     })
-    passwordInput.label = "密码"
+    passwordInput.label = I18N.get("ui.screen.phira.login.text.password")
     passwordInput.type = "password"
     passwordInput.togglePassword = true
     passwordInput.append(passwordInputHelp)
@@ -76,11 +77,11 @@ export default async function loginPage(t: Element): Promise<loginResult> {
     okButton.variant = "filled"
     const okIcon = document.createElement("mdui-icon-login")
     okIcon.slot = "end-icon"
-    okButton.innerText = "登录"
+    okButton.innerText = I18N.get("ui.screen.phira.login.text.login_btn")
     okButton.append(okIcon)
-    cancelButton.innerText = "取消"
+    cancelButton.innerText = I18N.get("ui.screen.phira.login.text.cancel_btn")
     const checkKeepPassword = new Checkbox()
-    checkKeepPassword.innerText = "记住账号与密码"
+    checkKeepPassword.innerText = I18N.get("ui.screen.phira.login.text.keep_password")
     dialog.append(cancelButton)
     dialog.append(okButton)
     dialogInput.append(checkKeepPassword)
@@ -92,28 +93,28 @@ export default async function loginPage(t: Element): Promise<loginResult> {
     return await new Promise<loginResult>(async (r) => {
         cancelButton.addEventListener("click", () => {
             dialog.open = false
-            r({ api: undefined, ok: false, status: 200, error: "用户取消操作" } as loginResult)
+            r({ api: undefined, ok: false, status: 200, error: I18N.get("ui.screen.phira.login.text.error.b") } as loginResult)
         })
         okButton.addEventListener("click", async () => {
             let pr = await protocolPage(t)
             if (!(pr.privacy_policy && pr.terms_of_use)) {
-                dialog.headline = "登录失败"
+                dialog.headline = I18N.get("ui.screen.phira.login.text.login_fail")
                 dialog.removeChild(okButton)
                 dialogInput.removeChild(emailInput)
                 dialogInput.removeChild(passwordInput)
                 dialogInput.removeChild(checkKeepPassword)
-                dialogInput.innerText = "在使用由 TeamFlos 提供的 Phira 线上服务之前，你必须阅读并同意TeamFlos的《服务条款》和《隐私政策》"
+                dialogInput.innerText = I18N.get("ui.screen.phira.login.text.login_tip")
                 let newCancelButton = new Button()
                 newCancelButton.slot = "action"
                 newCancelButton.variant = "elevated"
-                newCancelButton.innerText = "好"
+                newCancelButton.innerText = I18N.get("ui.screen.phira.login.text.ok")
                 dialog.append(newCancelButton)
                 newCancelButton.addEventListener("click", () => {
                     dialog.open = false
-                    r({ api: undefined, ok: false, status: 200, error: "用户不同意TeamFlos的《服务条款》和《隐私政策》" } as loginResult)
+                    r({ api: undefined, ok: false, status: 200, error: I18N.get("ui.screen.phira.login.text.error.a") } as loginResult)
                 })
             } else {
-                dialog.headline = "登录中"
+                dialog.headline = I18N.get("ui.screen.phira.login.text.logging")
                 dialogInput.removeChild(emailInput)
                 dialogInput.removeChild(passwordInput)
                 dialogInput.removeChild(checkKeepPassword)
@@ -126,7 +127,7 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 dialogInput.append(p)
                 dialog.removeChild(okButton)
                 let api = await PhiraAPI.login(emailInput.value, passwordInput.value)
-                dialog.headline = api.api ? "登录成功" : "登录失败"
+                dialog.headline = api.api ? I18N.get("ui.screen.phira.login.text.login.true") : I18N.get("ui.screen.phira.login.text.login_fail")
                 dialogInput.removeChild(p)
                 if (!api.ok) dialogInput.innerText = api.error
                 dialog.removeChild(cancelButton)
@@ -134,7 +135,7 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 let newCancelButton = new Button()
                 newCancelButton.slot = "action"
                 newCancelButton.variant = "elevated"
-                newCancelButton.innerText = "好"
+                newCancelButton.innerText = I18N.get("ui.screen.phira.login.text.ok")
                 dialog.append(newCancelButton)
                 if (api.api) {
                     DB.setInfoData("phira", checkKeepPassword.checked ? genCookie(emailInput.value, passwordInput.value) : "null")

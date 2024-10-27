@@ -7,6 +7,7 @@ import { PlayS as PlayScreen } from "../../play/play";
 import { File } from "../../../core/file";
 import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID, getOrCreateCacheDATACallback } from "../../data";
 import { generateRandomString } from "../../../core/random";
+import { I18N } from "../../i18n";
 const NONE_IMG = await (async () => {
     let c = document.createElement("canvas")
     let ctx = c.getContext("2d")!
@@ -39,7 +40,7 @@ export class ChartPage {
         this.search = new TextField()
         this.search.icon = "search"
         this.search.clearable = true
-        this.search.label = "搜索"
+        this.search.label = I18N.get("ui.screen.phira.chart.text.search")
         this.resize()
         const resizeObserver = new ResizeObserver((_entries) => {
             this.resize()
@@ -54,31 +55,31 @@ export class ChartPage {
         this.searchDiv = document.createElement("div")
         this.select1 = new Select()
         this.select2 = new Select()
-        this.select1.label = "排列顺序"
-        this.select2.label = "类型"
+        this.select1.label = I18N.get("ui.screen.phira.chart.text.select1")
+        this.select2.label = I18N.get("ui.screen.phira.chart.text.select2")
         const addItem = (a: Select, b: SearchDivision | SearchOrder, t: string) => {
             let i = new MenuItem()
             i.value = b + "_"
             i.innerText = t + ""
             a.appendChild(i)
         }
-        addItem(this.select1, SearchOrder.name, "名称")
-        addItem(this.select1, SearchOrder.nameReverse, "名称逆序")
-        addItem(this.select1, SearchOrder.rating, "评分")
-        addItem(this.select1, SearchOrder.ratingReverse, "评分逆序")
-        addItem(this.select1, SearchOrder.time, "时间")
-        addItem(this.select1, SearchOrder.timeReverse, "时间逆序")
-        addItem(this.select2, SearchDivision.ordinary, "常规")
-        addItem(this.select2, SearchDivision.difficulty, "纯配置")
-        addItem(this.select2, SearchDivision.shenjin, "整活")
-        addItem(this.select2, SearchDivision.viewing, "观赏")
+        addItem(this.select1, SearchOrder.name, I18N.get("ui.screen.phira.chart.text.order.name"))
+        addItem(this.select1, SearchOrder.nameReverse, I18N.get("ui.screen.phira.chart.text.order.nameReverse"))
+        addItem(this.select1, SearchOrder.rating, I18N.get("ui.screen.phira.chart.text.order.rating"))
+        addItem(this.select1, SearchOrder.ratingReverse, I18N.get("ui.screen.phira.chart.text.order.ratingReverse"))
+        addItem(this.select1, SearchOrder.time, I18N.get("ui.screen.phira.chart.text.order.time"))
+        addItem(this.select1, SearchOrder.timeReverse, I18N.get("ui.screen.phira.chart.text.order.timeReverse"))
+        addItem(this.select2, SearchDivision.ordinary, I18N.get("ui.screen.phira.chart.text.d.ordinary"))
+        addItem(this.select2, SearchDivision.difficulty, I18N.get("ui.screen.phira.chart.text.d.difficulty"))
+        addItem(this.select2, SearchDivision.shenjin, I18N.get("ui.screen.phira.chart.text.d.shenjin"))
+        addItem(this.select2, SearchDivision.viewing, I18N.get("ui.screen.phira.chart.text.d.viewing"))
         this.select1.value = SearchOrder.timeReverse + "_"
         this.select2.value = SearchDivision.ordinary + "_"
         this.searchBtn = new Button()
         this.searchBtn.variant = "filled"
         this.searchBtn.icon = 'search'
         this.searchBtn.endIcon = 'arrow_forward'
-        this.searchBtn.innerText = '搜索'
+        this.searchBtn.innerText = I18N.get("ui.screen.phira.chart.text.search")
         this.searchBtn.fullWidth = true
         this.searchDiv.classList.add("search-div")
         this.search.classList.add("search-text")
@@ -291,11 +292,11 @@ export class ChartPage {
             } catch {
                 dialog(
                     {
-                        headline: "错误",
-                        description: "在尝试获取铺面时发生错误，URL：" + url,
+                        headline: I18N.get("ui.screen.phira.chart.text.error.text"),
+                        description: I18N.get("ui.screen.phira.chart.text.error.text.d") + url,
                         actions: [
                             {
-                                text: "返回",
+                                text: I18N.get("ui.screen.phira.chart.text.error.text.r"),
                                 onClick: () => {
                                     this.load.classList.add("hide")
                                     this.root!.classList.add("push-in")
@@ -306,11 +307,11 @@ export class ChartPage {
                                 }
                             },
                             {
-                                text: "重试",
+                                text: I18N.get("ui.screen.phira.chart.text.error.text.re"),
                                 onClick: async () => { await f() },
                             },
                             {
-                                text: "手动下载",
+                                text: I18N.get("ui.screen.phira.chart.text.error.text.download"),
                                 onClick: async () => {
                                     const link = document.createElement('a')
                                     link.href = srcUrl

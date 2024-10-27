@@ -3,6 +3,7 @@ import { ResourceManager } from "../../core/resource";
 import { ResPack } from "../main";
 import { PlayS } from "../play/play";
 import { BaseScreen } from "./base";
+import { I18N } from "../i18n";
 
 export class LocalScreen extends BaseScreen {
     private resManger?: ResourceManager
@@ -28,8 +29,8 @@ export class LocalScreen extends BaseScreen {
         const autoplay = new Switch()
         const c = new Card()
         c.variant = "filled"
-        fbtn.innerText = "上传文件"
-        sbtn.innerText = "启动！"
+        fbtn.innerText = I18N.get("ui.screen.local.uploadfile")
+        sbtn.innerText = I18N.get("ui.screen.local.play")
         const s = new Select()
         c.append(s)
         c.append(fbtn)

@@ -1,4 +1,5 @@
 import { BUILD_ENV, BUILDTIME, GIT_HASH, PACKAGE_JSON } from "./env";
+import { I18N } from "./i18n";
 import { VERSION as PIXI_VERSION } from "pixi.js";
 import { STATUS, STATUSTEXT } from "./status";
 import * as DB from "./data"
@@ -10,7 +11,7 @@ let nv = `V${v}-${GIT_HASH.slice(0, 7).toLocaleUpperCase()}+pixi_${PIXI_VERSION}
 document.getElementById("info")!.innerText = nv
 //////////////////////////////////////
 import { loadFont } from "../core/font";
-STATUS.setStatus("加载字体中")
+STATUS.setStatus(I18N.get("status.load_font"))
 await loadFont()
 STATUS.setStatus("")
 STATUS.setStatusInfo("")
@@ -101,7 +102,7 @@ export const tabRec = document.getElementById("tab-rec")! as NavigationRailItem
 export const tabLocal = document.getElementById("tab-local")! as NavigationRailItem
 uModeBtn()
 
-STATUS.setStatus("加载资源中")
+STATUS.setStatus(I18N.get("status.load_resource"))
 let zip: Zip
 STATUS.setStatusInfo("assets/pack/resource")
 zip = await loadZip("resource.zip", await DB.getOrCreateCacheDATA("assets/pack/resource"))
@@ -306,7 +307,7 @@ export async function reqLogout() {
 
     avatar.icon = "account_circle"
     avatar.src = undefined
-    avatarName.innerText = "未登录"
+    avatarName.innerText = I18N.get("ui.text.not_login")
 }
 export function getChartClassification() {
 
@@ -353,13 +354,13 @@ classChart3.addEventListener("click", () => {
 })
 
 //////////////////////////////////////////////////////////////////////////////
-setTimeout(()=>{
+setTimeout(() => {
     load.classList.add("hide")
     document.getElementById("start-o")!.classList.remove("black");
-    setTimeout(()=>{
+    setTimeout(() => {
         document.getElementById("start-o")!.remove()
         STATUSTEXT.classList.toggle("status-text-onload")
         STATUSTEXT.classList.toggle("status-text-done")
-    },300)
-},100)
+    }, 300)
+}, 100)
 

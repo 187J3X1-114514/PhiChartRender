@@ -1,5 +1,6 @@
 import localForage from "localforage";
 import { newLogger } from "../core/log";
+import { I18N } from "./i18n";
 
 const log = newLogger("Database")
 localForage.config({
@@ -36,12 +37,12 @@ export const CacheDataDB = localForage.createInstance({
     description: 'CacheDATA'
 
 })
-log.info("初始化数据库完成")
+log.info(I18N.get("log.init_database_done"))
 export async function addChartByPhiraID(id: number, chart: Blob) {
     return new Promise((r) => {
         ChartDataDB.setItem(`PHIRA-CHART-ID+${id}`, chart, (e) => {
-            log.info(`尝试缓存铺面: ${id}`)
-            if (e != null) log.warn(`尝试缓存铺面时发生错误：${e}`);
+            log.info(`${I18N.get("log.try_cache_chart")}: ${id}`)
+            if (e != null) log.warn(`${I18N.get("log.try_cache_chart_error")}：${e}`);
             r(null)
         })
     })
@@ -49,8 +50,8 @@ export async function addChartByPhiraID(id: number, chart: Blob) {
 export async function getChartByPhiraID(id: number): Promise<Blob> {
     return new Promise((r) => {
         ChartDataDB.getItem(`PHIRA-CHART-ID+${id}`, (e, v) => {
-            log.info(`尝试获取铺面: ${id}`)
-            if (e != null) log.warn(`尝试获取铺面时发生错误：${e}`);
+            log.info(`${I18N.get("log.try_get_chart")}: ${id}`)
+            if (e != null) log.warn(`${I18N.get("log.try_get_chart_error")}：${e}`);
             r(v as Blob)
         })
     })
@@ -67,8 +68,8 @@ export async function checkCacheDATA(name: string) {
 export async function addCacheDATA(name: string, data: any) {
     return new Promise((r) => {
         CacheDataDB.setItem(`CacheDATA+${name}`, data, (e) => {
-            log.info(`尝试缓存文件: ${name}`)
-            if (e != null) log.warn(`尝试缓存文件时发生错误：${e}`);
+            log.info(`${I18N.get("log.try_cache_file")}: ${name}`)
+            if (e != null) log.warn(`${I18N.get("log.try_cache_file_error")}：${e}`);
             r(null)
         })
     })
@@ -76,8 +77,8 @@ export async function addCacheDATA(name: string, data: any) {
 export async function getCacheDATA(name: string): Promise<any> {
     return new Promise((r) => {
         CacheDataDB.getItem(`CacheDATA+${name}`, (e, v) => {
-            log.info(`尝试获取缓存文件: ${name}`)
-            if (e != null) log.warn(`尝试获取缓存文件时发生错误：${e}`);
+            log.info(`${I18N.get("log.try_get_file")}: ${name}`)
+            if (e != null) log.warn(`${I18N.get("log.try_get_file_error")}：${e}`);
             r(v as Blob)
         })
     })
@@ -93,7 +94,7 @@ export async function getOrCreateCacheDATA(url: string, other?: RequestInit): Pr
     }
 }
 
-export async function getOrCreateCacheDATACallback(url: string, callback: (url:string)=>Promise<Blob>): Promise<Blob> {
+export async function getOrCreateCacheDATACallback(url: string, callback: (url: string) => Promise<Blob>): Promise<Blob> {
     if (await checkCacheDATA(url)) {
         return getCacheDATA(url)
     } else {
@@ -106,7 +107,7 @@ export async function getOrCreateCacheDATACallback(url: string, callback: (url:s
 export async function getInfoData(key: string): Promise<string> {
     return new Promise((r) => {
         UserInfoDB.getItem(key, (e, v) => {
-            if (e != null) log.warn(`尝试获取用户信息时时发生错误${key}：${e}`);
+            if (e != null) log.warn(`${I18N.get("log.try_get_userinfo_error")}${key}：${e}`);
             r(v as string)
         })
     })
@@ -115,7 +116,7 @@ export async function getInfoData(key: string): Promise<string> {
 export async function setInfoData(key: string, value: string) {
     return new Promise((r) => {
         UserInfoDB.setItem(key, value, (e) => {
-            if (e != null) log.warn(`尝试存储用户信息时时发生错误${key}：${e}`);
+            if (e != null) log.warn(`${I18N.get("log.try_cache_userinfo_error")}${key}：${e}`);
             r(null)
         })
     })

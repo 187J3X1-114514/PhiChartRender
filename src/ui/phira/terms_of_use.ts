@@ -2,15 +2,18 @@ import { Button, Dialog, snackbar } from "mdui";
 import { genDialogBtn } from "../utils/index"
 import * as API_URL from '../../api/url'
 import * as DB from "../data"
+import { i18n, I18N } from "../i18n";
+
 interface protocolResult {
     terms_of_use: boolean
     privacy_policy: boolean
 }
+
 export default async function protocolPage(t: Element): Promise<protocolResult> {
     if (await DB.checkInfoData("protocol")) {
         try {
             let p = JSON.parse(atob(await DB.getInfoData("protocol")!))
-            if (p.terms_of_use&& p.privacy_policy) {
+            if (p.terms_of_use && p.privacy_policy) {
                 return {
                     terms_of_use: true,
                     privacy_policy: true
@@ -18,6 +21,7 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
             }
         } catch { }
     }
+
     let r = {
         terms_of_use: false,
         privacy_policy: false
@@ -29,17 +33,17 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
     el.style.zIndex = "3000"
     const dialog = new Dialog()
     dialog.classList.add("close-on-overlay-click")
-    dialog.headline = "《服务条款》和《隐私政策》"
-    dialog.description = "在使用由 TeamFlos 提供的 Phira 线上服务之前，你必须阅读并同意TeamFlos的《服务条款》和《隐私政策》"
+    dialog.headline = I18N.get("ui.screen.phira.terms_of_use.text.a")
+    dialog.description = I18N.get("ui.screen.phira.terms_of_use.text.b")
     const cancelButton = genDialogBtn("elevated")
     const okButton = genDialogBtn("elevated")
     const protocol1Button = genDialogBtn("tonal")
     const protocol2Button = genDialogBtn("tonal")
-    cancelButton.innerText = "拒绝"
-    okButton.innerText = "确认"
+    cancelButton.innerText = I18N.get("ui.screen.phira.terms_of_use.text.no")
+    okButton.innerText = I18N.get("ui.screen.phira.terms_of_use.text.yes")
     okButton.disabled = true
-    protocol1Button.innerText = "《服务条款》"
-    protocol2Button.innerText = "《隐私政策》"
+    protocol1Button.innerText = I18N.get("ui.screen.phira.terms_of_use.text.c")
+    protocol2Button.innerText = I18N.get("ui.screen.phira.terms_of_use.text.d")
     const icon1 = document.createElement("mdui-icon")
     icon1.slot = "icon"
     icon1.name = 'close'
@@ -74,14 +78,15 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
         protocol2.innerHTML = (await (await fetch(API_URL.PHIRA_PROTOCOL2_TEXT)).text()).replaceAll("template", "div")
     } catch {
         snackbar({
-            message: "无法获取Phira的使用条款和隐私政策，将跳转到Phira官网",
+            message: I18N.get("ui.screen.phira.terms_of_use.text.jump_msg"),
         })
         jump = true
     }
     if (!jump) {
         let _1 = protocol1.getElementsByTagName("article")[0].getElementsByTagName("div")[0]!
         let _2 = protocol1.getElementsByTagName("article")[0].getElementsByTagName("div")[1]!
-        if (_1.getAttribute("v-if")?.includes("zh-CN")) {
+        let lang = i18n.getUserLanguage() == "zh-CN" ? "zh-CN" : "en"
+        if (_1.getAttribute("v-if")?.includes(lang)) {
             protocol1 = _1
         } else {
             protocol1 = _2
@@ -89,7 +94,7 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
 
         let _3 = protocol2.getElementsByTagName("article")[0].getElementsByTagName("div")[0]!
         let _4 = protocol2.getElementsByTagName("article")[0].getElementsByTagName("div")[1]!
-        if (_3.getAttribute("v-if")?.includes("zh-CN")) {
+        if (_3.getAttribute("v-if")?.includes(lang)) {
             protocol2 = _3
         } else {
             protocol2 = _4
@@ -107,25 +112,25 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
     const check = () => {
         if (r.terms_of_use && r.privacy_policy) { okButton.disabled = false; icon3.name = 'check' }
     }
-    protocolNOBtn1.addEventListener("click",()=>{
+    protocolNOBtn1.addEventListener("click", () => {
         icon1.name = 'close'
         r.terms_of_use = false
         protocolDialog1.open = false
         check()
     })
-    protocolNOBtn2.addEventListener("click",()=>{
+    protocolNOBtn2.addEventListener("click", () => {
         icon2.name = 'close'
         r.privacy_policy = false
         protocolDialog2.open = false
         check()
     })
-    protocolYESBtn1.addEventListener("click",()=>{
+    protocolYESBtn1.addEventListener("click", () => {
         icon1.name = 'check'
         r.terms_of_use = true
         protocolDialog1.open = false
         check()
     })
-    protocolYESBtn2.addEventListener("click",()=>{
+    protocolYESBtn2.addEventListener("click", () => {
         icon2.name = 'check'
         r.privacy_policy = true
         protocolDialog2.open = false
@@ -139,10 +144,10 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
         } else {
             protocolDialog1.open = true
             protocolYESBtn1.disabled = true
-            let _i = setTimeout(()=>{
+            let _i = setTimeout(() => {
                 protocolYESBtn1.disabled = false
                 clearTimeout(_i)
-            },5000)
+            }, 5000)
         }
         check()
     })
@@ -153,17 +158,17 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
         } else {
             protocolDialog2.open = true
             protocolYESBtn2.disabled = true
-            let _i = setTimeout(()=>{
+            let _i = setTimeout(() => {
                 protocolYESBtn2.disabled = false
                 clearTimeout(_i)
-            },5000)
+            }, 5000)
         }
 
         check()
     })
     dialog.open = true
     return await new Promise<protocolResult>((ra) => {
-        okButton.addEventListener("click", async() => {
+        okButton.addEventListener("click", async () => {
             dialog.open = false
             dialog.addEventListener("closed", () => {
                 t.removeChild(el)
@@ -172,7 +177,7 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
             DB.setInfoData("protocol", btoa(JSON.stringify(r)))
             return ra(r)
         })
-        cancelButton.addEventListener("click", async() => {
+        cancelButton.addEventListener("click", async () => {
             dialog.open = false
             dialog.addEventListener("closed", () => {
                 t.removeChild(el)
@@ -182,6 +187,4 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
             return ra(r)
         })
     })
-
-
 }
