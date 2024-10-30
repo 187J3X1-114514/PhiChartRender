@@ -61,6 +61,7 @@ export class LocalScreen extends BaseScreen {
 
     }
     destroy(): void {
+        this.root.remove()
         this.resManger?.destroy()
         delete this.resManger
     }

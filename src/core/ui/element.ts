@@ -36,10 +36,10 @@ export class UIElement {
     public offsetY: number = 0
     public baseAlpha: number = 1
     public settings:UIElementSettings = undefined as any
-    private uiManger: baseUIManager
+    private uiManager: baseUIManager
     private constructor(type: attachUI, ui: baseUIManager) {
         this.eventLayers = []
-        this.uiManger = ui
+        this.uiManager = ui
         this.extendEvent = {
             color: [],
             scaleX: [],
@@ -198,31 +198,6 @@ export class UIElement {
                 this.sprite.tint = event.value;
             }
         }
-
-        switch (this.type) {
-            case attachUI.ComboNumber:
-                this.offsetX = 0
-                this.offsetY = 0//-this.sprite.height / 2.2
-                break
-            case attachUI.Combo:
-                this.offsetX = 0
-                this.offsetY = 0//this.uiManger.element.ComboNumber.offsetY
-                this.baseAlpha = 0.8
-                break
-            case attachUI.Score:
-                this.offsetX = -this.sprite.width / 2
-                this.offsetY = 0//this.uiManger.element.ComboNumber.offsetY
-                break
-            case attachUI.Name:
-                this.offsetX = this.sprite.width / 2
-                break
-            case attachUI.Level:
-                this.offsetX = -this.sprite.width / 2
-                break
-            case attachUI.Pause:
-                this.offsetX = 0
-                break
-        }
         if (this.hasEvent) {
             if (this.isText && this.hasEvent) this.setText(this.text, true);
             this.sprite.scale.x = this.scaleX * this.baseScaleX
@@ -253,6 +228,30 @@ export class UIElement {
     }
     resize(size: SizerData) {
         this.updataSettings()
+        switch (this.type) {
+            case attachUI.ComboNumber:
+                this.offsetX = 0
+                this.offsetY = 0//-this.sprite.height / 2.2
+                break
+            case attachUI.Combo:
+                this.offsetX = 0
+                this.offsetY = 0//this.uiManger.element.ComboNumber.offsetY
+                this.baseAlpha = 0.8
+                break
+            case attachUI.Score:
+                this.offsetX = -this.sprite.width / 2
+                this.offsetY = 0//this.uiManger.element.ComboNumber.offsetY
+                break
+            case attachUI.Name:
+                this.offsetX = this.sprite.width / 2
+                break
+            case attachUI.Level:
+                this.offsetX = -this.sprite.width / 2
+                break
+            case attachUI.Pause:
+                this.offsetX = 0
+                break
+        }
         if (this.isText) {
             let sp = this.sprite as Text
             this.size = size.lineScale * 0.63 * this.settings.scaleX
@@ -316,7 +315,7 @@ export class UIElement {
         }
     }
     updataSettings(){
-        this.settings = this.uiManger.getUIElementSettings(this.type)
+        this.settings = this.uiManager.getUIElementSettings(this.type)
     }
 }
 function easeInOutCubic(x: number): number {

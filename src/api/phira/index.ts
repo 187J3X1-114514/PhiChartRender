@@ -52,15 +52,16 @@ export class PhiraAPI {
                     },
                     body: JSON.stringify({
                         email: email, password: password
-                    })
+                    }),
+
                 })
                 fetchJSON = await fetchResult.json()
             } catch (e) {
                 result["api"] = undefined
-                result["status"] = fetchResult.status
+                result["status"] = -1
                 result["error"] = e
                 result["ok"] = false
-                return result as loginResult
+                r__(result as loginResult)
             }
 
             if (!fetchResult.ok) {
@@ -68,7 +69,7 @@ export class PhiraAPI {
                 result["status"] = fetchResult.status
                 result["error"] = fetchJSON["error"]
                 result["ok"] = false
-                return result as loginResult
+                r__(result as loginResult)
             }
             loginJson = fetchJSON
             try {
@@ -85,7 +86,7 @@ export class PhiraAPI {
                 result["status"] = fetchResult.status
                 result["error"] = e
                 result["ok"] = false
-                return result as loginResult
+                r__(result as loginResult)
             }
 
             if (!fetchResult.ok) {
@@ -93,7 +94,7 @@ export class PhiraAPI {
                 result["status"] = fetchResult.status
                 result["error"] = fetchJSON["error"]
                 result["ok"] = false
-                return result as loginResult
+                r__(result as loginResult)
             }
             meJson = fetchJSON
             result["api"] = new this(loginJson, { name: meJson["name"], email: email, password: password }, meJson)
@@ -144,14 +145,15 @@ export class PhiraAPI {
         let fetchResult
         let fetchJSON
         let meJson
-        fetchResult = await fetch(API_URL.PHIRA_API_URL_LOGIN, {
+        fetchResult = await fetchWithTimeout(API_URL.PHIRA_API_URL_LOGIN, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 email: this.email, password: this.password
-            })
+            }),
+            timeout:10000
         })
         fetchJSON = await fetchResult.json()
         if (!fetchResult.ok) {
@@ -251,4 +253,17 @@ export interface PhiraAPIChartInfo {
     created: string
     updated: string
     chartUpdated: string
+}
+
+async function fetchWithTimeout(resource: string | URL | globalThis.Request, options: RequestInit & { timeout?: number } = {}) {
+    const { timeout = 10000 } = options;
+
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const response = await fetch(resource, {
+        ...options,
+        signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
 }

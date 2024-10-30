@@ -27,7 +27,8 @@ import { get_theme, main, MAINWINDOW_HWND, ON_TAURI, RUN_RS_FN } from "./tauri";
 import { openDebug } from "./debug/ui_pos";
 import { background } from "./background/background";
 import { LocalScreen } from "./screen/local";
-import { ChartPage } from "./phira/chart/chart";
+import { PhiraChartScreen } from "./screen/phira";
+import { ScreenManager } from "./screen/manager";
 
 
 const UI_HTML = `    
@@ -120,100 +121,16 @@ for (let e of document.getElementsByClassName("arrow")) {
     })
 }
 export const BACKGROUND = await background.init()
-
-var cp: ChartPage | undefined = undefined;
+export const SCREEN = await ScreenManager.init(app)
 tabPhira.addEventListener("click", async () => {
-    if (cp != undefined) {
-        cp.root.classList.add("push-out-y")
-        setTimeout(async () => {
-            lScreen = new LocalScreen(app)
-            lScreen.create()
-            lScreen.root.classList.add("push-in-y")
-            lScreen.addToPage()
-            setTimeout(() => {
-                lScreen!.root.classList.remove("push-in-y")
-            }, 400)
-        }, 220)
-        setTimeout(() => {
-            cp!.remove()
-            cp = undefined
-        }, 270)
-    } else if (lScreen != undefined) {
-        lScreen.root.classList.add("push-out-y")
-        setTimeout(async () => {
-            if (account == undefined) await reqLogin()
-            let api = account!
 
-            cp = ChartPage.create(api, app)
-            cp.root.classList.add("push-in-y")
-            setTimeout(() => {
-                cp!.root.classList.remove("push-in-y")
-            }, 400)
-            await cp.searchChart()
-        }, 220)
-        setTimeout(() => {
-            lScreen!.root.remove()
-            lScreen!.destroy()
-            lScreen = undefined
-        }, 270)
-    } else {
-        while (true) {
-            if (app.firstChild == null) break
-            app.removeChild(app.firstChild!)
-        }
-        if (account == undefined) await reqLogin()
-        let api = account!
-        cp = ChartPage.create(api, app)
-        cp.root.classList.add("push-in-y")
-        setTimeout(() => {
-            cp!.root.classList.remove("push-in-y")
-        }, 400)
-        await cp.searchChart()
-    }
+    SCREEN.change(new PhiraChartScreen(app), async () => {
+        await reqLogin()
+    })
 })
-var lScreen: LocalScreen | undefined = undefined;
-tabLocal.addEventListener("click", async () => {
-    if (cp != undefined) {
-        cp.root.classList.add("push-out-y")
-        setTimeout(async () => {
-            lScreen = new LocalScreen(app)
-            lScreen.create()
-            lScreen.root.classList.add("push-in-y")
-            lScreen.addToPage()
-            setTimeout(() => {
-                lScreen!.root.classList.remove("push-in-y")
-            }, 400)
-        }, 220)
-        setTimeout(() => {
-            cp!.remove()
-            cp = undefined
-        }, 270)
-    } else if (lScreen != undefined) {
-        lScreen.root.classList.add("push-out-y")
-        setTimeout(async () => {
-            if (account == undefined) await reqLogin()
-            let api = account!
 
-            cp = ChartPage.create(api, app)
-            cp.root.classList.add("push-in-y")
-            setTimeout(() => {
-                cp!.root.classList.remove("push-in-y")
-            }, 400)
-            await cp.searchChart()
-        }, 220)
-        setTimeout(() => {
-            lScreen!.root.remove()
-            lScreen!.destroy()
-            lScreen = undefined
-        }, 270)
-    } else {
-        lScreen = new LocalScreen(app)
-        lScreen.create()
-        setTimeout(() => {
-            lScreen!.root.classList.remove("push-in-y")
-        }, 400)
-        lScreen.addToPage()
-    }
+tabLocal.addEventListener("click", async () => {
+    SCREEN.change(new LocalScreen(app))
 })
 tabLocal.click()
 function buildCPross() {
@@ -241,11 +158,15 @@ modeBtn.addEventListener("click", async () => {
     if (m == "auto") m_ = "light"
     Cookies.set("mode", m_)
     await setThemeP(m_ as Theme)
-    if (m_ != "auto") {
-        (document.getElementsByClassName("phira-github")[0]! as HTMLElement).style.setProperty("--color", m_ == "light" ? "#000000" : "#FFFFFF")
-    } else {
-        (document.getElementsByClassName("phira-github")[0]! as HTMLElement).style.setProperty("--color", window.matchMedia("(prefers-color-scheme: light)").matches ? "#000000" : "#FFFFFF")
-    }
+    try {
+        if (m_ != "auto") {
+
+            (document.getElementsByClassName("phira-github")[0]! as HTMLElement).style.setProperty("--color", m_ == "light" ? "#000000" : "#FFFFFF")
+        } else {
+            (document.getElementsByClassName("phira-github")[0]! as HTMLElement).style.setProperty("--color", window.matchMedia("(prefers-color-scheme: light)").matches ? "#000000" : "#FFFFFF")
+        }
+    } catch { }
+
 
     uModeBtn()
 
@@ -274,6 +195,7 @@ debugBtn.addEventListener("click", async () => {
     await openDebug()
 })
 export async function reqLogin() {
+    if (account != undefined) return
     (document.getElementById("avatar-dropdown")! as Dropdown).open = false;
     (document.getElementById("avatar-dropdown-1")! as MenuItem).disabled = true;
     let loginR = await loginPage(document.body)
@@ -329,28 +251,35 @@ classChart1.addEventListener("click", () => {
     classChart1.classList.add("list-item-active")
     classChart2.classList.remove("list-item-active")
     classChart3.classList.remove("list-item-active")
-    cp!.type = 0
-    cp!.page = 1
+    if (SCREEN.screen instanceof PhiraChartScreen) {
+        SCREEN.screen.chartPage!.type = 0
+        SCREEN.screen.chartPage!.page = 1
+        SCREEN.screen.chartPage!.searchChart()
+    }
+
     navigationDrawer.open = false
-    cp!.searchChart()
 })
 classChart2.addEventListener("click", () => {
     classChart2.classList.add("list-item-active")
     classChart1.classList.remove("list-item-active")
     classChart3.classList.remove("list-item-active")
-    cp!.type = 2
-    cp!.page = 1
+    if (SCREEN.screen instanceof PhiraChartScreen) {
+        SCREEN.screen.chartPage!.type = 2
+        SCREEN.screen.chartPage!.page = 1
+        SCREEN.screen.chartPage!.searchChart()
+    }
     navigationDrawer.open = false
-    cp!.searchChart()
 })
 classChart3.addEventListener("click", () => {
     classChart3.classList.add("list-item-active")
     classChart1.classList.remove("list-item-active")
     classChart2.classList.remove("list-item-active")
-    cp!.type = 1
-    cp!.page = 1
+    if (SCREEN.screen instanceof PhiraChartScreen) {
+        SCREEN.screen.chartPage!.type = 1
+        SCREEN.screen.chartPage!.page = 1
+        SCREEN.screen.chartPage!.searchChart()
+    }
     navigationDrawer.open = false
-    cp!.searchChart()
 })
 
 //////////////////////////////////////////////////////////////////////////////

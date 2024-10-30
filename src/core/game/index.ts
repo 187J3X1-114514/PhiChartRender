@@ -308,6 +308,7 @@ export default class PhiGame {
             this.judgement.sounds[name].volume = this.judgement._hitsoundVolume;
         }
         this.isFirst = false
+        window.onblur = ()=>{this.autoPause()}
     }
 
     pause() {
@@ -325,8 +326,17 @@ export default class PhiGame {
         }
     }
 
+    autoPause() {
+
+            if (!this._isPaused) {
+                this.pause()
+            }
+        
+    }
+
     restart() {
         this.app.ticker.remove(() => this.gameTick());
+        window.onblur = ()=>{this.autoPause()}
         this.chart.music.reset();
 
         this.chart.reset();
@@ -378,6 +388,7 @@ export default class PhiGame {
         canvas.width = canvas.height = 0;
 
         this.app.destroy(removeCanvas, { children: false, texture: false, textureSource: false });
+        window.onblur = null
     }
 
     on(type: string, callback: () => any) {
@@ -392,10 +403,12 @@ export default class PhiGame {
         this.processors[type].push(callback);
     }
 
+
+
     resize(withChartSprites = true, shouldResetFakeJudgeLine = true) {
         if (!this.app) return;
         // 计算新尺寸相关数据
-        
+
         this.renderTarget.resize(this.app.screen.width, this.app.screen.height, this._settings.resolution)
         this.renders.sizer = this.calcResizer(this.app.screen.width, this.app.screen.height, this._settings.noteScale, this._settings.resolution);
         this.antialiasing.updata(
@@ -594,6 +607,7 @@ export default class PhiGame {
                 this.renders.fpsText.alpha = 0
                 this.renders.mainContainer.alpha = 0
                 this.app.ticker.remove(() => this.gameTick());
+                window.onblur = null
             }
 
         }
@@ -602,7 +616,7 @@ export default class PhiGame {
     calcResizer(width: number, height: number, noteScale = 8000, resolution = window.devicePixelRatio): SizerData {
         let result: SizerData = {} as any;
 
-        
+
 
         result.width = height / 9 * 16 < width ? height / 9 * 16 : width;
         result.height = height;
@@ -630,14 +644,14 @@ export default class PhiGame {
     }
 
     render() {
-        
+
     }
 
-    getDefaultShader(){
+    getDefaultShader() {
         return [DefaultShader.filter]
-        .concat(
-            this._params.settings.antialias && this._params.settings.antialiasType == 1?[this.antialiasing.FXAA!]:[]
-        )
+            .concat(
+                this._params.settings.antialias && this._params.settings.antialiasType == 1 ? [this.antialiasing.FXAA!] : []
+            )
     }
 
     private initRender() {

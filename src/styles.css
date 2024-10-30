@@ -457,7 +457,8 @@ mdui-navigation-rail {
 #start-o.black {
     opacity: 1;
 }
-#start-o{
+
+#start-o {
     opacity: 0;
     position: fixed;
     top: 0;
@@ -786,7 +787,7 @@ mdui-navigation-drawer {
     }
 }
 
-.status-text-onload{
+.status-text-onload {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
@@ -801,4 +802,30 @@ mdui-navigation-drawer {
     font-family: Font, phi;
     text-align: right;
 
+}
+
+.mdui-segmented-button-selected {
+    color: rgb(var(--mdui-color-on-secondary-container));
+    background-color: rgb(var(--mdui-color-secondary-container));
+    --mdui-comp-ripple-state-layer-color: var(--mdui-color-on-secondary-container);
+}
+
+.phira-chart-page-g {
+    height: 40px;
+    width: 30%;
+    transform: translateY(-25px);
+}
+
+.phira-chart-root {
+    text-align: center;
+}
+
+.phira-chart-root .active{
+    text-align: left;
+    padding-bottom: 48px;
+    
+}
+
+.phira-chart-root .search-div{
+    text-align: left;
 }

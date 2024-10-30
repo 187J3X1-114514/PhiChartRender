@@ -1,8 +1,8 @@
-import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem } from "mdui";
+import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem, snackbar, SegmentedButtonGroup, SegmentedButton, Icon } from "mdui";
 import { dialog } from "mdui/functions/dialog.js";
 import { PhiraAPI, PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
 import { proxyPhriaApiURL, PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
-import { ResPack, account, navigationDrawer } from "../../main";
+import { ResPack, account, navigationDrawer, reqLogin } from "../../main";
 import { PlayS as PlayScreen } from "../../play/play";
 import { File } from "../../../core/file";
 import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID, getOrCreateCacheDATACallback } from "../../data";
@@ -28,13 +28,66 @@ export class ChartPage {
     private select2?: Select
     private searchDiv?: HTMLDivElement
     private searchBtn: Button = (undefined as unknown) as any
+    private maxPage: number = 0
     public page: number = 1
     public type: number = 2
     private load: LinearProgress = (undefined as unknown) as any
     public root: HTMLDivElement = (undefined as unknown) as any
+
+    public pagesBtnG: SegmentedButtonGroup = new SegmentedButtonGroup()
+    public pagesBtnLast: SegmentedButton = new SegmentedButton()
+    public pagesBtnNext: SegmentedButton = new SegmentedButton()
+    public pagesBtn0: SegmentedButton = new SegmentedButton()
+    public pagesBtn1: SegmentedButton = new SegmentedButton()
+    public pagesBtn2: SegmentedButton = new SegmentedButton()
+
     private constructor() {
 
     }
+
+    private updataPageBtn() {
+        if (this.page >= this.maxPage - 3) {
+            this.pagesBtn0.innerText = (this.maxPage - 2).toFixed(0)
+            this.pagesBtn1.innerText = (this.maxPage - 1).toFixed(0)
+            this.pagesBtn2.innerText = (this.maxPage).toFixed(0)
+
+            this.pagesBtn0.value = (this.maxPage - 2).toFixed(0)
+            this.pagesBtn1.value = (this.maxPage - 1).toFixed(0)
+            this.pagesBtn2.value = (this.maxPage).toFixed(0)
+
+            this.pagesBtn2.classList.remove("mdui-segmented-button-selected")
+            this.pagesBtn1.classList.remove("mdui-segmented-button-selected")
+            this.pagesBtn0.classList.add("mdui-segmented-button-selected")
+        } else if (!(this.page > 2)) {
+            this.pagesBtn0.innerText = this.page.toFixed(0)
+            this.pagesBtn1.innerText = (this.page + 1).toFixed(0)
+            this.pagesBtn2.innerText = (this.page + 2).toFixed(0)
+
+            this.pagesBtn0.value = this.page.toFixed(0)
+            this.pagesBtn1.value = (this.page + 1).toFixed(0)
+            this.pagesBtn2.value = (this.page + 2).toFixed(0)
+
+            this.pagesBtn2.classList.remove("mdui-segmented-button-selected")
+            this.pagesBtn1.classList.remove("mdui-segmented-button-selected")
+            this.pagesBtn0.classList.add("mdui-segmented-button-selected")
+        } else {
+            this.pagesBtn0.innerText = (this.page - 1).toFixed(0)
+            this.pagesBtn1.innerText = this.page.toFixed(0)
+            this.pagesBtn2.innerText = (this.page + 1).toFixed(0)
+
+            this.pagesBtn0.value = (this.page - 1).toFixed(0)
+            this.pagesBtn1.value = this.page.toFixed(0)
+            this.pagesBtn2.value = (this.page + 1).toFixed(0)
+
+            this.pagesBtn2.classList.remove("mdui-segmented-button-selected")
+            this.pagesBtn1.classList.add("mdui-segmented-button-selected")
+            this.pagesBtn0.classList.remove("mdui-segmented-button-selected")
+        }
+        this.pagesBtnLast.disabled = this.page == 1
+        this.pagesBtnNext.disabled = this.page == this.maxPage
+
+    }
+
     private afterCreate() {
         this.cards = document.createElement("div")
         this.search = new TextField()
@@ -51,6 +104,53 @@ export class ChartPage {
         this.root.classList.add("fadeIn")
         this.root.classList.add("fadeIn-s")
         this.root.classList.remove("fadeIn-s")
+        this.root.classList.add("phira-chart-root")
+
+        this.pagesBtnLast.innerText = I18N.get("ui.screen.phira.chart.text.last_page")
+        this.pagesBtnNext.innerText = I18N.get("ui.screen.phira.chart.text.next_page")
+
+        this.pagesBtnG.appendChild(this.pagesBtnLast)
+        this.pagesBtnG.appendChild(this.pagesBtn0)
+        this.pagesBtnG.appendChild(this.pagesBtn1)
+        this.pagesBtnG.appendChild(this.pagesBtn2)
+        this.pagesBtnG.appendChild(this.pagesBtnNext)
+        this.pagesBtnG.classList.add("phira-chart-page-g")
+
+        this.pagesBtnLast.addEventListener("click", async () => {
+            this.page -= 1
+            await this.searchChart()
+        })
+        this.pagesBtnNext.addEventListener("click", async () => {
+            this.page += 1
+            await this.searchChart()
+        })
+
+        this.pagesBtn0.addEventListener("click", async () => {
+            this.page = parseInt(this.pagesBtn0.value)
+            await this.searchChart()
+        })
+        this.pagesBtn1.addEventListener("click", async () => {
+            this.page = parseInt(this.pagesBtn1.value)
+            await this.searchChart()
+        })
+        this.pagesBtn2.addEventListener("click", async () => {
+            this.page = parseInt(this.pagesBtn2.value)
+            await this.searchChart()
+        })
+
+        this.pagesBtnLast.appendChild((() => {
+            let _ = new Icon()
+            _.slot = "icon"
+            _.name = "keyboard_arrow_left"
+            return _
+        })())
+        this.pagesBtnNext.appendChild((() => {
+            let _ = new Icon()
+            _.slot = "end-icon"
+            _.name = "keyboard_arrow_right"
+            return _
+        })())
+        this.updataPageBtn()
 
         this.searchDiv = document.createElement("div")
         this.select1 = new Select()
@@ -96,6 +196,7 @@ export class ChartPage {
         this.root.append(this.searchDiv)
         document.body.append(this.load)
         this.root.append(this.cards)
+        this.root.append(this.pagesBtnG)
         this.searchBtn.addEventListener("click", async () => {
             this.searchBtn.disabled = true
             this.searchBtn.loading = true
@@ -138,29 +239,29 @@ export class ChartPage {
         load.style.zIndex = "10"
         const i = new Image()
         rootCard.clickable = true;
-        (async()=>{
+        (async () => {
             const srcUrl = data.illustration.replace("https://api.phira.cn/", "") + ".thumbnail"
             const url = proxyPhriaApiURL(srcUrl);
             let blob: Blob | undefined = undefined
-            if (await checkCacheDATA(url.replace("https://api.phira.cn/files/",""))) {
-                blob = await getCacheDATA(url.replace("https://api.phira.cn/files/",""))
+            if (await checkCacheDATA(url.replace("https://api.phira.cn/files/", ""))) {
+                blob = await getCacheDATA(url.replace("https://api.phira.cn/files/", ""))
             } else {
                 await new Promise(async (r) => {
                     let tempi = new Image()
                     tempi.setAttribute('crossorigin', 'anonymous');
                     tempi.src = url
-                    tempi.onload = async() => {
+                    tempi.onload = async () => {
                         const bmp = await createImageBitmap(tempi)
                         const canvas = document.createElement('canvas')
                         canvas.width = bmp.width
                         canvas.height = bmp.height
                         const ctx = canvas.getContext('2d')!
-                        ctx.drawImage(bmp,0,0)
+                        ctx.drawImage(bmp, 0, 0)
                         blob = await new Promise<Blob>((res) => canvas.toBlob(res as any))
                         await addCacheDATA(url, blob)
                         r(null)
                     }
-                    tempi.onerror = ()=>{
+                    tempi.onerror = () => {
                         i.src = NONE_IMG
                         r(null)
                     }
@@ -249,19 +350,31 @@ export class ChartPage {
     }
     async searchChart() {
 
+        if (account == undefined) {
+            snackbar({
+                message: I18N.get("ui.screen.phira.chart.text.error.text.not_login"),
+                action: I18N.get("ui.screen.phira.login.text.login_btn"),
+                onActionClick: async () => await reqLogin(),
+                messageLine: 2
+            })
+            return
+        }
+        this.load.classList.remove("hide")
         let api = account!
         let r = await api.search(
             api.getSearchOrder(this.select1!.value.slice(0, this.select1!.value.length - 1) as string),
             api.getSearchDivision(this.select2!.value.slice(0, this.select2!.value.length - 1) as string),
             this.search!.value, 30, this.page, this.type
         )
+        this.maxPage = r.maxPages
+        this.updataPageBtn()
         while (this.cards!.firstChild) {
             this.cards!.removeChild(this.cards!.firstChild!)
         }
-        for (let v of r.results){
+        for (let v of r.results) {
             await this.createChartCard(v)
         }
-        this.load.classList.remove("hide")
+
         let a = setInterval(() => {
             let c = true
             for (let b of this.cards!.getElementsByTagName("mdui-card")) {

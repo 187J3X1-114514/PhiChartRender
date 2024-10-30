@@ -162,6 +162,7 @@ export default class UIManager implements baseUIManager {
         this.PauseBtnOutLine.fill({
             color: 0, alpha: 0.0
         })
+        alpha *= this.element.Pause.alpha
         this.PauseBtnOutLine.stroke({ width: this.size!.lineHeightScale * 3 * 0.6, color: 0xA9A9A9, alpha: alpha });
 
 

@@ -5,15 +5,17 @@ import { PlayS } from "../play/play";
 import { BaseScreen } from "./base";
 import { ChartPage } from "../phira/chart/chart";
 
-export class PhiraScreen extends BaseScreen {
+export class PhiraChartScreen extends BaseScreen {
     private resManger?: ResourceManager
+    public chartPage?:ChartPage
 
     async create(): Promise<void> {
-        await reqLogin()
         let api = account!
-        await ChartPage.create(api, this.root)
+        this.chartPage = ChartPage.create(api, this.root)
+        this.chartPage.searchChart()
     }
     destroy(): void {
+        this.chartPage!.remove()
         this.resManger?.destroy()
         delete this.resManger
     }
