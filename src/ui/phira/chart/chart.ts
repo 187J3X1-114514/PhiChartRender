@@ -224,7 +224,7 @@ export class ChartPage {
         chartPage.cards!.style.margin = '10px'
         return chartPage
     }
-    async createChartCard(data: PhiraAPIChartInfo) {
+    createChartCard(data: PhiraAPIChartInfo) {
         this.chartCount++
         const rootCard = new Card()
         rootCard.style.opacity = '0'
@@ -349,7 +349,7 @@ export class ChartPage {
         };
     }
     async searchChart() {
-
+        this.chartCount = 0
         if (account == undefined) {
             snackbar({
                 message: I18N.get("ui.screen.phira.chart.text.error.text.not_login"),
@@ -372,7 +372,7 @@ export class ChartPage {
             this.cards!.removeChild(this.cards!.firstChild!)
         }
         for (let v of r.results) {
-            await this.createChartCard(v)
+            this.createChartCard(v)
         }
 
         let a = setInterval(() => {

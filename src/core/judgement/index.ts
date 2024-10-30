@@ -8,7 +8,7 @@ import { SizerData } from '../types/params';
 import Note from '../chart/note';
 import Audio from '../audio';
 
-const particleCountPerClickAnim = 4;
+const particleCountPerClickAnim = 8;
 
 const AllJudgeTimes = {
     bad: 180,
