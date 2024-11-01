@@ -10,13 +10,13 @@ PS:这个模拟器只是因为我想在学校的希沃白板上玩Phigros的心�
 
 <div align="center">
 <h4>
-Phira搜索界面
+Phira铺面搜索界面
 </h4>
-<img src="/assets/5b4edb2c1f8d007d3924d3eb58cf823.png">
+<img src="/assets/8aa4054e58ed44165069a20c63568f7.png">
 <h4>
-AUTOPLAY模式游玩
+游玩
 </h4>
-<img src="/assets/16bafc07abd44483b4c5508ee8735fc.png">
+<img src="/assets/9c41181996f645d79511cf72566d5d2.png">
 
 </div>
 
