@@ -26,6 +26,7 @@ export class PrprExtra {
         if (json.videos) prpr.videos = this.PrprVideoReader(json);
         if (prpr.effects.length == 0) prpr.hasShader = false
         prpr.src = deepCopy(json)
+        console.log(prpr)
         return prpr
     }
 
@@ -274,7 +275,7 @@ export class PrprExtra {
                         startTime: -999999,
                         start: _values,
                         end: _values,
-                        endTime: -999999
+                        endTime: 999999
                     }]
                 }
             }

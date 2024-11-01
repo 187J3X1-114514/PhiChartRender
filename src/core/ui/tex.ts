@@ -3,8 +3,8 @@ import { Texture } from "pixi.js";
 export const pauseButton = (() => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
-    const buttonWidth = 11
-    const width = 33
+    const buttonWidth = 12
+    const width = 34
     const height = 37
     canvas.width = width;
     canvas.height = height;

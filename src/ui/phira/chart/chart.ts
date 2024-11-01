@@ -58,7 +58,7 @@ export class ChartPage {
             this.pagesBtn2.classList.remove("mdui-segmented-button-selected")
             this.pagesBtn1.classList.remove("mdui-segmented-button-selected")
             this.pagesBtn0.classList.add("mdui-segmented-button-selected")
-        } else if (!(this.page > 2)) {
+        } else if (!(this.page > 1)) {
             this.pagesBtn0.innerText = this.page.toFixed(0)
             this.pagesBtn1.innerText = (this.page + 1).toFixed(0)
             this.pagesBtn2.innerText = (this.page + 2).toFixed(0)

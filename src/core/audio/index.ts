@@ -16,13 +16,13 @@ export default class Audio {
         this.soundName = n
         this.sound = s
     }
-    static async from(src: any,soundName:string=generateRandomString(32)): Promise<Audio> {
+    static async from(src: any, soundName: string = generateRandomString(32)): Promise<Audio> {
         return await new Promise((r) => {
             let _ = performance.now()
             let m = new this(soundName, sound.add(soundName, {
-                source: src, preload: true, loaded: () => { 
-                    log.debug("添加音频",soundName,"用时",(performance.now()-_).toFixed(0)+"ms")
-                    r(m) 
+                source: src, preload: true, loaded: () => {
+                    log.debug("添加音频", soundName, "用时", (performance.now() - _).toFixed(0) + "ms")
+                    r(m)
                 }
             }))
         })
@@ -55,6 +55,22 @@ export default class Audio {
         this.sound.stop()
     }
     seek(_duration: any) {
+        this.soundPlay?.stop()
+        this.soundPlay?.destroy()
+        this.sound.stop()
+
+        this.soundPlay = this.sound.play(
+            {
+                start: _duration
+            }
+        ) as IMediaInstance
+        this.soundPlay.on("end", () => {
+            if (this.onend) this.onend()
+        })
+        this.soundPlay.on("progress", (a, b) => {
+            this.progress = a
+            this.currentTime = a * b
+        })
     }
 
     get isPaused() {

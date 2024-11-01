@@ -120,7 +120,7 @@ export default class PhiGame {
         this.renders.mainContainer.addChild(this.renders.UIContainer);
 
         this.renders.videoContainer = new Container();
-        this.renders.videoContainer.zIndex = -5;
+        this.renders.videoContainer.zIndex = -4;
         this.renders.gameContainer.addChild(this.renders.videoContainer);
 
 
@@ -308,7 +308,11 @@ export default class PhiGame {
             this.judgement.sounds[name].volume = this.judgement._hitsoundVolume;
         }
         this.isFirst = false
-        window.onblur = ()=>{this.autoPause()}
+        window.onblur = () => { this.autoPause() }
+        (window as any).curGameSeekTime = (a:number)=>{
+            this.chart.music.seek(a)
+        }
+        (window as any).curGameMusic = this.chart.music
     }
 
     pause() {
@@ -328,15 +332,15 @@ export default class PhiGame {
 
     autoPause() {
 
-            if (!this._isPaused) {
-                this.pause()
-            }
-        
+        if (!this._isPaused && this._animateStatus == 1) {
+            this.pause()
+        }
+
     }
 
     restart() {
         this.app.ticker.remove(() => this.gameTick());
-        window.onblur = ()=>{this.autoPause()}
+        window.onblur = () => { this.autoPause() }
         this.chart.music.reset();
 
         this.chart.reset();
