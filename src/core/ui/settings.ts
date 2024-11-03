@@ -1,4 +1,4 @@
-import { UISettings } from "../types/ui"
+import type { UISettings } from "../types/ui"
 export const defaultUISettings = {
     scale: {
         Pause: 0.7,

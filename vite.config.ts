@@ -1,8 +1,11 @@
 import { defineConfig } from "vite";
-import { internalIpV4 } from "internal-ip";
 import topLevelAwait from 'vite-plugin-top-level-await'
 import GitRevisionVitePlugin from 'git-revision-vite-plugin';
 import { readFile } from 'fs'
+import { fileURLToPath } from "url";
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 function assetFileName(chunkInfo: any): string {
     var n = chunkInfo.name
@@ -24,6 +27,15 @@ const pj: any = await (async () => {
 
 export default defineConfig(async () => ({
     plugins: [
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => tag.startsWith('mdui-')
+                }
+            }
+        }),
+        vueJsx(),
+        vueDevTools(),
         topLevelAwait({
             promiseExportName: '__tla',
             promiseImportName: i => `__tla_${i}`
@@ -57,5 +69,9 @@ export default defineConfig(async () => ({
     optimizeDeps: {
         exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
     },
+    resolve: {
+        alias: {
+            '@': fileURLToPath(new URL('./src', import.meta.url))
+        }
+    }
 }));
-

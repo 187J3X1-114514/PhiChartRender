@@ -4,7 +4,7 @@ import Score from './score';
 import JudgePoint from './point';
 import { Container, AnimatedSprite, Texture, Sprite } from 'pixi.js';
 import Chart from '../chart';
-import { SizerData } from '../types/params';
+import type { SizerData } from '../types/params';
 import Note from '../chart/note';
 import Audio from '../audio';
 

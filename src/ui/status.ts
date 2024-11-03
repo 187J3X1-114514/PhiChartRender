@@ -27,7 +27,6 @@ export class StatusManager{
     }
 
     private callback(){
-        console.log(this.buildStr())
         let str = this.buildStr()
         //STATUSTEXT.innerText = str
     }

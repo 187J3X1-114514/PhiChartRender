@@ -1,5 +1,5 @@
 import { newLogger } from '../log'
-import { IMediaInstance, Sound, sound } from '@pixi/sound';
+import { type IMediaInstance, Sound, sound } from '@pixi/sound';
 import { generateRandomString } from '../random';
 const log = newLogger("Audio")
 sound.disableAutoPause = true

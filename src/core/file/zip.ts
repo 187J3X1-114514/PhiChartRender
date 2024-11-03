@@ -1,4 +1,4 @@
-import SevenZip, { SevenZipModule } from "7z-wasm";
+import SevenZip, { type SevenZipModule } from "7z-wasm";
 import { File } from './file'
 import { newLogger } from '../log'
 import { mimeTypes } from './minetype';

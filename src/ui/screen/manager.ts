@@ -1,5 +1,4 @@
 import { BaseScreen } from "./base";
-import { LocalScreen } from "./local";
 
 export class ScreenManager {
     public screen: BaseScreen = undefined as any
@@ -8,10 +7,9 @@ export class ScreenManager {
     static async init(root: HTMLElement) {
         let _ = new this()
         _.root = root
-        await _.change(new LocalScreen(_.root))
         return _
     }
-    async change(screen: BaseScreen,onclose:()=>void=()=>{}) {
+    async change(screen: BaseScreen, onclose: () => void = () => { }) {
         if (this.screen != undefined) {
             await this.screen.close()
         }

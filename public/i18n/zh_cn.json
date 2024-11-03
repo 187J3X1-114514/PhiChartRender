@@ -76,7 +76,10 @@
         "html.protocol.yes":"同意",
         "html.dev":"正在开发",
         "html.thread.error.a":"检测到当前无法使用多线程功能，将在10秒后自动刷新页面，你也可以手动刷新页面，如果刷新后仍然出现此提升请反馈这个问题。",
-        "html.thread.error.b":"仍然无法使用多线程功能，将关闭多线程功能"
+        "html.thread.error.b":"仍然无法使用多线程功能，将关闭多线程功能",
+        "html.light_mode":"亮色模式",
+        "html.dark_mode":"暗色模式",
+        "html.auto_mode":"跟随系统"
 
     }
 }

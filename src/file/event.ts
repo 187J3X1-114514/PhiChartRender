@@ -1,6 +1,6 @@
-import { jsonEventLayer } from "../core/chart/types/judgeLine";
+import type { jsonEventLayer } from "../core/chart/types/judgeLine";
 import { number } from "../core/verify";
-import { bpmEvent, Event, floorPositionEvent, rpeEvent, valueAndEvent, valueEvent } from "../core/chart/baseEvents";
+import type { bpmEvent, Event, floorPositionEvent, rpeEvent, valueAndEvent, valueEvent } from "../core/chart/baseEvents";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
 
 export function buildEventData(view: WriteBufferDataView, data: Event) {

@@ -1,4 +1,4 @@
-import { judgeLineData } from "./judgeLine"
+import type { judgeLineData } from "./judgeLine"
 
 export interface officialChartData {
     formatVersion: number

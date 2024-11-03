@@ -1,8 +1,8 @@
 import { PrprExtra } from "../core/prpr/prpr";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
-import PrPrExtraJSON, { PrPrExtraEffect, PrPrExtraVideo } from "../core/prpr/types";
+import type { PrPrExtraJSON, PrPrExtraEffect, PrPrExtraVideo } from "../core/prpr/types";
 import { buildBaseBpmEventData, buildRpeEventData, readBaseBpmEventData, readRpeEventData } from "./event";
-import { rpeEvent } from "../core/chart/baseEvents";
+import type { rpeEvent } from "../core/chart/baseEvents";
 
 export function buildVideoEventData(view: WriteBufferDataView, data: PrPrExtraVideo) {
     view.setString(data.path)

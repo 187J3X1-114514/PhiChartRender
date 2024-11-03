@@ -6,7 +6,7 @@ import utils from './utils';
 import { RePhiEditEasing as Easing } from '../easing'
 import { RePhiEdit as utils2 } from './otherUtils'
 import { chart_log } from './index.js';
-import { Event } from '../baseEvents.js';
+import type { Event } from '../baseEvents.js';
 export default function RePhiEditChartConverter(_chart: any) {
     let notes: any[] = [];
     let sameTimeNoteCount = {};

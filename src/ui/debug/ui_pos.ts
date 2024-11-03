@@ -1,9 +1,8 @@
 import { ButtonIcon, List, ListItem, Slider } from "mdui"
 import { Application, Graphics } from "pixi.js"
-import { attachUI, UISettings } from "../../core/types/ui"
-import { UIElement } from "../../core/ui/element"
+import type {  UISettings } from "../../core/types/ui"
 import debugUIManger from "../../core/ui/debug_ui"
-import { SizerData } from "../../core/types/params"
+import type { SizerData } from "../../core/types/params"
 
 function calcResizer(width: number, height: number, noteScale = 8000, resolution = window.devicePixelRatio): SizerData {
     let result: SizerData = {} as any;

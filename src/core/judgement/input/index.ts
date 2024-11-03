@@ -1,4 +1,4 @@
-import { SizerData } from '../../types/params';
+import type { SizerData } from '../../types/params';
 import InputPoint from './point';
 import { Graphics } from 'pixi.js';
 

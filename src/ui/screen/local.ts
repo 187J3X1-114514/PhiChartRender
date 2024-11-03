@@ -1,9 +1,9 @@
 import { Button, Card, Select, MenuItem, Switch } from "mdui";
 import { ResourceManager } from "../../core/resource";
-import { ResPack } from "../main";
 import { PlayS } from "../play/play";
 import { BaseScreen } from "./base";
 import { I18N } from "../i18n";
+import { ResPack } from "../App.vue";
 
 export class LocalScreen extends BaseScreen {
     private resManger?: ResourceManager

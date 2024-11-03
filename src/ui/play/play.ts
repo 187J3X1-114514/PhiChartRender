@@ -1,9 +1,9 @@
-import { ChartData, ChartInfo } from "../../core/chart/chartinfo";
+import { type ChartData, ChartInfo } from "../../core/chart/chartinfo";
 import PhiGame from "../../core/game";
 import { ResourceManager, ResourcePack } from "../../core/resource";
 import { File } from "../../core/file";
 import { Application } from "pixi.js";
-import { topAppBar, BACKGROUND } from "../main";
+import { topAppBar } from "../App.vue";
 
 export class PlayS {
     private res: ResourceManager
@@ -40,7 +40,7 @@ export class PlayS {
             }
         }
         await this.chart!.blur(40)
-        
+
         this.app = new Application()
         this.chart_data = this.chart!.get(this.res)
         await this.app.init({
@@ -63,7 +63,7 @@ export class PlayS {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1,antialias:true,antialiasType:1
+                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1, antialias: true, antialiasType: 1
             }
         })
         console.log(this.app.renderer.render)
@@ -75,19 +75,19 @@ export class PlayS {
         })
     }
     start() {
-        topAppBar.style.display = "none"
+        topAppBar.value.style.display = "none"
         document.body.style.paddingTop = "0px"
         this.app!.canvas.classList.add("push-in")
         this.app!.canvas.classList.add("game")
-        BACKGROUND.pause()
+        //BACKGROUND.pause()
         setTimeout(() => {
             this.game!.start()
             this.app!.canvas.classList.remove("push-in")
         }, 620)
     }
     private onend() {
-        BACKGROUND.render()
-        topAppBar.style.display = "flex"
+        //BACKGROUND.render()
+        topAppBar.value.style.display = "flex"
         document.body.style.paddingTop = "64px"
         this.app!.canvas.classList.add("push-out")
         this.end()

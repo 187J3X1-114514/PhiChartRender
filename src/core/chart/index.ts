@@ -3,10 +3,10 @@ import * as Convert from './convert';
 import { Sprite, Graphics, Text, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import Note from './note';
-import { bpmEvent } from './baseEvents';
+import type { bpmEvent } from './baseEvents';
 import Audio from '../audio';
-import { PhiAssets, ResourceManager } from '../resource';
-import { SizerData } from '../types/params';
+import { type PhiAssets, ResourceManager } from '../resource';
+import type { SizerData } from '../types/params';
 export default class Chart {
     judgelines: Judgeline[]
     notes: Note[]

@@ -1,8 +1,8 @@
-import { SizerData } from '../types/params';
+import type { SizerData } from '../types/params';
 import { UIElement } from './element';
 import { defaultUISettings } from './settings';
 import { Container } from 'pixi.js';
-import { attachUI, UISettings, UIElementSettings, baseUIManager } from "../types/ui"
+import { attachUI, type UISettings, type UIElementSettings, baseUIManager } from "../types/ui"
 
 export default class debugUIManger implements baseUIManager {
     public element: {

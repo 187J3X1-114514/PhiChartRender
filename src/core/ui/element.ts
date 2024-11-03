@@ -1,11 +1,11 @@
 import EventLayer from '../chart/eventlayer';
 import * as font from '../font'
-import { Event, valueEvent } from '../chart/baseEvents';
+import type { Event, valueEvent } from '../chart/baseEvents';
 import { Sprite, Text, TextStyle } from 'pixi.js';
-import { SizerData } from '../types/params';
+import { type SizerData } from '../types/params';
 import { pauseButton } from './tex';
 import Judgeline from '../chart/judgeline';
-import { attachUI,UIElementSettings,baseUIManager } from "../types/ui"
+import { attachUI, type UIElementSettings, baseUIManager } from "../types/ui"
 
 export class UIElement {
     private eventLayers: EventLayer[];
@@ -35,7 +35,7 @@ export class UIElement {
     public offsetX: number = 0
     public offsetY: number = 0
     public baseAlpha: number = 1
-    public settings:UIElementSettings = undefined as any
+    public settings: UIElementSettings = undefined as any
     private uiManager: baseUIManager
     private constructor(type: attachUI, ui: baseUIManager) {
         this.eventLayers = []
@@ -97,7 +97,7 @@ export class UIElement {
                 v.rotateOriginValue = 0
             })
         }
-        
+
         return e
 
     }
@@ -153,7 +153,7 @@ export class UIElement {
                 let eventLayer = this.eventLayers[i];
                 __.push(eventLayer.calcTime(currentTime))
             }
-            
+
             //__ = __.reverse()
             for (let i = 0, length = __.length; i < length; i++) {
                 let eventLayer = this.eventLayers[i];
@@ -274,7 +274,7 @@ export class UIElement {
                 case attachUI.Score:
                     this.x = size.width - (size.width * this.settings.X)
                     this.y = size.height * this.settings.Y
-                    this.textStyle!.fontSize = size.baseFontSize * 0.95  * this.settings.scaleX+ "px"
+                    this.textStyle!.fontSize = size.baseFontSize * 0.95 * this.settings.scaleX + "px"
                     break
                 case attachUI.Name:
                     this.x = size.width * this.settings.X
@@ -293,10 +293,11 @@ export class UIElement {
             this.baseScaleX = size.heightPercent * this.settings.scaleX
             this.baseScaleY = size.heightPercent * this.settings.scaleY
             this.x = size.width * this.settings.X
-            this.y =  size.height * this.settings.Y
+            this.y = size.height * this.settings.Y
         }
 
     }
+    /*
     calcAni(size: SizerData, isStart: boolean, progress: number) {
         this.calcTime(0, size)
         let isTop = this.type == attachUI.Pause || this.type == attachUI.Score || this.type == attachUI.Combo || this.type == attachUI.ComboNumber
@@ -313,14 +314,15 @@ export class UIElement {
             let offsetY2 = easeOutCubic(progress) * y * (isTop ? -3 : 3)
             this.sprite.y = (y + offsetY2)
         }
-    }
-    updataSettings(){
+    }*/
+    updataSettings() {
         this.settings = this.uiManager.getUIElementSettings(this.type)
     }
 }
+/*
 function easeInOutCubic(x: number): number {
     return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }
 function easeOutCubic(x: number): number {
     return 1 - Math.pow(1 - x, 3);
-}
+}*/

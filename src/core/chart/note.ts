@@ -2,8 +2,8 @@ import * as verify from '../verify';
 import { Container, Sprite, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import Audio from '../audio';
-import { PhiAssets, ResourceManager } from '../resource';
-import { jsonNoteData, NoteParam } from './types/note';
+import { type PhiAssets, ResourceManager } from '../resource';
+import type { jsonNoteData, NoteParam } from './types/note';
 
 
 export default class Note {

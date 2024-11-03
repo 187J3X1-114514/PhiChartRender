@@ -3,11 +3,11 @@ import utils from './convert/utils';
 import { Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import EventLayer from './eventlayer';
 import * as font from '../font'
-import { floorPositionEvent, Event, valueEvent } from './baseEvents';
-import { PhiAssets, ResourceManager } from '../resource';
-import { SizerData } from '../types/params';
+import type { floorPositionEvent, Event, valueEvent } from './baseEvents';
+import { type PhiAssets, ResourceManager } from '../resource';
+import type { SizerData } from '../types/params';
 import { chart_log } from './convert';
-import { jsonEventLayer, jsonJudgeLineData } from './types/judgeLine';
+import type { jsonEventLayer, jsonJudgeLineData } from './types/judgeLine';
 const blackJudgeLine = (() => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;

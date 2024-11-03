@@ -25,7 +25,6 @@ export class i18n {
         this.language = this.getLanguage(i18n.getUserLanguage())
         this.languageJSON = await (await fetch(this.I18N_INFO.baseDir + "/" + this.language.url)).json()
         this.DefaultLanguageJSON = await (await fetch(this.I18N_INFO.baseDir + "/" + this.I18N_INFO.languages["zh-CN"].url)).json()
-        this.replaceHTMLText()
     }
     private getLanguage(name: string) {
         if (this.I18N_INFO.languages[name] != undefined) return this.I18N_INFO.languages[name]
@@ -36,13 +35,6 @@ export class i18n {
             return Cookies.get("lang")!
         } else {
             return navigator.language
-        }
-    }
-
-    replaceHTMLText() {
-        for (let key in this.DefaultLanguageJSON!.text) {
-            //document.body.innerText = document.body.innerText.replace("$${*" + key + "*}$$", this.get(key))
-            
         }
     }
 
@@ -66,5 +58,6 @@ export class i18n {
     }
 }
 
-export const I18N = new i18n()
+export const I18N = new i18n();
+(window as any).I18N = I18N
 await I18N.load()

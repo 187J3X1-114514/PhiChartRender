@@ -1,10 +1,10 @@
 import * as verify from '../verify';
 import Judgement from '../judgement';
-import { PhiAssets } from "../resource"
+import type { PhiAssets } from "../resource";
 import { Application, Container, Sprite, Graphics, Text, TextStyle, Ticker, RenderTarget } from 'pixi.js';
 import * as font from '../font'
 import Chart from '../chart';
-import { GameParams, GameSettings, SizerData } from '../types/params';
+import type { GameParams, GameSettings, SizerData } from '../types/params';
 import Audio from '../audio';
 import { ResourceManager } from '../resource/resource_manager';
 import { printImage } from '../utils';

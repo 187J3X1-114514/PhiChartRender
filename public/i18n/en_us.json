@@ -73,6 +73,9 @@
         "html.dev": "Under Development",
         "html.thread.error.a": "Detected that multi-threading functionality is currently unavailable. The page will automatically refresh in 10 seconds. You can also manually refresh the page. If this prompt still appears after refreshing, please report this issue.",
         "html.thread.error.b": "Still unable to use multi-threading functionality. Multi-threading will be disabled.",
-        "ui.screen.phira.chart.text.error.text.not_login": "Not logged into Phira account, please log in to your Phira account before proceeding with the following operations."
+        "ui.screen.phira.chart.text.error.text.not_login": "Not logged into Phira account, please log in to your Phira account before proceeding with the following operations.",
+        "html.light_mode":"Light",
+        "html.dark_mode":"Dark",
+        "html.auto_mode":"System"
     }
 }

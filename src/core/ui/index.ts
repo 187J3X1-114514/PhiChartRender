@@ -1,10 +1,10 @@
-import { SizerData } from '../types/params';
+import type { SizerData } from '../types/params';
 import Chart from '../chart';
 import { UIElement } from './element';
 import PhiGame from '../game';
 import { Container, Graphics, Sprite } from 'pixi.js';
 import { defaultUISettings } from './settings';
-import { attachUI, UISettings, UIElementSettings, baseUIManager } from "../types/ui"
+import { attachUI, type UISettings, type UIElementSettings, baseUIManager } from "../types/ui"
 export default class UIManager implements baseUIManager {
     private chart: Chart
     public element: {
@@ -182,13 +182,29 @@ export default class UIManager implements baseUIManager {
 
     }
     calcAni(size: SizerData, isStart: boolean, progress: number) {
-        this.element.Combo.calcAni(size, isStart, progress)
-        this.element.ComboNumber.calcAni(size, isStart, progress)
-        this.element.Level.calcAni(size, isStart, progress)
-        this.element.Name.calcAni(size, isStart, progress)
-        this.element.Pause.calcAni(size, isStart, progress)
-        this.element.Score.calcAni(size, isStart, progress)
+        this.element.Combo.calcTime(0, size)
+        this.element.Score.calcTime(0, size)
+        this.element.Pause.calcTime(0, size)
+        this.element.Name.calcTime(0, size)
+        this.element.Level.calcTime(0, size)
+        this.element.ComboNumber.calcTime(0, size)
+        if (isStart) {
+            this.setUIAniOffsetY(-((uiFadeInFn(progress) * 120) - 120))
+        } else {
+            this.setUIAniOffsetY(((uiFadeOutFn(progress) * 120)))
+        }
     }
+
+    setUIAniOffsetY(offset: number) {
+        this.element.Combo.sprite.y = this.element.Combo.y - offset
+        this.element.ComboNumber.sprite.y = this.element.ComboNumber.y - offset
+        this.element.Score.sprite.y = this.element.Score.y - offset
+        this.element.Pause.sprite.y = this.element.Pause.y - offset
+
+        this.element.Name.sprite.y = this.element.Name.y + offset
+        this.element.Level.sprite.y = this.element.Level.y + offset
+    }
+
     calcOtherAni() {
 
     }
@@ -258,4 +274,12 @@ export default class UIManager implements baseUIManager {
             Y: y
         } as UIElementSettings
     }
+}
+
+function uiFadeInFn(x: number) {
+    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
+function uiFadeOutFn(x: number): number {
+    return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
 }

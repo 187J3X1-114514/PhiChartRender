@@ -1,4 +1,4 @@
-import { SizerData } from '../types/params';
+import type { SizerData } from '../types/params';
 import Judgeline from '../chart/judgeline';
 export default class Score {
     _notesCount: number;

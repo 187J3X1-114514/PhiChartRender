@@ -11,115 +11,18 @@
     <script type="module" src="/src/main.ts" defer></script>
     <link rel="stylesheet" href="/src/phira.css" />
     <mdui-linear-progress id="load-stage" class="search-load"></mdui-linear-progress>
+    
 </head>
 
 <body>
     <div id="start-o" class="black"></div>
     <div id="___background" class="___background-two"></div>
-    <mdui-top-app-bar variant="hide" id="top-app-bar" style="display: flex" class="left-all">
-        <div class="top-app-bar-blur"></div>
-        <mdui-top-app-bar-title id="top-app-bar-title">Phigros Simulator Plus</mdui-top-app-bar-title>
-        <div style="flex-grow: 1" id="top-app-bar-other">
-        </div>
-        <div style="margin: auto 0;height: 100%;white-space:nowrap" id="top-app-bar-other">
-            <mdui-button-icon variant="tonal" icon="auto_mode" id="mode" class="modeBtn"></mdui-button-icon>
-            <mdui-dropdown trigger="hover" close-delay="2000" id="avatar-dropdown">
-                <mdui-avatar style="height: 100%;right: 8px;" id="avatar" icon="account_circle" slot="trigger">
 
-                </mdui-avatar>
-                <mdui-menu>
-                    <mdui-menu-item id="avatar-dropdown-1"> <mdui-icon slot="end-icon" name="login"></mdui-icon>
-                        <span slot="end-text"
-                            id="avatar-dropdown-1-text">$${*html.login.phira.in*}$$</span></mdui-menu-item>
-                    <mdui-menu-item id="avatar-dropdown-2"> <mdui-icon slot="end-icon" name="logout"></mdui-icon>
-                        <span slot="end-text"
-                            id="avatar-dropdown-2-text">$${*html.login.phira.out*}$$</span></mdui-menu-item>
-                </mdui-menu>
-            </mdui-dropdown>
-            <h4 style="display:inline;" id="avatar-name">$${*ui.text.not_login*}$$</h4>
-        </div>
-
-
-    </mdui-top-app-bar>
-    <mdui-navigation-drawer modal close-on-esc id="navigation-drawer" close-on-overlay-click style="top: 64px;">
-        <div class="navigation-drawer-blur"></div>
-        <mdui-list>
-            <mdui-collapse accordion id="phira-drawer" class="collapse-rail hide">
-                <mdui-collapse-item>
-                    <mdui-list-item rounded slot="header" icon="class"><span
-                            id="html.phira.class-chart">$${*html.phira.class-chart*}$$</span><mdui-icon slot="end-icon"
-                            class="arrow" name="expand_more"></mdui-icon></mdui-list-item>
-                    <div style="margin-left: 2.5em;">
-                        <mdui-list-item rounded id="class-chart-1">$${*html.phira.class-chart-1*}$$</mdui-list-item>
-                        <mdui-list-item rounded id="class-chart-2">$${*html.phira.class-chart-2*}$$</mdui-list-item>
-                        <mdui-list-item rounded id="class-chart-3">$${*html.phira.class-chart-3*}$$</mdui-list-item>
-                    </div>
-
-                </mdui-collapse-item>
-            </mdui-collapse>
-            <div id="rec-drawer" class="collapse-rail hide">
-                <mdui-list-item rounded nonclickable class="dev-text">
-                    <span id="rec-dev-text">
-                        $${*html.dev*}$$
-                    </span>
-
-                </mdui-list-item>
-            </div>
-            <mdui-collapse accordion id="loc-drawer" class="collapse-rail">
-                <mdui-list-item rounded id="loc-drawer-1" icon="clear">$${*html.chart.clear*}$$</mdui-list-item>
-                <mdui-list-item rounded id="loc-drawer-2" icon="folder">$${*html.chart.view*}$$</mdui-list-item>
-            </mdui-collapse>
-        </mdui-list>
-    </mdui-navigation-drawer>
-    <mdui-navigation-rail value="loc" id="navigation-rail">
-        <div class="navigation-rail-blur"></div>
-        <mdui-button-icon icon="menu" slot="top" id="top-app-bar-menu"></mdui-button-icon>
-        <mdui-button-icon icon="bug_report" slot="bottom" id="debug-btn"></mdui-button-icon>
-        <mdui-button-icon icon="settings" slot="bottom"></mdui-button-icon>
-        <mdui-tooltip placement="right" slot="bottom" content="$${*html.src*}$$" id="src-text-tooltip">
-            <mdui-button-icon icon="source"
-                onclick='window.open("https://github.com/187J3X1-114514/PhiChartRender")'></mdui-button-icon>
-        </mdui-tooltip>
-
-
-
-
-        <mdui-navigation-rail-item icon="cloud" class="black-font" id="tab-phira"
-            value="phira"><span>$${*html.tab.phira*}$$</span></mdui-navigation-rail-item>
-        <mdui-navigation-rail-item icon="videocam" class="black-font" id="tab-rec"
-            value="rec"><span>$${*html.tab.rec*}$$</span></mdui-navigation-rail-item>
-        <mdui-navigation-rail-item icon="insert_drive_file" value="loc" id="tab-local"
-            class="black-font"><span>$${*html.tab.local*}$$</span></mdui-navigation-rail-item>
-    </mdui-navigation-rail>
     <div id="app" class="left-all"></div>
-    <span class="info" id="info">{{VES}}</span>
     <script type="module">
         import { dialog, alert } from "mdui"
         import { snackbar } from 'mdui/functions/snackbar.js';
         import Cookies from 'js-cookie'
-        import { I18N } from "./src/ui/i18n"
-        document.getElementById("tab-phira").getElementsByTagName("span")[0].innerText = I18N.get("html.tab.phira")
-        document.getElementById("tab-rec").getElementsByTagName("span")[0].innerText = I18N.get("html.tab.rec")
-        document.getElementById("tab-local").getElementsByTagName("span")[0].innerText = I18N.get("html.tab.local")
-        document.getElementById("loc-drawer-1").innerText = I18N.get("html.chart.clear")
-        document.getElementById("loc-drawer-2").innerText = I18N.get("html.chart.view")
-        document.getElementById("rec-dev-text").innerText = I18N.get("html.dev")
-
-        document.getElementById("class-chart-1").innerText = I18N.get("html.phira.class-chart-1")
-        document.getElementById("class-chart-2").innerText = I18N.get("html.phira.class-chart-2")
-        document.getElementById("class-chart-3").innerText = I18N.get("html.phira.class-chart-3")
-        document.getElementById("html.phira.class-chart").innerText = I18N.get("html.phira.class-chart")
-
-        document.getElementById("avatar-dropdown-1-text").innerText = I18N.get("html.login.phira.in")
-        document.getElementById("avatar-dropdown-2-text").innerText = I18N.get("html.login.phira.out")
-        document.getElementById("avatar-name").innerText = I18N.get("ui.text.not_login")
-        document.getElementById("protocolNO1").innerText = I18N.get("ui.screen.phira.terms_of_use.text.no")
-        document.getElementById("protocolYES1").innerText = I18N.get("html.protocol.yes")
-        document.getElementById("protocolNO2").innerText = I18N.get("ui.screen.phira.terms_of_use.text.no")
-        document.getElementById("protocolYES2").innerText = I18N.get("html.protocol.yes")
-
-        document.getElementById("src-text-tooltip").setAttribute("content", I18N.get("html.src"))
-        
 
         try {
             new SharedArrayBuffer(4)
@@ -162,18 +65,6 @@
         </div>
     </div>
     -->
-    <mdui-dialog fullscreen id="protocolDialog1">
-        <div id="protocolText1"></div>
-        <mdui-button id="protocolNO1" slot="action"
-            variant="tonal">$${*ui.screen.phira.terms_of_use.text.no*}$$</mdui-button>
-        <mdui-button id="protocolYES1" slot="action" disabled variant="tonal">$${*html.protocol.yes*}$$</mdui-button>
-    </mdui-dialog>
-    <mdui-dialog fullscreen id="protocolDialog2">
-        <div id="protocolText2"></div>
-        <mdui-button id="protocolNO2" slot="action"
-            variant="tonal">$${*ui.screen.phira.terms_of_use.text.no*}$$</mdui-button>
-        <mdui-button id="protocolYES2" slot="action" disabled variant="tonal">$${*html.protocol.yes*}$$</mdui-button>
-    </mdui-dialog>
 </body>
 
 </html>

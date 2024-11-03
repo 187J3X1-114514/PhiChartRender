@@ -4,9 +4,9 @@ import EventLayer from '../eventlayer.js';
 import Note from '../note';
 
 import utils from './utils';
-import { Event, Event2, bpmEvent, valueEvent } from '../baseEvents';
-import { officialChartData } from '../types/index.js';
-import { extendNoteData } from '../types/note.js';
+import type { Event, Event2, bpmEvent, valueEvent } from '../baseEvents';
+import type { officialChartData } from '../types/index.js';
+import type { extendNoteData } from '../types/note.js';
 import { chart_log } from './index.js';
 
 export default function OfficialChartConverter(_chart: officialChartData) {

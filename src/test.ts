@@ -130,7 +130,7 @@ import Chart from './core/chart';
 import { PlayS } from './ui/play/play';
 import { Application } from 'pixi.js';
 import Game from './core/game';
-import { topAppBar, BACKGROUND, ResPack } from './ui/main';
+import { topAppBar, ResPack } from './ui/App.vue';
 import { ChartPack } from './file/chart_pack';
 
 const resM = new ResourceManager()
@@ -184,11 +184,10 @@ let r = new ResizeObserver(() => { game!.resize(true) })
 r.observe(app!.canvas)
 game.createSprites()
 
-topAppBar.style.display = "none"
+topAppBar.value.style.display = "none"
 document.body.style.paddingTop = "0px"
 app!.canvas.classList.add("push-in")
 app!.canvas.classList.add("game")
-BACKGROUND.pause()
 setTimeout(() => {
     game!.start()
     app!.canvas.classList.remove("push-in")

@@ -1,5 +1,5 @@
-import { Event, valueEvent } from "./baseEvents";
-import { jsonEventLayer } from "./types/judgeLine";
+import type { Event, valueEvent } from "./baseEvents";
+import type { jsonEventLayer } from "./types/judgeLine";
 
 export default class EventLayer {
     public speed: valueEvent[] = []

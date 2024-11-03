@@ -1,6 +1,6 @@
-import { rpeEvent } from "../../chart/baseEvents"
+import type { rpeEvent } from "../../chart/baseEvents"
 
-export default interface PrPrExtraJSON {
+export interface PrPrExtraJSON {
     bpm: { time: number[], bpm: number }[]
     videos: PrPrExtraVideo[],
     effects: PrPrExtraEffect[]

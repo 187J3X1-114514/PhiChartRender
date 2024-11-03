@@ -829,3 +829,12 @@ mdui-navigation-drawer {
 .phira-chart-root .search-div{
     text-align: left;
 }
+
+.game-pause-root{
+
+}
+
+.chart-illustration mdui-chip span{
+    mix-blend-mode:difference;
+    color:rgb(255,255,255)
+}

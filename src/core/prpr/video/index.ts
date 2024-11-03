@@ -1,7 +1,7 @@
 import { Container, Graphics, Sprite, Texture } from "pixi.js";
-import { PrPrExtraVideo } from "../types";
-import { Event } from "../../chart/baseEvents";
-import { SizerData } from "../../types/params";
+import type { PrPrExtraVideo } from "../types";
+import type { Event } from "../../chart/baseEvents";
+import type { SizerData } from "../../types/params";
 
 export class PrprVideo {
     public video: HTMLVideoElement = {} as any

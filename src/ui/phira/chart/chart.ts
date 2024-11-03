@@ -1,13 +1,13 @@
 import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem, snackbar, SegmentedButtonGroup, SegmentedButton, Icon } from "mdui";
 import { dialog } from "mdui/functions/dialog.js";
-import { PhiraAPI, PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
-import { proxyPhriaApiURL, PHIRA_API_BASE_URL_NO_CORS2, PHIRA_API_CORS } from "../../../api/url";
-import { ResPack, account, navigationDrawer, reqLogin } from "../../main";
+import { PhiraAPI, type PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
+import { proxyPhriaApiURL } from "../../../api/url";
 import { PlayS as PlayScreen } from "../../play/play";
 import { File } from "../../../core/file";
-import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID, getOrCreateCacheDATACallback } from "../../data";
+import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID } from "../../data";
 import { generateRandomString } from "../../../core/random";
 import { I18N } from "../../i18n";
+import { account, load, reqLogin, ResPack } from "@/ui/App.vue";
 const NONE_IMG = await (async () => {
     let c = document.createElement("canvas")
     let ctx = c.getContext("2d")!
@@ -31,7 +31,6 @@ export class ChartPage {
     private maxPage: number = 0
     public page: number = 1
     public type: number = 2
-    private load: LinearProgress = (undefined as unknown) as any
     public root: HTMLDivElement = (undefined as unknown) as any
 
     public pagesBtnG: SegmentedButtonGroup = new SegmentedButtonGroup()
@@ -190,11 +189,7 @@ export class ChartPage {
         this.searchDiv.append(this.select1)
         this.searchDiv.append(this.select2)
         this.searchDiv.append(this.searchBtn)
-        this.load = new LinearProgress()
-        this.load.classList.add("search-load")
-        this.load.classList.add("hide")
         this.root.append(this.searchDiv)
-        document.body.append(this.load)
         this.root.append(this.cards)
         this.root.append(this.pagesBtnG)
         this.searchBtn.addEventListener("click", async () => {
@@ -359,7 +354,7 @@ export class ChartPage {
             })
             return
         }
-        this.load.classList.remove("hide")
+        load.classList.remove("hide")
         let api = account!
         let r = await api.search(
             api.getSearchOrder(this.select1!.value.slice(0, this.select1!.value.length - 1) as string),
@@ -383,13 +378,13 @@ export class ChartPage {
                 }
             }
             if (c) {
-                this.load.classList.add("hide")
+                load.classList.add("hide")
                 clearInterval(a)
             }
         }, 100)
     }
     async playChart(data: PhiraAPIChartInfo) {
-        this.load.classList.remove("hide")
+        load.classList.remove("hide")
         var r
         const f = async () => {
 
@@ -411,7 +406,7 @@ export class ChartPage {
                             {
                                 text: I18N.get("ui.screen.phira.chart.text.error.text.r"),
                                 onClick: () => {
-                                    this.load.classList.add("hide")
+                                    load.classList.add("hide")
                                     this.root!.classList.add("push-in")
                                     setTimeout(() => {
                                         this.root!.classList.remove("push-in")
@@ -431,7 +426,7 @@ export class ChartPage {
                                     link.download = "phira-" + data.name + "-" + data.id + ".zip"
                                     link.target = "_blank"
                                     link.click()
-                                    this.load.classList.add("hide")
+                                    load.classList.add("hide")
                                     this.root!.classList.add("push-in")
                                     setTimeout(() => {
                                         this.root!.classList.remove("push-in")
@@ -464,13 +459,12 @@ export class ChartPage {
             }, 650)
         })
         await c.load()
-        this.load.classList.add("hide")
+        load.classList.add("hide")
         c.start()
     }
 
     remove() {
         this.root.remove()
-        this.load.remove()
     }
 
 }

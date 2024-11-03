@@ -1,7 +1,7 @@
 import { Application } from "pixi.js"
-import { ChartData } from "../chart/chartinfo"
+import type { ChartData } from "../chart/chartinfo"
 import { ResourceManager } from "../resource"
-import { PhiAssets } from "../resource/resource_pack"
+import type { PhiAssets } from "../resource/resource_pack"
 import { PrprExtra } from "../prpr/prpr"
 
 export interface GameParams {

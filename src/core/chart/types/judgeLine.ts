@@ -1,5 +1,5 @@
-import { Event, Event2, floorPositionEvent, speedEvent,  valueEvent } from "../baseEvents"
-import { extendNoteData } from "./note"
+import type { Event, Event2, floorPositionEvent, speedEvent, valueEvent } from "../baseEvents"
+import type { extendNoteData } from "./note"
 
 export interface judgeLineData {
     bpm: number

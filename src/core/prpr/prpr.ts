@@ -1,16 +1,16 @@
 
 import Effect from './effect/index'
 import utils from '../chart/convert/utils';
-import PrPrExtraJSON, { PrPrExtraVideo } from './types';
+import type { PrPrExtraJSON, PrPrExtraVideo } from './types';
 import { RePhiEditEasing } from '../chart/easing';
 import PhiGame from '../game';
 import Shader, { DefaultShader } from './effect/shader';
 import { Filter, Texture } from 'pixi.js';
 import { newLogger } from '../log';
 import { PrprVideo } from './video';
-import { SizerData } from '../types/params';
+import type { SizerData } from '../types/params';
 import { join } from '../file/utils';
-import { rpeEvent } from '../chart/baseEvents';
+import type { rpeEvent } from '../chart/baseEvents';
 import { deepCopy } from '../utils';
 const log = newLogger("prpr拓展")
 export class PrprExtra {

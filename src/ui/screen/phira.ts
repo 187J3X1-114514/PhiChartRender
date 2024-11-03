@@ -1,9 +1,7 @@
-import { Button, Card, Select, MenuItem } from "mdui";
 import { ResourceManager } from "../../core/resource";
-import { account, app, reqLogin, ResPack } from "../main";
-import { PlayS } from "../play/play";
 import { BaseScreen } from "./base";
 import { ChartPage } from "../phira/chart/chart";
+import { account } from "../App.vue";
 
 export class PhiraChartScreen extends BaseScreen {
     private resManger?: ResourceManager

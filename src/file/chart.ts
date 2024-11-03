@@ -1,8 +1,8 @@
 import Chart, { arrangeLineEvents, arrangeSingleValueLineEvents } from "../core/chart";
-import {  jsonJudgeLineData } from "../core/chart/types/judgeLine";
+import type { jsonJudgeLineData } from "../core/chart/types/judgeLine";
 import {  text } from "../core/verify";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
-import { jsonNoteData } from "../core/chart/types/note";
+import type { jsonNoteData } from "../core/chart/types/note";
 import Judgeline from "../core/chart/judgeline";
 import Note from "../core/chart/note";
 import { buildFloorPositionEventData, buildColorValueEventData, buildEventData, buildStringValueEventData, readFloorPositionEventData, readColorValueEventData, readEventData, readStringValueEventData, buildEventLayerData, readEventLayerData, buildBpmEventData, readBpmEventData } from "./event";

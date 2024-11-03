@@ -1,5 +1,5 @@
 import { Button, Checkbox, CircularProgress, Dialog, TextField } from "mdui";
-import { PhiraAPI, loginResult } from "../../api/phira";
+import { PhiraAPI, type loginResult } from "../../api/phira";
 import * as DB from "../data"
 import md5 from 'md5-js'
 import * as CryptoJS from 'crypto-js'
