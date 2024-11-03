@@ -252,7 +252,7 @@ export default {
     },
     setup() {
         onMounted(() => {
-            (document.getElementById("src-text-tooltip")! as any).content = I18N.get('html.chart.src')
+            (document.getElementById("src-text-tooltip")! as any).content = I18N.get('html.src')
             uModeBtn()
             setTimeout(() => {
                 load.classList.add("hide")
