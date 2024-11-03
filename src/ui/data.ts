@@ -56,6 +56,14 @@ export async function getChartByPhiraID(id: number): Promise<Blob> {
         })
     })
 }
+
+export async function removeChartByPhiraID(id: number) {
+    return new Promise((r) => {
+        ChartDataDB.removeItem(`PHIRA-CHART-ID+${id}`, (e) => {
+            r(null)
+        })
+    })
+}
 export async function checkChartByPhiraID(id: number) {
     return (await ChartDataDB.keys()).includes(`PHIRA-CHART-ID+${id}`)
 }

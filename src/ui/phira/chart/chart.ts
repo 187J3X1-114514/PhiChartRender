@@ -1,13 +1,14 @@
-import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem, snackbar, SegmentedButtonGroup, SegmentedButton, Icon } from "mdui";
+import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem, snackbar, SegmentedButtonGroup, SegmentedButton, Icon, $ } from "mdui";
 import { dialog } from "mdui/functions/dialog.js";
 import { PhiraAPI, type PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
 import { proxyPhriaApiURL } from "../../../api/url";
 import { PlayS as PlayScreen } from "../../play/play";
 import { File } from "../../../core/file";
-import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID } from "../../data";
+import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID, removeChartByPhiraID } from "../../data";
 import { generateRandomString } from "../../../core/random";
 import { I18N } from "../../i18n";
 import { account, load, reqLogin, ResPack } from "@/ui/App.vue";
+import { scrollIntoView } from "@/utils";
 const NONE_IMG = await (async () => {
     let c = document.createElement("canvas")
     let ctx = c.getContext("2d")!
@@ -29,6 +30,7 @@ export class ChartPage {
     private searchDiv?: HTMLDivElement
     private searchBtn: Button = (undefined as unknown) as any
     private maxPage: number = 0
+    public isRemove: boolean = false
     public page: number = 1
     public type: number = 2
     public root: HTMLDivElement = (undefined as unknown) as any
@@ -149,6 +151,7 @@ export class ChartPage {
             _.name = "keyboard_arrow_right"
             return _
         })())
+        this.pagesBtnG.classList.add("hide")
         this.updataPageBtn()
 
         this.searchDiv = document.createElement("div")
@@ -338,24 +341,31 @@ export class ChartPage {
                 this.playChart(data)
             }, 150)
         })
+        rootCard.classList.add("fadeIn")
         return {
             data: data,
             el: rootCard
         };
     }
     async searchChart() {
+        this.pagesBtnG.classList.add("hide")
         this.chartCount = 0
         if (account == undefined) {
             snackbar({
                 message: I18N.get("ui.screen.phira.chart.text.error.text.not_login"),
                 action: I18N.get("ui.screen.phira.login.text.login_btn"),
-                onActionClick: async () => await reqLogin(),
+                onActionClick: async () => {
+                    this.pagesBtnG.classList.remove("hide")
+                    await reqLogin()
+                },
                 messageLine: 2
             })
             return
         }
         load.classList.remove("hide")
         let api = account!
+        scrollIntoView(document.body)
+        await this.removeCard()
         let r = await api.search(
             api.getSearchOrder(this.select1!.value.slice(0, this.select1!.value.length - 1) as string),
             api.getSearchDivision(this.select2!.value.slice(0, this.select2!.value.length - 1) as string),
@@ -363,13 +373,11 @@ export class ChartPage {
         )
         this.maxPage = r.maxPages
         this.updataPageBtn()
-        while (this.cards!.firstChild) {
-            this.cards!.removeChild(this.cards!.firstChild!)
-        }
+
         for (let v of r.results) {
             this.createChartCard(v)
         }
-
+        this.pagesBtnG.classList.remove("hide")
         let a = setInterval(() => {
             let c = true
             for (let b of this.cards!.getElementsByTagName("mdui-card")) {
@@ -382,6 +390,34 @@ export class ChartPage {
                 clearInterval(a)
             }
         }, 100)
+    }
+    async removeCard() {
+        let _ = this.chartCount
+        let ___ = this.cards!.children.length
+        let ____ = 0
+        for (let i = 0, length = this.cards!.children.length; i < length; i++) {
+            setTimeout(() => {
+                let __ = this.cards!.children.item(___ - i - 1)! as Card;
+                __.style.opacity = "0"
+                setTimeout(() => {
+                    __.style.display = "none"
+                    ____++
+                }, 500)
+            }, i * 40
+            )
+        }
+        await new Promise((r) => {
+            let i = setInterval(() => {
+                if (____ == ___) {
+                    while (this.cards!.firstChild) {
+                        this.cards!.removeChild(this.cards!.firstChild)
+                    }
+                    clearInterval(i)
+                    r(null)
+                }
+            }, 100)
+        })
+
     }
     async playChart(data: PhiraAPIChartInfo) {
         load.classList.remove("hide")
@@ -448,6 +484,7 @@ export class ChartPage {
             b = await r!.blob()
             await addChartByPhiraID(data.id, b)
         }
+
         let c = new PlayScreen(new File(b, generateRandomString(32) + ".zip"), ResPack)
         c.setOnEnd(() => {
             setTimeout(() => {
@@ -458,12 +495,29 @@ export class ChartPage {
                 }, 800)
             }, 650)
         })
-        await c.load()
+        try {
+            await c.load()
+        } catch {
+            await removeChartByPhiraID(data.id)
+            snackbar({
+                message: I18N.get("ui.screen.phira.chart.text.error.text.file")
+            })
+            load.classList.add("hide")
+            this.root!.classList.add("push-in")
+            setTimeout(() => {
+                this.root!.classList.remove("push-in")
+            }, 800)
+            this.root.classList.remove("hide")
+        }
+
         load.classList.add("hide")
+        if (this.isRemove) return
         c.start()
     }
 
     remove() {
+        this.isRemove = true
+        load.classList.add("hide")
         this.root.remove()
     }
 

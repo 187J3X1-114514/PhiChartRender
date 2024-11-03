@@ -79,7 +79,8 @@
         "html.thread.error.b":"仍然无法使用多线程功能，将关闭多线程功能",
         "html.light_mode":"亮色模式",
         "html.dark_mode":"暗色模式",
-        "html.auto_mode":"跟随系统"
+        "html.auto_mode":"跟随系统",
+        "ui.screen.phira.chart.text.error.text.file":"加载铺面时发生未知错误"
 
     }
 }

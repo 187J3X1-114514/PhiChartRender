@@ -1,5 +1,7 @@
 <template>
-    <div ref="app"></div>
+    <div ref="app">
+        <ScreenComponent :screen-name="screenName" :other-data="screenOtherData"></ScreenComponent>
+    </div>
     <span class="info" id="info">{{ `V${PACKAGE_JSON.version.split('v').pop()}-${GIT_HASH.slice(0,
         7).toLocaleUpperCase()}+pixi_${PIXI_VERSION}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
         }}</span>
@@ -14,7 +16,7 @@
                 <mdui-button-icon variant="tonal" icon="auto_mode" id="mode" ref="modeBtn" slot="trigger"
                     class="modeBtn" @click="modeBtnClick()"></mdui-button-icon>
                 <mdui-menu selects="single" id="modeMenu" @change="modeMenuClick()">
-                    <mdui-menu-item  :selected="THEME === 'light'" value="light">
+                    <mdui-menu-item :selected="THEME === 'light'" value="light">
                         <mdui-icon slot="end-icon" name="light_mode"></mdui-icon>
                         <span slot="end-text">{{ I18N("html.light_mode") }}</span>
                     </mdui-menu-item>
@@ -50,13 +52,13 @@
     </mdui-top-app-bar>
 
     <mdui-navigation-rail ref="navigationRail" value="loc" id="navigation-rail"
-        @change="navigationRailTab = navigationRail.value; changeScreen(navigationRailTab)">
+        @change="navigationRailTab = navigationRail.value; screenName = navigationRailTab">
         <div class="navigation-rail-blur"></div>
         <mdui-button-icon @click="navigationDrawer.open = !navigationDrawer.open" icon="menu" slot="top"
             id="top-app-bar-menu" ref="top-app-bar-menu"></mdui-button-icon>
         <mdui-button-icon icon="bug_report" slot="bottom" id="debug-btn"></mdui-button-icon>
         <mdui-button-icon icon="settings" slot="bottom"></mdui-button-icon>
-        <mdui-tooltip placement="right" slot="bottom" content="I18N('html.src')" id="src-text-tooltip">
+        <mdui-tooltip placement="right" slot="bottom" content="{{ I18N('html.src') }}" id="src-text-tooltip">
             <mdui-button-icon icon="source"
                 onclick='window.open("https://github.com/187J3X1-114514/PhiChartRender")'></mdui-button-icon>
         </mdui-tooltip>
@@ -79,15 +81,15 @@
                             name="expand_more"></mdui-icon></mdui-list-item>
                     <div style="margin-left: 2.5em;">
                         <mdui-list-item rounded :class="{ 'list-item-active': phiraClassType === 0 }" id="class-chart-1"
-                            @click="phiraClassType = 0; searchPhirChart(phiraClassType)">{{
+                            @click="phiraClassType = 0; (screenOtherData as any).type = phiraClassType">{{
                                 I18N("html.phira.class-chart-1")
                             }}</mdui-list-item>
                         <mdui-list-item rounded :class="{ 'list-item-active': phiraClassType === 2 }" id="class-chart-2"
-                            @click="phiraClassType = 2; searchPhirChart(phiraClassType)">{{
+                            @click="phiraClassType = 2; (screenOtherData as any).type = phiraClassType">{{
                                 I18N("html.phira.class-chart-2")
                             }}</mdui-list-item>
                         <mdui-list-item rounded :class="{ 'list-item-active': phiraClassType === 1 }" id="class-chart-3"
-                            @click="phiraClassType = 1; searchPhirChart(phiraClassType)">{{
+                            @click="phiraClassType = 1; (screenOtherData as any).type = phiraClassType">{{
                                 I18N("html.phira.class-chart-3") }}</mdui-list-item>
                     </div>
 
@@ -130,23 +132,21 @@ import { onMounted, ref } from 'vue';
 import { I18N } from "./i18n"
 import { CircularProgress, Dropdown, getTheme, LinearProgress, MenuItem, setTheme, TopAppBar } from 'mdui';
 import Cookies from 'js-cookie'
-import { ScreenManager } from './screen/manager'
+
 import { BUILD_ENV, BUILDTIME, GIT_HASH, PACKAGE_JSON } from "./env";
 import { VERSION as PIXI_VERSION } from "pixi.js";
-import { PhiraChartScreen } from './screen/phira';
 import { PhiraAPI } from '@/api/phira';
 import loginPage from './phira/login';
-import { LocalScreen } from './screen/local';
 import { loadZip } from '@/core/file';
 import { ResourcePack } from '@/core/resource';
 import * as DB from "./data"
 import { STATUSTEXT } from './status';
 import { loadFont } from "../core/font";
+import ScreenComponent from "./screen/ScreenComponent.vue"
 await loadFont()
 
 export var account: undefined | PhiraAPI = undefined;
 export const app = ref<HTMLElement>(null as any)
-export const SCREEN = await ScreenManager.init(app.value)
 export const avatar = ref(null as any)
 export const avatarName = ref(null as any)
 
@@ -230,11 +230,14 @@ function uModeBtn() {
     if (m == "auto") m_ = "auto_mode"
     modeBtn.value.icon = m_
 }
-if (Cookies.get("mode")){
+if (Cookies.get("mode")) {
     setThemeP(Cookies.get("mode")!)
 }
 export default {
     name: 'Main',
+    components: {
+        ScreenComponent
+    },
     data() {
         return {
             I18N: (l: string) => {
@@ -247,7 +250,9 @@ export default {
             GIT_HASH: GIT_HASH,
             PACKAGE_JSON: PACKAGE_JSON,
             PIXI_VERSION: PIXI_VERSION,
-            THEME:THEME
+            THEME: THEME,
+            screenName: "loc",
+            screenOtherData: {}
         }
     },
     setup() {
@@ -261,7 +266,7 @@ export default {
                     document.getElementById("start-o")?.remove()
                     STATUSTEXT.classList.toggle("status-text-onload")
                     STATUSTEXT.classList.toggle("status-text-done")
-                    SCREEN.change(new LocalScreen(app.value))
+                    //SCREEN.change(new LocalScreen(app.value))
                 }, 300)
             }, 100)
         });
@@ -309,27 +314,9 @@ export default {
             } catch { }
             uModeBtn()
         },
-        changeScreen: (t: string) => {
-            if (t == "phira") {
-                SCREEN.change(new PhiraChartScreen(app.value), async () => {
-                    await reqLogin()
-                })
-            }
-            if (t == "loc") {
-                SCREEN.change(new LocalScreen(app.value))
-            }
-        },
         reqLogin: reqLogin,
         reqLogout: reqLogout,
-        getTheme: () => { return getTheme() },
-        searchPhirChart: (type: number) => {
-            if (SCREEN.screen instanceof PhiraChartScreen) {
-                SCREEN.screen.chartPage!.type = type
-                SCREEN.screen.chartPage!.page = 1
-                SCREEN.screen.chartPage!.searchChart()
-            }
-            navigationDrawer.value.open = false
-        }
+        getTheme: () => { return getTheme() }
     }
 }
 

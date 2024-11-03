@@ -76,6 +76,7 @@
         "ui.screen.phira.chart.text.error.text.not_login": "Not logged into Phira account, please log in to your Phira account before proceeding with the following operations.",
         "html.light_mode":"Light",
         "html.dark_mode":"Dark",
-        "html.auto_mode":"System"
+        "html.auto_mode":"System",
+        "ui.screen.phira.chart.text.error.text.file": "An unknown error occurred while loading the chart file"
     }
 }

@@ -1,6 +1,3 @@
-import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
-export const mainWebview = WebviewWindow.getByLabel('main')!
-mainWebview.setFullscreen(false)
 export function isWeb() {
     return ((window as any).__TAURI_INTERNALS__) ? true : false
 }
@@ -15,7 +12,6 @@ export const launchFullscreen = () => {
     } else if ((element as any)?.msRequestFullscreen) {
         (element as any)?.msRequestFullscreen()
     }
-    mainWebview.setFullscreen(true)
 }
 
 export const exitFullscreen = () => {
@@ -26,7 +22,6 @@ export const exitFullscreen = () => {
     } else if ((document as any)?.webkitExitFullscreen) {
         (document as any)?.webkitExitFullscreen()
     }
-    mainWebview.setFullscreen(false)
 }
 export const isFullscreen = () => {
     return document.fullscreenElement !== null
@@ -51,4 +46,32 @@ export function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: 
     multiple && (inpEle.multiple = multiple);
     inpEle.addEventListener("change", event => fn(inpEle.files, inpEle, event), { once: true });
     inpEle.click();
+}
+export function scrollIntoView(traget: HTMLElement) {
+    const tragetElem = traget;
+    const tragetElemPostition = tragetElem.offsetTop;
+
+    if (
+        typeof window.getComputedStyle(document.body).scrollBehavior ==
+        "undefined"
+    ) {
+        let scrollTop =
+            document.documentElement.scrollTop || document.body.scrollTop;
+        const step = function () {
+            let distance = tragetElemPostition - scrollTop;
+            scrollTop = scrollTop + distance / 5;
+            if (Math.abs(distance) < 1) {
+                window.scrollTo(0, tragetElemPostition);
+            } else {
+                window.scrollTo(0, scrollTop);
+                setTimeout(step, 20);
+            }
+        };
+        step();
+    } else {
+        tragetElem.scrollIntoView({
+            behavior: "smooth",
+            inline: "nearest"
+        });
+    }
 }

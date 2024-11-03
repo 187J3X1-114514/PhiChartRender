@@ -8,5 +8,6 @@ document.documentElement.addEventListener("click", () => {
     if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
 })
 
-createApp(App).mount('#app')
+export const app = createApp(App)
+app.mount('#app')
 
