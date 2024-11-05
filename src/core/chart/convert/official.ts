@@ -8,6 +8,7 @@ import type { Event, Event2, bpmEvent, valueEvent } from '../baseEvents';
 import type { officialChartData } from '../types/index.js';
 import type { extendNoteData } from '../types/note.js';
 import { chart_log } from './index.js';
+import { CONST } from '@/core/types/const';
 
 export default function OfficialChartConverter(_chart: officialChartData) {
     let chart = new Chart();
@@ -159,7 +160,7 @@ export default function OfficialChartConverter(_chart: officialChartData) {
             let noteStartSpeedEvent = rawNote.judgeline.getFloorPosition(rawNote.time);
             rawNote.floorPosition = noteStartSpeedEvent ? noteStartSpeedEvent.floorPosition + noteStartSpeedEvent.value * (rawNote.time - noteStartSpeedEvent.startTime) : 0;
 
-            if (rawNote.type == 3) {
+            if (rawNote.type == CONST.NoteType.Hold) {
                 //let noteEndSpeedEvent = rawNote.judgeline.getFloorPosition(rawNote.holdEndTime);
                 rawNote.holdLength = rawNote.holdTime * rawNote.speed /*(noteEndSpeedEvent ? noteEndSpeedEvent.floorPosition + noteEndSpeedEvent.value * (rawNote.holdEndTime - noteEndSpeedEvent.startTime) : 0) - rawNote.floorPosition */;
             }

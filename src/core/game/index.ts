@@ -305,11 +305,11 @@ export default class PhiGame {
         };
 
         for (const name in this.judgement.sounds) {
-            this.judgement.sounds[name].volume = this.judgement._hitsoundVolume;
+            (this.judgement.sounds as any)[name].volume = this.judgement._hitsoundVolume;
         }
         this.isFirst = false
         window.onblur = () => { this.autoPause() }
-        (window as any).curGameSeekTime = (a:number)=>{
+        (window as any).curGameSeekTime = (a: number) => {
             this.chart.music.seek(a)
         }
         (window as any).curGameMusic = this.chart.music

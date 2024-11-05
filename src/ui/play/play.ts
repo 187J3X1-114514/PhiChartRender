@@ -74,6 +74,9 @@ export class PlayS {
             this.onend()
         })
     }
+    getChart(){
+        return this.chart!
+    }
     start() {
         topAppBar.value.style.display = "none"
         document.body.style.paddingTop = "0px"

@@ -118,17 +118,11 @@ export class ChartInfo {
                 return t
             case "txt":
                 let _data = (await file.async("text")) as string
-                let _txt_info = loadTxtChartInfo(_data)
+                let _txt_info = loadTxtChartInfo(_data) as any
                 let _newData = {
                     RPEVersion: 100,
-                    charter: _txt_info.Charter,
-                    composer: _txt_info.Composer,
-                    level: _txt_info.Level,
                     offset: 0,
-                    name: _txt_info.Name,
-                    music: _txt_info.Song,
-                    illustration: _txt_info.Picture,
-                    chart: _txt_info.Chart
+                    ..._txt_info
 
                 } as RPEChartInfo
                 t = new this(_newData.chart, _newData.music, _newData.illustration, _newData)
@@ -160,11 +154,35 @@ export class ChartInfo {
 function loadTxtChartInfo(str: string) {
     let list = str.split("\n")
     if (list[0].includes("#")) {
-        let Data: any = {}
+        let Data: RPEChartInfo = {} as any
         list.slice(1).forEach((line) => {
             try {
                 let _ = line.split(":")
-                Data[_[0].trim()] = _[1].trim()
+                let name = _[0].trim()
+                let value = _[1].trim()
+                switch (name) {
+                    case 'Name':
+                        Data.name = value
+                        break
+                    case 'Song':
+                        Data.music = value
+                        break
+                    case 'Picture':
+                        Data.illustration = value
+                        break
+                    case 'Chart':
+                        Data.chart = value
+                        break
+                    case 'Level':
+                        Data.level = value
+                        break
+                    case 'Composer':
+                        Data.composer = value
+                        break
+                    case 'Charter':
+                        Data.chart = value
+                        break
+                }
             } catch { }
         })
         return Data

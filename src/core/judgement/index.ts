@@ -7,6 +7,8 @@ import Chart from '../chart';
 import type { SizerData } from '../types/params';
 import Note from '../chart/note';
 import Audio from '../audio';
+import { CONST } from '../types/const';
+import { PhiNoteSound } from '../resource/resource_pack';
 
 const particleCountPerClickAnim = 8;
 
@@ -65,9 +67,9 @@ var ClickAnimatePointCache: Texture;
 
 export default class Judgement {
     chart: Chart;
-    stage: any;
+    stage: Container;
     textures: any;
-    sounds: any;
+    sounds: PhiNoteSound;
     _autoPlay: boolean;
     _hitsound: boolean;
     _hitsoundVolume: number;
@@ -76,11 +78,10 @@ export default class Judgement {
     judgeTimes: any;
     judgePoints: JudgePoint[] = [];
     clickParticleContainer: Container = new Container();
-    renderSize: any;
+    renderSize: SizerData = undefined as any;
     _clickAnimBaseScale: any;
     _holdBetween: number = 0;
     private currentTime: number = 0
-    calcNote: (currentTime: any, note: any) => void
     private anims: AnimatedSprite[] = []
     constructor(params: any = {}) {
         this.chart = params.chart;
@@ -100,10 +101,6 @@ export default class Judgement {
             good: (!params.challangeMode ? AllJudgeTimes.good : AllJudgeTimes.goodChallenge) / 1000,
             bad: (!params.challangeMode ? AllJudgeTimes.bad : AllJudgeTimes.badChallenge) / 1000
         };
-
-        this.calcTick = this.calcTick.bind(this);
-        this.calcNote = this.calcNoteJudge.bind(this);
-
         this.reset();
     }
 
@@ -204,44 +201,52 @@ export default class Judgement {
     }
 
     createClickAnimate(note: Note) {
-        let anim = new AnimatedSprite(note.score! >= 3 ? this.textures.normal : this.textures.bad, false),
-            baseScale = this.renderSize.noteScale * 5.6;
-        (anim as any).startTime = this.currentTime
-        this.anims.push(anim)
-        if (note.score! >= 3 && note.type != 3) anim.position.set(note.judgelineX, note.judgelineY);
-        else anim.position.copyFrom(note.sprite.position);
-
-        anim.scale.set((note.score! >= 3 ? this._clickAnimBaseScale.normal : this._clickAnimBaseScale.bad) * baseScale);
-        anim.tint = note.score === 4 ? 0xFFECA0 : note.score === 3 ? 0xB4E1FF : 0x6c4343;
-        anim.anchor.set(0.5, 0.5)
-        anim.loop = false;
-
         if (note.score! >= 3) {
-            let currentParticleCount = 0;
-            while (currentParticleCount < particleCountPerClickAnim) {
-                let particle: any = new Sprite(ClickAnimatePointCache);
-                (particle as Sprite).anchor.set(0.5, 0.5)
-                particle.tint = note.score === 4 ? 0xFFECA0 : 0xB4E1FF;
+            let anim = new AnimatedSprite(note.score! >= 3 ? this.textures.normal : this.textures.bad, false),
+                baseScale = this.renderSize.noteScale * 5.6;
+            (anim as any).startTime = this.currentTime
+            this.anims.push(anim)
+            if (note.score! >= 3 && note.type != CONST.NoteType.Hold) anim.position.set(note.judgelineX, note.judgelineY);
+            else anim.position.copyFrom(note.sprite.position);
 
-                particle.startTime = this.currentTime;
-                particle.basePos = anim.position;
-                particle.baseScale = baseScale;
+            anim.scale.set((note.score! >= 3 ? this._clickAnimBaseScale.normal : this._clickAnimBaseScale.bad) * baseScale);
+            anim.tint = note.score === 4 ? 0xFFECA0 : note.score === 3 ? 0xB4E1FF : 0x6c4343;
+            anim.anchor.set(0.5, 0.5)
+            anim.loop = false;
 
-                particle.distance = particle._distance = Math.random() * 100 + 250;
-                particle.direction = Math.floor(Math.random() * 360);
-                particle.sinr = Math.sin(particle.direction);
-                particle.cosr = Math.cos(particle.direction);
+            if (note.score! >= 3) {
+                let currentParticleCount = 0;
+                while (currentParticleCount < particleCountPerClickAnim) {
+                    let particle: any = new Sprite(ClickAnimatePointCache);
+                    (particle as Sprite).anchor.set(0.5, 0.5)
+                    particle.tint = note.score === 4 ? 0xFFECA0 : 0xB4E1FF;
 
-                this.clickParticleContainer.addChild(particle);
+                    particle.startTime = this.currentTime;
+                    particle.basePos = anim.position;
+                    particle.baseScale = baseScale;
 
-                currentParticleCount++;
+                    particle.distance = particle._distance = Math.random() * 100 + 250;
+                    particle.direction = Math.floor(Math.random() * 360);
+                    particle.sinr = Math.sin(particle.direction);
+                    particle.cosr = Math.cos(particle.direction);
+
+                    this.clickParticleContainer.addChild(particle);
+
+                    currentParticleCount++;
+                }
             }
+            else {
+                anim.angle = note.sprite.angle;
+            }
+            this.stage.addChild(anim);
+        } else if (note.score == 2 && note.type == CONST.NoteType.Tap) {
+            if (note.scoreTime == undefined || NaN) return
+            let sprite = new Sprite()
+            sprite.scale.copyFrom(note.sprite.scale)
+            sprite.position.copyFrom(note.sprite.position)
+            sprite.alpha = (this.currentTime - note.scoreTime) / 500
+            this.stage.addChild(sprite);
         }
-        else {
-            anim.angle = note.sprite.angle;
-        }
-        this.stage.addChild(anim);
-        return anim;
     }
 
     playHitsound(note: Note) {
@@ -249,22 +254,22 @@ export default class Judgement {
         if (note.hitsound) (note.hitsound as Audio).play();
         else {
             switch (note.type) {
-                case 1:
+                case CONST.NoteType.Tap:
                     {
                         this.sounds.tap.play();
                         break;
                     }
-                case 3:
+                case CONST.NoteType.Hold:
                     {
                         this.sounds.hold.play();
                         break;
                     }
-                case 2:
+                case CONST.NoteType.Drag:
                     {
                         this.sounds.drag.play();
                         break;
                     }
-                case 4:
+                case CONST.NoteType.Flick:
                     {
                         this.sounds.flick.play();
                         break;
@@ -281,7 +286,7 @@ export default class Judgement {
         this.input.destroySprites();
         this.score.destroySprites();
     }
-    calcNoteJudge(currentTime: number, note: Note) {
+    calcNote(currentTime: number, note: Note) {
         if (note.isFake) return; // 忽略假 Note
         if (note.isScored && note.isScoreAnimated) return; // 已记分忽略
         if (note.time - this.judgeTimes.bad > currentTime) return; // 不在记分范围内忽略
@@ -340,7 +345,7 @@ export default class Judgement {
         }
 
         switch (note.type) {
-            case 1:
+            case CONST.NoteType.Tap:
                 {
                     for (let i = 0, length = this.judgePoints.length; i < length; i++) {
                         if (
@@ -369,7 +374,7 @@ export default class Judgement {
 
                     break;
                 }
-            case 2:
+            case CONST.NoteType.Drag:
                 {
                     if (note.isScored && !note.isScoreAnimated && timeBetween <= 0) {
                         this.pushNoteJudge(note);
@@ -392,7 +397,7 @@ export default class Judgement {
 
                     break;
                 }
-            case 3:
+            case CONST.NoteType.Hold:
                 {
                     if (note.isScored) {
                         if (currentTime - note.lastHoldTime! >= this._holdBetween) {
@@ -450,7 +455,7 @@ export default class Judgement {
 
                     break;
                 }
-            case 4:
+            case CONST.NoteType.Flick:
                 {
                     if (note.isScored && !note.isScoreAnimated && timeBetween <= 0) {
                         this.pushNoteJudge(note);

@@ -16,7 +16,7 @@ export async function loadTextures(src: string | HTMLImageElement | File): Promi
     } else if (typeof src === 'string') {
         return await pixi.Assets.load({
             src: src,
-            format: src.split(".")[src.split(".").length - 1],
+            format: "png",
             loadParser: 'loadTextures'
         })
     } else {

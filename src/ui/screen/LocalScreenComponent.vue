@@ -35,7 +35,7 @@ export default {
     },
     methods: {
         uploadFile: () => {
-            
+
             openFilePicker(async (f) => {
                 await ress.loads(f);
                 while (chartSelect.value.firstChild) {

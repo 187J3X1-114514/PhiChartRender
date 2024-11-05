@@ -34,12 +34,11 @@ export default class Input {
         canvas.addEventListener('touchend', (a) => this.touchEnd(a), passiveIfSupported);
         canvas.addEventListener('touchcancel', (a) => this.touchEnd(a), passiveIfSupported);
 
-        // 鼠标适配，其实并不打算做
         canvas.addEventListener('mousedown', (a) => this.mouseStart(a), passiveIfSupported);
         canvas.addEventListener('mousemove', (a) => this.mouseMove(a));
         canvas.addEventListener('mouseup', (a) => this.mouseEnd(a));
 
-        // canvas.addEventListener('contextmenu', this._noCanvasMenu, passiveIfSupported);
+        canvas.addEventListener('contextmenu', this._noCanvasMenu, passiveIfSupported);
     }
 
     removeListenerFromCanvas(canvas: HTMLCanvasElement) {
@@ -50,16 +49,18 @@ export default class Input {
         canvas.removeEventListener('touchend', (a) => this.touchEnd(a));
         canvas.removeEventListener('touchcancel', (a) => this.touchEnd(a));
 
-        // 鼠标适配，其实并不打算做
         canvas.removeEventListener('mousedown', (a) => this.mouseStart(a));
         canvas.removeEventListener('mousemove', (a) => this.mouseMove(a));
         canvas.removeEventListener('mouseup', (a) => this.mouseEnd(a));
 
-        // canvas.removeEventListener('contextmenu', this._noCanvasMenu);
+        canvas.removeEventListener('contextmenu', this._noCanvasMenu);
     }
 
     reset() {
         this.inputs.length = 0;
+    }
+    private _noCanvasMenu(e: MouseEvent) {
+        e.preventDefault()
     }
 
     createSprite(stage: any, showInputPoint = true) {

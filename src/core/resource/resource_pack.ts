@@ -53,8 +53,10 @@ const ResourcePackInfoSchema = t.type({
         tap: t.array(t.string),
         drag: t.array(t.string),
         hold: t.array(t.string),
-        flick: t.array(t.string)
+        flick: t.array(t.string),
+        bad_note_color: t.string
     }),
+
     judgeLine: t.type({
         ap: t.string,
         fc: t.string,
@@ -91,18 +93,20 @@ export interface PhiAssets {
     }
     judgeLine: pixi.Texture
 
-    sound: {
-        tap: Audio
-        drag: Audio
-        hold: Audio
-        flick: Audio
-    }
+    sound: PhiNoteSound
     __src_sound: {
         tap: Blob
         drag: Blob
         hold: Blob
         flick: Blob
     }
+}
+
+export interface PhiNoteSound {
+    tap: Audio
+    drag: Audio
+    hold: Audio
+    flick: Audio
 }
 
 export class ResourcePackInfo {
@@ -164,7 +168,23 @@ export class ResourcePackInfo {
                 json.sound
             )
         } else {
-            log.error("资源包信息解析失败 -> ", json)
+
+            let messages: string[] = []
+            result.left.forEach((v) => {
+                let keys = []
+                let last = v.context[v.context.length - 1]
+                for (let _ of v.context) {
+                    if (_.key != '') keys.push(_.key)
+                }
+                let keyPath = keys.join(".")
+                if (last.actual == undefined) {
+                    messages.push(`${messages.length + 1}.资源包信息中缺少 ${keyPath}`)
+                } else {
+                    messages.push(`${messages.length + 1}.资源包信息中 ${keyPath} 的数据类型错误 期望${last.type.name}`)
+                }
+            })
+            log.error("资源包信息解析失败 -> ", json, "\n资源包信息中存在的问题：\n" + messages.join("\n"))
+            console.log(result)
             throw new Error("资源包信息解析失败")
         }
 
@@ -280,4 +300,10 @@ export class ResourcePack {
         log.info('资源包 -> ' + zip.name + ' 加载完成')
         return new this(info, assets)
     }
+}
+
+
+async function genBadNoteTex(src: pixi.Texture) {
+    const img = src.source.resource as ImageBitmap
+
 }

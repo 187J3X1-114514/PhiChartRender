@@ -4,7 +4,7 @@ import { PhiraAPI, type PhiraAPIChartInfo, SearchDivision, SearchOrder } from ".
 import { proxyPhriaApiURL } from "../../../api/url";
 import { PlayS as PlayScreen } from "../../play/play";
 import { File } from "../../../core/file";
-import { addCacheDATA, addChartByPhiraID, checkCacheDATA, checkChartByPhiraID, getCacheDATA, getChartByPhiraID, removeChartByPhiraID } from "../../data";
+import { addCacheDATA, addChartByID, addChartInfo, checkCacheDATA, checkChartByID, getCacheDATA, getChartByID, removeChartByID } from "../../data";
 import { generateRandomString } from "../../../core/random";
 import { I18N } from "../../i18n";
 import { account, load, reqLogin, ResPack } from "@/ui/App.vue";
@@ -33,7 +33,7 @@ export class ChartPage {
     public isRemove: boolean = false
     public page: number = 1
     public type: number = 2
-    public root: HTMLDivElement = (undefined as unknown) as any
+    public rootElement: HTMLDivElement = (undefined as unknown) as any
 
     public pagesBtnG: SegmentedButtonGroup = new SegmentedButtonGroup()
     public pagesBtnLast: SegmentedButton = new SegmentedButton()
@@ -99,13 +99,13 @@ export class ChartPage {
         const resizeObserver = new ResizeObserver((_entries) => {
             this.resize()
         })
-        resizeObserver.observe(this.root);
+        resizeObserver.observe(this.rootElement);
         window.addEventListener("resize", () => this.resize())
         this.cards.classList.add("active")
-        this.root.classList.add("fadeIn")
-        this.root.classList.add("fadeIn-s")
-        this.root.classList.remove("fadeIn-s")
-        this.root.classList.add("phira-chart-root")
+        this.rootElement.classList.add("fadeIn")
+        this.rootElement.classList.add("fadeIn-s")
+        this.rootElement.classList.remove("fadeIn-s")
+        this.rootElement.classList.add("phira-chart-root")
 
         this.pagesBtnLast.innerText = I18N.get("ui.screen.phira.chart.text.last_page")
         this.pagesBtnNext.innerText = I18N.get("ui.screen.phira.chart.text.next_page")
@@ -192,9 +192,9 @@ export class ChartPage {
         this.searchDiv.append(this.select1)
         this.searchDiv.append(this.select2)
         this.searchDiv.append(this.searchBtn)
-        this.root.append(this.searchDiv)
-        this.root.append(this.cards)
-        this.root.append(this.pagesBtnG)
+        this.rootElement.append(this.searchDiv)
+        this.rootElement.append(this.cards)
+        this.rootElement.append(this.pagesBtnG)
         this.searchBtn.addEventListener("click", async () => {
             this.searchBtn.disabled = true
             this.searchBtn.loading = true
@@ -215,7 +215,7 @@ export class ChartPage {
         el.appendChild(pel)
         let chartPage = new this()
         chartPage.api = api
-        chartPage.root = pel
+        chartPage.rootElement = pel
         chartPage.afterCreate()
         chartPage.cards!.style.display = 'grid'
         chartPage.cards!.style.gap = '20px'
@@ -240,9 +240,10 @@ export class ChartPage {
         (async () => {
             const srcUrl = data.illustration.replace("https://api.phira.cn/", "") + ".thumbnail"
             const url = proxyPhriaApiURL(srcUrl);
+            const imageName = url.split("/").pop()!
             let blob: Blob | undefined = undefined
-            if (await checkCacheDATA(url.replace("https://api.phira.cn/files/", ""))) {
-                blob = await getCacheDATA(url.replace("https://api.phira.cn/files/", ""))
+            if (await checkCacheDATA(imageName)) {
+                blob = await getCacheDATA(imageName)
             } else {
                 await new Promise(async (r) => {
                     let tempi = new Image()
@@ -256,7 +257,7 @@ export class ChartPage {
                         const ctx = canvas.getContext('2d')!
                         ctx.drawImage(bmp, 0, 0)
                         blob = await new Promise<Blob>((res) => canvas.toBlob(res as any))
-                        await addCacheDATA(url, blob)
+                        await addCacheDATA(imageName, blob)
                         r(null)
                     }
                     tempi.onerror = () => {
@@ -333,10 +334,10 @@ export class ChartPage {
         this.resize()
         rootCard.addEventListener("click", () => {
             setTimeout(() => {
-                this.root!.classList.add("push-out")
+                this.rootElement!.classList.add("push-out")
                 setTimeout(() => {
-                    this.root.classList.add("hide")
-                    this.root!.classList.remove("push-out")
+                    this.rootElement.classList.add("hide")
+                    this.rootElement!.classList.remove("push-out")
                 }, 650)
                 this.playChart(data)
             }, 150)
@@ -421,14 +422,14 @@ export class ChartPage {
     }
     async playChart(data: PhiraAPIChartInfo) {
         load.classList.remove("hide")
-        var r
-        const f = async () => {
+        var response
+        const fetchFn = async () => {
 
             const srcUrl = data.file.replace("https://api.phira.cn/", "");
             const url = proxyPhriaApiURL(srcUrl);
             try {
                 this.api.fetch(url)
-                r = await fetch(
+                response = await fetch(
                     url,
                     { method: "GET", headers: { 'Authorization': 'Bearer ' + account!.userToken } }
                 )
@@ -443,16 +444,16 @@ export class ChartPage {
                                 text: I18N.get("ui.screen.phira.chart.text.error.text.r"),
                                 onClick: () => {
                                     load.classList.add("hide")
-                                    this.root!.classList.add("push-in")
+                                    this.rootElement!.classList.add("push-in")
                                     setTimeout(() => {
-                                        this.root!.classList.remove("push-in")
+                                        this.rootElement!.classList.remove("push-in")
                                     }, 800)
-                                    this.root.classList.remove("hide")
+                                    this.rootElement.classList.remove("hide")
                                 }
                             },
                             {
                                 text: I18N.get("ui.screen.phira.chart.text.error.text.re"),
-                                onClick: async () => { await f() },
+                                onClick: async () => { await fetchFn() },
                             },
                             {
                                 text: I18N.get("ui.screen.phira.chart.text.error.text.download"),
@@ -463,11 +464,11 @@ export class ChartPage {
                                     link.target = "_blank"
                                     link.click()
                                     load.classList.add("hide")
-                                    this.root!.classList.add("push-in")
+                                    this.rootElement!.classList.add("push-in")
                                     setTimeout(() => {
-                                        this.root!.classList.remove("push-in")
+                                        this.rootElement!.classList.remove("push-in")
                                     }, 800)
-                                    this.root.classList.remove("hide")
+                                    this.rootElement.classList.remove("hide")
                                 },
                             }
                         ]
@@ -476,49 +477,51 @@ export class ChartPage {
 
             }
         }
-        let b
-        if (await checkChartByPhiraID(data.id)) {
-            b = await getChartByPhiraID(data.id)
+        let chartid = "phira-" + data.id
+        let blob
+        if (await checkChartByID(chartid)) {
+            blob = await getChartByID(chartid)
         } else {
-            await f()
-            b = await r!.blob()
-            await addChartByPhiraID(data.id, b)
+            await fetchFn()
+            blob = await response!.blob()
+            await addChartByID(chartid, blob)
         }
 
-        let c = new PlayScreen(new File(b, generateRandomString(32) + ".zip"), ResPack)
-        c.setOnEnd(() => {
+        let chart = new PlayScreen(new File(blob, generateRandomString(32) + ".zip"), ResPack)
+        chart.setOnEnd(() => {
             setTimeout(() => {
-                this.root!.classList.add("push-in")
-                this.root.classList.remove("hide")
+                this.rootElement!.classList.add("push-in")
+                this.rootElement.classList.remove("hide")
                 setTimeout(() => {
-                    this.root!.classList.remove("push-in")
+                    this.rootElement!.classList.remove("push-in")
                 }, 800)
             }, 650)
         })
         try {
-            await c.load()
+            await chart.load()
+            await addChartInfo(chart.getChart().src, chartid)
         } catch {
-            await removeChartByPhiraID(data.id)
+            await removeChartByID(chartid)
             snackbar({
                 message: I18N.get("ui.screen.phira.chart.text.error.text.file")
             })
             load.classList.add("hide")
-            this.root!.classList.add("push-in")
+            this.rootElement!.classList.add("push-in")
             setTimeout(() => {
-                this.root!.classList.remove("push-in")
+                this.rootElement!.classList.remove("push-in")
             }, 800)
-            this.root.classList.remove("hide")
+            this.rootElement.classList.remove("hide")
         }
 
         load.classList.add("hide")
         if (this.isRemove) return
-        c.start()
+        chart.start()
     }
 
     remove() {
         this.isRemove = true
         load.classList.add("hide")
-        this.root.remove()
+        this.rootElement.remove()
     }
 
 }

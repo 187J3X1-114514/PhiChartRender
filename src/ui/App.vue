@@ -154,7 +154,22 @@ export const topAppBar = ref<TopAppBar>(null as any)
 export const load = document.getElementById("load-stage")! as LinearProgress
 const THEME = ref(getTheme())
 let zip = await loadZip("resource.zip", await DB.getOrCreateCacheDATA("assets/pack/resource"))
-export const ResPack = await ResourcePack.load(zip)
+var __ResPack
+try {
+    __ResPack = await ResourcePack.load(zip)
+} catch {
+    let src = await (await fetch("assets/pack/resource")).blob()
+    zip = await loadZip("resource.zip", src)
+    try {
+        __ResPack = await ResourcePack.load(zip)
+        await DB.addCacheDATA("assets/pack/resource", src)
+    } catch {
+
+    }
+}
+
+export const ResPack = __ResPack as ResourcePack
+console.log(ResPack)
 for (let e of document.getElementsByClassName("arrow")) {
     var el = (e as HTMLElement).parentElement as HTMLElement
     el.addEventListener("click", () => {

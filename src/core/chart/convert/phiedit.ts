@@ -6,6 +6,7 @@ import utils from './utils';
 import { PhiEditEasing as Easing } from '../easing'
 import { PhiEdit as utils2 } from './otherUtils'
 import { chart_log } from './index.js';
+import { CONST } from '@/core/types/const';
 export default function PhiEditChartConverter(_chart: any) {
     let rawChart = _chart.split("\n");
     let chart = new Chart();
@@ -101,7 +102,7 @@ export default function PhiEditChartConverter(_chart: any) {
             case 'n1':
                 { // tap
                     chartSimple.pushNote({
-                        type: 1,
+                        type: CONST.NoteType.Tap,
                         lineId: !isNaN(command[1]) ? command[1] : -1,
                         startTime: command[2] || 0,
                         positionX: command[3] || 0,
@@ -113,7 +114,7 @@ export default function PhiEditChartConverter(_chart: any) {
             case 'n2':
                 { // hold
                     chartSimple.pushNote({
-                        type: 3,
+                        type: CONST.NoteType.Hold,
                         lineId: !isNaN(command[1]) ? command[1] : -1,
                         startTime: command[2] || 0,
                         endTime: command[3] || (command[2] || 0),
@@ -126,7 +127,7 @@ export default function PhiEditChartConverter(_chart: any) {
             case 'n3':
                 { // flick
                     chartSimple.pushNote({
-                        type: 4,
+                        type: CONST.NoteType.Flick,
                         lineId: !isNaN(command[1]) ? command[1] : -1,
                         startTime: command[2] || 0,
                         positionX: command[3] || 0,
@@ -138,7 +139,7 @@ export default function PhiEditChartConverter(_chart: any) {
             case 'n4':
                 { // drag
                     chartSimple.pushNote({
-                        type: 2,
+                        type: CONST.NoteType.Drag,
                         lineId: !isNaN(command[1]) ? command[1] : -1,
                         startTime: command[2] || 0,
                         positionX: command[3] || 0,
@@ -415,7 +416,7 @@ export default function PhiEditChartConverter(_chart: any) {
                 let noteStartSpeedEvent = judgeline.getFloorPosition(note.startTime);
                 note.floorPosition = noteStartSpeedEvent ? noteStartSpeedEvent.floorPosition + noteStartSpeedEvent.value * (note.startTime - noteStartSpeedEvent.startTime) : 0;
 
-                if (note.type == 3) {
+                if (note.type == CONST.NoteType.Hold) {
                     let noteEndSpeedEvent = judgeline.getFloorPosition(note.endTime);
                     note.holdLength = (noteEndSpeedEvent ? noteEndSpeedEvent.floorPosition + noteEndSpeedEvent.value * (note.endTime - noteEndSpeedEvent.startTime) : 0) - note.floorPosition;
                 }

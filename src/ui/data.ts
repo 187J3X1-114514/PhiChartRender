@@ -1,6 +1,7 @@
 import localForage from "localforage";
 import { newLogger } from "../core/log";
 import { I18N } from "./i18n";
+import { BaseChartInfo } from "@/core/chart/chartinfo";
 
 const log = newLogger("Database")
 localForage.config({
@@ -37,36 +38,6 @@ export const CacheDataDB = localForage.createInstance({
     description: 'CacheDATA'
 
 })
-log.info(I18N.get("log.init_database_done"))
-export async function addChartByPhiraID(id: number, chart: Blob) {
-    return new Promise((r) => {
-        ChartDataDB.setItem(`PHIRA-CHART-ID+${id}`, chart, (e) => {
-            log.info(`${I18N.get("log.try_cache_chart")}: ${id}`)
-            if (e != null) log.warn(`${I18N.get("log.try_cache_chart_error")}：${e}`);
-            r(null)
-        })
-    })
-}
-export async function getChartByPhiraID(id: number): Promise<Blob> {
-    return new Promise((r) => {
-        ChartDataDB.getItem(`PHIRA-CHART-ID+${id}`, (e, v) => {
-            log.info(`${I18N.get("log.try_get_chart")}: ${id}`)
-            if (e != null) log.warn(`${I18N.get("log.try_get_chart_error")}：${e}`);
-            r(v as Blob)
-        })
-    })
-}
-
-export async function removeChartByPhiraID(id: number) {
-    return new Promise((r) => {
-        ChartDataDB.removeItem(`PHIRA-CHART-ID+${id}`, (e) => {
-            r(null)
-        })
-    })
-}
-export async function checkChartByPhiraID(id: number) {
-    return (await ChartDataDB.keys()).includes(`PHIRA-CHART-ID+${id}`)
-}
 
 
 export async function checkCacheDATA(name: string) {
@@ -133,3 +104,67 @@ export async function setInfoData(key: string, value: string) {
 export async function checkInfoData(key: string) {
     return (await UserInfoDB.keys()).includes(key)
 }
+
+export async function addChartByID(id: string, chart: Blob) {
+    return new Promise((r) => {
+        ChartDataDB.setItem(`CHART-ID+${id}`, chart, (e) => {
+            log.info(`${I18N.get("log.try_cache_chart")}: ${id}`)
+            if (e != null) log.warn(`${I18N.get("log.try_cache_chart_error")}：${e}`);
+            r(null)
+        })
+    })
+}
+export async function getChartByID(id: string): Promise<Blob> {
+    return new Promise((r) => {
+        ChartDataDB.getItem(`CHART-ID+${id}`, (e, v) => {
+            log.info(`${I18N.get("log.try_get_chart")}: ${id}`)
+            if (e != null) log.warn(`${I18N.get("log.try_get_chart_error")}：${e}`);
+            r(v as Blob)
+        })
+    })
+}
+
+export async function removeChartByID(id: string) {
+    return new Promise((r) => {
+        ChartDataDB.removeItem(`CHART-ID+${id}`, (e) => {
+            r(null)
+        })
+    })
+}
+
+export async function checkChartByID(id: string) {
+    CacheChartInfo = await getAllChartInfo()
+    return CacheChartInfo[id] != undefined
+}
+
+export async function addChartInfo(info: BaseChartInfo, id: string | number) {
+    CacheChartInfo[id] = info as any
+    await saveAllChartInfo()
+}
+
+interface ChartInfo {
+    name: string
+    music: string
+    illustration: string
+    chart: string
+    charter: string
+    level: string
+}
+
+const CHARTINFO_KEY = "CHARTINFO"
+
+export async function getAllChartInfo(): Promise<Record<string, ChartInfo>> {
+    if (await checkInfoData(CHARTINFO_KEY)) {
+        return JSON.parse(await getInfoData(CHARTINFO_KEY))
+    } else {
+        return {}
+    }
+}
+
+export async function saveAllChartInfo() {
+    await setInfoData(CHARTINFO_KEY, JSON.stringify(CacheChartInfo))
+}
+
+
+export var CacheChartInfo = await getAllChartInfo()
+log.info(I18N.get("log.init_database_done"))

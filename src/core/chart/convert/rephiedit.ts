@@ -7,6 +7,7 @@ import { RePhiEditEasing as Easing } from '../easing'
 import { RePhiEdit as utils2 } from './otherUtils'
 import { chart_log } from './index.js';
 import type { Event } from '../baseEvents.js';
+import { CONST } from '@/core/types/const';
 export default function RePhiEditChartConverter(_chart: any) {
     let notes: any[] = [];
     let sameTimeNoteCount = {};
@@ -304,31 +305,41 @@ export default function RePhiEditChartConverter(_chart: any) {
         else {
             note.holdLength = 0;
         }
-
-        // 推送 Note
-        chart.notes.push(new Note({
-            id: note.id,
-            type: (
-                note.type == 1 ? 1 :
-                    note.type == 2 ? 3 :
-                        note.type == 3 ? 4 :
-                            note.type == 4 ? 2 : 1
-            ),
-            time: note.startTime,
-            holdTime: note.endTime - note.startTime,
-            speed: note.speed,
-            floorPosition: note.floorPosition,
-            holdLength: note.holdLength,
-            positionX: (note.positionX / (670 * (9 / 80))),
-            basicAlpha: note.alpha / 255,
-            visibleTime: note.visibleTime < 999999 ? note.visibleTime : NaN,
-            yOffset: (note.yOffset / 900),
-            xScale: note.size,
-            isAbove: note.above == 1 ? true : false,
-            isMulti: note.isMulti,
-            isFake: note.isFake == 1 ? true : false,
-            judgeline: note.judgeline
-        }));
+        let noteType = -1
+        switch (note.type) {
+            case 1:
+                noteType = CONST.NoteType.Tap
+                break
+            case 2:
+                noteType = CONST.NoteType.Hold
+                break
+            case 3:
+                noteType = CONST.NoteType.Flick
+                break
+            case 4:
+                noteType = CONST.NoteType.Drag
+                break
+        }
+        if (noteType != -1) {
+            chart.notes.push(new Note({
+                id: note.id,
+                type: noteType,
+                time: note.startTime,
+                holdTime: note.endTime - note.startTime,
+                speed: note.speed,
+                floorPosition: note.floorPosition,
+                holdLength: note.holdLength,
+                positionX: (note.positionX / (670 * (9 / 80))),
+                basicAlpha: note.alpha / 255,
+                visibleTime: note.visibleTime < 999999 ? note.visibleTime : NaN,
+                yOffset: (note.yOffset / 900),
+                xScale: note.size,
+                isAbove: note.above == 1 ? true : false,
+                isMulti: note.isMulti,
+                isFake: note.isFake == 1 ? true : false,
+                judgeline: note.judgeline
+            }));
+        }
     });
 
     chart.judgelines.sort((a: any, b: any) => a.id - b.id);
