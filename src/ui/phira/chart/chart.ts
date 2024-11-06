@@ -500,7 +500,8 @@ export class ChartPage {
         try {
             await chart.load()
             await addChartInfo(chart.getChart().src, chartid)
-        } catch {
+        } catch(e) {
+            console.log(e)
             await removeChartByID(chartid)
             snackbar({
                 message: I18N.get("ui.screen.phira.chart.text.error.text.file")
@@ -511,6 +512,8 @@ export class ChartPage {
                 this.rootElement!.classList.remove("push-in")
             }, 800)
             this.rootElement.classList.remove("hide")
+            load.classList.add("hide")
+            return
         }
 
         load.classList.add("hide")

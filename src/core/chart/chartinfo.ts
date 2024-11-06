@@ -180,7 +180,7 @@ function loadTxtChartInfo(str: string) {
                         Data.composer = value
                         break
                     case 'Charter':
-                        Data.chart = value
+                        Data.charter = value
                         break
                 }
             } catch { }

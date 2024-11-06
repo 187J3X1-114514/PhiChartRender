@@ -40,7 +40,6 @@ export class PlayS {
             }
         }
         await this.chart!.blur(40)
-
         this.app = new Application()
         this.chart_data = this.chart!.get(this.res)
         await this.app.init({
@@ -54,6 +53,7 @@ export class PlayS {
             resolution: window.devicePixelRatio,
             preference: navigator.gpu ? "webgl" : "webgl"
         })
+
         this.game = await PhiGame.create({
             app: this.app,
             render: {
@@ -66,7 +66,6 @@ export class PlayS {
                 autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1, antialias: true, antialiasType: 1
             }
         })
-        console.log(this.app.renderer.render)
         let r = new ResizeObserver(() => { this.game!.resize(true) })
         r.observe(this.app!.canvas)
         this.game.createSprites()
@@ -74,7 +73,7 @@ export class PlayS {
             this.onend()
         })
     }
-    getChart(){
+    getChart() {
         return this.chart!
     }
     start() {
