@@ -118,7 +118,7 @@ import { ReadBufferDataView, WriteBufferDataView } from './file/data_view';
 import Shader from './core/prpr/effect/shader';
 import { PrPrExtraEffect, PrPrExtraVideo } from './core/prpr/types';
 import { buildEffectData, buildVideoEventData, PrprExtraFile, readEffectData, readVideoEventData } from './file/prpr';
-import { rpeEvent } from './core/chart/baseEvents';
+import { RPEEvent } from './core/chart/anim/type';
 import { buildRpeEventData, readRpeEventData } from './file/event';
 import { PrprExtra } from './core/prpr/prpr';
 document.documentElement.addEventListener("click", () => {

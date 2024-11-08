@@ -1,38 +1,33 @@
-export interface baseEvent {
+export interface BaseEvent {
     startTime: number
     endTime: number
 }
-export interface floorPositionEvent extends baseEvent {
+export interface floorPositionEvent extends BaseEvent {
     floorPosition: number
 }
-export interface Event extends baseEvent {
+export interface Event extends BaseEvent {
     start: number
     end: number
 }
-export interface Event2 extends Event {
+export interface OfficialChartEvent extends Event {
     start2: number
     end2: number
 }
-export interface valueEvent extends baseEvent {
+export interface ValueEvent extends BaseEvent {
     value: any
 }
-export interface bpmEvent extends baseEvent {
+export interface BpmEvent extends BaseEvent {
     startTime: number
     endTime: number
     bpm: number
     holdBetween: number
 }
-export interface speedEvent extends valueEvent {
+export interface SpeedEvent extends ValueEvent {
     value: number
     floorPosition: number
 }
-export interface valueAndEvent extends baseEvent {
-    start?: number
-    end?: number
-    value?: number
-}
 
-export interface rpeEvent {
+export interface RPEEvent {
     startTime: number[],
     endTime: number[],
     easingType?: number,

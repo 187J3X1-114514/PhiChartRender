@@ -1,12 +1,13 @@
-import type { Event, valueEvent } from "./baseEvents";
+import { FloatAnim } from "./anim/float";
+import type { Event, ValueEvent } from "./anim/type";
 import type { jsonEventLayer } from "./types/judgeLine";
 
 export default class EventLayer {
-    public speed: valueEvent[] = []
-    public moveX: Event[] = [];
-    public moveY: Event[] = [];
-    public alpha: Event[] = [];
-    public rotate: Event[] = [];
+    public speed: ValueEvent[] = []
+    public moveX: FloatAnim = new FloatAnim();
+    public moveY: FloatAnim = new FloatAnim();
+    public alpha: FloatAnim = new FloatAnim();
+    public rotate: FloatAnim = new FloatAnim();
 
     _speed: number = 0;
     _posX: number = 0;
@@ -19,29 +20,34 @@ export default class EventLayer {
     public moveYIndex: number = 0;
     public alphaIndex: number = 0;
     public rotateIndex: number = 0;
-    public speedOriginValue?: number
-    public moveXOriginValue?: number
     public moveYOriginValue?: number
     public alphaOriginValue?: number
     public rotateOriginValue?: number
     sort() {
         const sorter = (a: { startTime: number }, b: { startTime: number }) => a.startTime - b.startTime;
         this.speed.sort(sorter);
-        this.moveX.sort(sorter);
-        this.moveY.sort(sorter);
-        this.alpha.sort(sorter);
-        this.rotate.sort(sorter);
+        this.moveX.sort();
+        this.moveY.sort();
+        this.alpha.sort();
+        this.rotate.sort();
+    }
+
+    set speedOriginValue(value: number) {
+
+    }
+    set moveXOriginValue(value: number) {
+
     }
 
     calcTime(currentTime: number) {
-        let _posX = this.valueCalculator(this.moveX, currentTime, this.moveXOriginValue || this._posX);
-        let _posY = this.valueCalculator(this.moveY, currentTime, this.moveYOriginValue || this._posY);
-        let _alpha = this.valueCalculator(this.alpha, currentTime, this.alphaOriginValue || this._alpha);
-        let _rotate = this.valueCalculator(this.rotate, currentTime, this.rotateOriginValue || this._rotate);
-        this._posX = _posX[0]
-        this._posY = _posY[0]
-        this._alpha = _alpha[0]
-        this._rotate = _rotate[0]
+        let _posX = this.moveX.calculate(currentTime)
+        let _posY = this.moveY.calculate(currentTime)
+        let _alpha = this.alpha.calculate(currentTime)
+        let _rotate = this.rotate.calculate(currentTime)
+        this._posX = _posX.value
+        this._posY = _posY.value
+        this._alpha = _alpha.value
+        this._rotate = _rotate.value
         for (let i = 0, length = this.speed.length; i < length; i++) {
             let event = this.speed[i];
             if (event.endTime < currentTime) continue;
@@ -49,42 +55,27 @@ export default class EventLayer {
 
             this._speed = event.value!;
         }
-        return { alpha: _alpha[1], x: _posX[1], y: _posY[1], rotate: _rotate[1] }
+        return { alpha: _alpha.notDefault, x: _posX.notDefault, y: _posY.notDefault, rotate: _rotate.notDefault }
     }
 
-    valueCalculator(events: { startTime: number, endTime: number, start: number, end: number }[], currentTime: number, originValue: number = 0, _eventIndex: number = 0): [number, boolean] {
-        for (let i = _eventIndex, length = events.length; i < length; i++) {
-            let event = events[i];
-            if (event.endTime < currentTime) continue;
-            if (event.startTime > currentTime) break;
-            if (event.start == event.end) return [event.start, true]
-
-            let timePercentEnd = (currentTime - event.startTime) / (event.endTime - event.startTime);
-            let timePercentStart = 1 - timePercentEnd;
-
-            return [event.start * timePercentStart + event.end * timePercentEnd, true];
-        }
-        return [originValue, false];
-    }
-
-    exportToJson(){
+    exportToJson() {
         return {
-            speed:this.speed,
-            moveX: this.moveX,
-            moveY: this.moveY,
-            alpha: this.alpha,
-            rotate:this.rotate,
+            speed: this.speed,
+            moveX: this.moveX.events,
+            moveY: this.moveY.events,
+            alpha: this.alpha.events,
+            rotate: this.rotate.events,
         } as jsonEventLayer
     }
 
-    static from(data:jsonEventLayer){
+    static from(data: jsonEventLayer) {
         let ev = new EventLayer()
         ev.speed = data.speed
-        ev.alpha = data.alpha
-        ev.moveX = data.moveX
-        ev.moveY = data.moveY
-        ev.rotate = data.rotate
+        ev.alpha.events = data.alpha
+        ev.moveX.events = data.moveX
+        ev.moveY.events = data.moveY
+        ev.rotate.events = data.rotate
         return ev
     }
-    
+
 }

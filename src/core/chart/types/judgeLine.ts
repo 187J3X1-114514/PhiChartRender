@@ -1,12 +1,12 @@
-import type { Event, Event2, floorPositionEvent, speedEvent, valueEvent } from "../baseEvents"
+import type { Event, OfficialChartEvent, floorPositionEvent, SpeedEvent, ValueEvent } from "../anim/type"
 import type { extendNoteData } from "./note"
 
 export interface judgeLineData {
     bpm: number
     notesAbove: extendNoteData[]
     notesBelow: extendNoteData[]
-    speedEvents: speedEvent[]
-    judgeLineMoveEvents: Event2[]
+    speedEvents: SpeedEvent[]
+    judgeLineMoveEvents: OfficialChartEvent[]
     judgeLineRotateEvents: Event[]
     judgeLineDisappearEvents: Event[]
 }
@@ -23,10 +23,10 @@ export interface jsonJudgeLineData {
     eventLayers: jsonEventLayer[];
     floorPositions: floorPositionEvent[];
     extendEvent: {
-        color: valueEvent[],
+        color: ValueEvent[],
         scaleX: Event[],
         scaleY: Event[],
-        text: valueEvent[],
+        text: ValueEvent[],
         incline: Event[]
     };
     noteControls: {
@@ -38,7 +38,7 @@ export interface jsonJudgeLineData {
 }
 
 export interface jsonEventLayer{
-    speed: valueEvent[]
+    speed: ValueEvent[]
     moveX: Event[]
     moveY: Event[]
     alpha: Event[]

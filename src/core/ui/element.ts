@@ -1,6 +1,6 @@
 import EventLayer from '../chart/eventlayer';
 import * as font from '../font'
-import type { Event, valueEvent } from '../chart/baseEvents';
+import type { Event, ValueEvent } from '../chart/anim/type';
 import { Sprite, Text, TextStyle } from 'pixi.js';
 import { type SizerData } from '../types/params';
 import { pauseButton } from './tex';
@@ -12,10 +12,10 @@ export class UIElement {
     public sprite: Text | Sprite = new Sprite()
     private textStyle?: TextStyle
     private extendEvent: {
-        color: valueEvent[],
+        color: ValueEvent[],
         scaleX: Event[],
         scaleY: Event[],
-        text: valueEvent[],
+        text: ValueEvent[],
         incline: Event[]
     };
     private testCtx: CanvasRenderingContext2D

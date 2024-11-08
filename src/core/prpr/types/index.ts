@@ -1,4 +1,4 @@
-import type { rpeEvent } from "../../chart/baseEvents"
+import type { RPEEvent } from "../../chart/anim/type"
 
 export interface PrPrExtraJSON {
     bpm: { time: number[], bpm: number }[]
@@ -9,8 +9,8 @@ export interface PrPrExtraVideo {
     path: string,
     time: number[],
     scale: string,
-    alpha: number | rpeEvent[],
-    dim: number | rpeEvent[],
+    alpha: number | RPEEvent[],
+    dim: number | RPEEvent[],
     startTime: number[],
     endTime: number[],
     easingType: number,
@@ -22,5 +22,5 @@ export interface PrPrExtraEffect {
     end: number[],
     shader: string,
     global?: boolean,
-    vars: Record<string, rpeEvent[] | number | number[]>
+    vars: Record<string, RPEEvent[] | number | number[]>
 }

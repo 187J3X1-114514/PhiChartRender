@@ -10,7 +10,7 @@ import { newLogger } from '../log';
 import { PrprVideo } from './video';
 import type { SizerData } from '../types/params';
 import { join } from '../file/utils';
-import type { rpeEvent } from '../chart/baseEvents';
+import type { RPEEvent } from '../chart/anim/type';
 import { deepCopy } from '../utils';
 const log = newLogger("prpr拓展")
 export class PrprExtra {
@@ -334,7 +334,7 @@ export class PrprExtra {
                 });
                 for (const name in _effect.vars) {
                     if (_effect.vars[name] instanceof Array) {
-                        let _values: rpeEvent[] = _effect.vars[name].slice();
+                        let _values: RPEEvent[] = _effect.vars[name].slice();
                         if (_values[0]?.startTime && _values[0]?.end instanceof Array && _values.length > 0) {
                             delete _effect.vars[name]
                             for (let i = 0, length = (_values[0].start as number[]).length; i < length; i++) {

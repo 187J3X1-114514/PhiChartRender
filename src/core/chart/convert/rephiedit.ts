@@ -6,7 +6,7 @@ import utils from './utils';
 import { RePhiEditEasing as Easing } from '../easing'
 import { RePhiEdit as utils2 } from './otherUtils'
 import { chart_log } from './index.js';
-import type { Event } from '../baseEvents.js';
+import type { Event } from '../anim/type.js';
 import { CONST } from '@/core/types/const';
 export default function RePhiEditChartConverter(_chart: any) {
     let notes: any[] = [];
@@ -27,7 +27,7 @@ export default function RePhiEditChartConverter(_chart: any) {
         let bpmChangedBeat = 0; // 当前 BPM 是在什么时候被更改的（Beat）
         let bpmChangedTime = 0; // 当前 BPM 是在什么时候被更改的（秒）
 
-        rawChart.BPMList.forEach((bpm: any, index: any) => {
+        rawChart.BPMList.forEach((bpm: any, index: number) => {
             bpm.endTime = rawChart.BPMList[index + 1] ? rawChart.BPMList[index + 1].startTime : [1e4, 0, 1];
 
             bpm.startBeat = bpm.startTime[0] + bpm.startTime[1] / bpm.startTime[2];
@@ -117,33 +117,31 @@ export default function RePhiEditChartConverter(_chart: any) {
 
             if (
                 eventLayer.speed.length <= 0 &&
-                eventLayer.moveX.length <= 0 &&
-                eventLayer.moveY.length <= 0 &&
-                eventLayer.alpha.length <= 0 &&
-                eventLayer.rotate.length <= 0
+                eventLayer.moveX.events.length <= 0 &&
+                eventLayer.moveY.events.length <= 0 &&
+                eventLayer.alpha.events.length <= 0 &&
+                eventLayer.rotate.events.length <= 0
             ) {
                 return;
             }
+            eventLayer.speed = utils.calculateRealTime(rawChart.BPMList, eventLayer.speed);
+            eventLayer.moveX.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.moveX.events);
+            eventLayer.moveY.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.moveY.events);
+            eventLayer.alpha.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.alpha.events);
+            eventLayer.rotate.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.rotate.events);
 
-            // 计算事件的真实时间
-            for (const name in eventLayer) {
-                if (!((eventLayer as any)[name] instanceof Array)) continue;
-                (eventLayer as any)[name] = utils.calculateRealTime(rawChart.BPMList, (eventLayer as any)[name]);
-            }
-
-            // 计算事件规范值
             eventLayer.speed.forEach((event: any) => {
                 event.value = event.value / (0.6 / (120 / 900));
             });
-            eventLayer.moveX.forEach((event) => {
+            eventLayer.moveX.events.forEach((event) => {
                 event.start = event.start / 1350;
                 event.end = event.end / 1350;
             });
-            eventLayer.moveY.forEach((event) => {
+            eventLayer.moveY.events.forEach((event) => {
                 event.start = event.start / 900;
                 event.end = event.end / 900;
             });
-            eventLayer.alpha.forEach((event) => {
+            eventLayer.alpha.events.forEach((event) => {
                 event.start = event.start / 255;
                 event.end = event.end / 255;
 
@@ -153,14 +151,14 @@ export default function RePhiEditChartConverter(_chart: any) {
                 event.start = event.start < -1 ? -1 : event.start;
                 event.end = event.end < -1 ? -1 : event.end;
             });
-            eventLayer.rotate.forEach((event) => {
+            eventLayer.rotate.events.forEach((event) => {
                 event.start = (Math.PI / 180) * event.start;
                 event.end = (Math.PI / 180) * event.end;
             });
-            eventLayer.moveX = fixEvent(eventLayer.moveX)
-            eventLayer.moveY = fixEvent(eventLayer.moveY)
-            eventLayer.alpha = fixEvent(eventLayer.alpha)
-            eventLayer.rotate = fixEvent(eventLayer.rotate)
+            eventLayer.moveX.events = fixEvent(eventLayer.moveX.events)
+            eventLayer.moveY.events = fixEvent(eventLayer.moveY.events)
+            eventLayer.alpha.events = fixEvent(eventLayer.alpha.events)
+            eventLayer.rotate.events = fixEvent(eventLayer.rotate.events)
             eventLayer.sort();
             judgeline.eventLayers.push(eventLayer);
         });
@@ -374,13 +372,28 @@ function convertChartFormat(rawChart: any) {
             judgeline.father = -1;
             judgeline.zOrder = 0;
 
-            judgeline.eventLayers.forEach((eventLayer: any) => {
-                for (const name in eventLayer) {
-                    eventLayer[name].forEach((event: any) => {
-                        event.easingLeft = 0;
-                        event.easingRight = 1;
-                    });
-                }
+            judgeline.eventLayers.forEach((eventLayer: EventLayer) => {
+                eventLayer.speed.forEach((event: any) => {
+                    event.easingLeft = 0;
+                    event.easingRight = 1;
+                });
+                eventLayer.moveX.events.forEach((event: any) => {
+                    event.easingLeft = 0;
+                    event.easingRight = 1;
+                });
+                eventLayer.moveY.events.forEach((event: any) => {
+                    event.easingLeft = 0;
+                    event.easingRight = 1;
+                });
+                eventLayer.alpha.events.forEach((event: any) => {
+                    event.easingLeft = 0;
+                    event.easingRight = 1;
+                });
+                eventLayer.rotate.events.forEach((event: any) => {
+                    event.easingLeft = 0;
+                    event.easingRight = 1;
+                });
+
             });
         });
     }

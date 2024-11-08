@@ -4,7 +4,7 @@ import EventLayer from '../eventlayer.js';
 import Note from '../note';
 
 import utils from './utils';
-import type { Event, Event2, bpmEvent, valueEvent } from '../baseEvents';
+import type { Event, OfficialChartEvent, BpmEvent, ValueEvent } from '../anim/type';
 import type { officialChartData } from '../types/index.js';
 import type { extendNoteData } from '../types/note.js';
 import { chart_log } from './index.js';
@@ -17,7 +17,7 @@ export default function OfficialChartConverter(_chart: officialChartData) {
     let rawChart = convertOfficialVersion(_chart);
     let notes: extendNoteData[] = [];
     let sameTimeNoteCount = {};
-    let bpmList: bpmEvent[] = [];
+    let bpmList: BpmEvent[] = [];
     
     chart.offset = rawChart.offset;
 
@@ -26,14 +26,14 @@ export default function OfficialChartConverter(_chart: officialChartData) {
         let events = new EventLayer();
         let judgelineNotes: any[] = [];
 
-        _judgeline.speedEvents.forEach((e: valueEvent) => {
+        _judgeline.speedEvents.forEach((e: ValueEvent) => {
             events.speed.push({
                 startTime: calcRealTime(e.startTime, _judgeline.bpm),
                 endTime: calcRealTime(e.endTime, _judgeline.bpm),
                 value: e.value
             });
         });
-        _judgeline.judgeLineMoveEvents.forEach((e: Event2) => {
+        _judgeline.judgeLineMoveEvents.forEach((e: OfficialChartEvent) => {
             events.moveX.push({
                 startTime: calcRealTime(e.startTime, _judgeline.bpm),
                 endTime: calcRealTime(e.endTime, _judgeline.bpm),
@@ -67,10 +67,10 @@ export default function OfficialChartConverter(_chart: officialChartData) {
         judgeline.eventLayers.push(events);
         judgeline.sortEvent();
 
-        judgeline.eventLayers[0].moveX = utils.arrangeSameValueEvent(judgeline.eventLayers[0].moveX);
-        judgeline.eventLayers[0].moveY = utils.arrangeSameValueEvent(judgeline.eventLayers[0].moveY);
-        judgeline.eventLayers[0].rotate = utils.arrangeSameValueEvent(judgeline.eventLayers[0].rotate);
-        judgeline.eventLayers[0].alpha = utils.arrangeSameValueEvent(judgeline.eventLayers[0].alpha);
+        judgeline.eventLayers[0].moveX.events = utils.arrangeSameValueEvent(judgeline.eventLayers[0].moveX.events);
+        judgeline.eventLayers[0].moveY.events = utils.arrangeSameValueEvent(judgeline.eventLayers[0].moveY.events);
+        judgeline.eventLayers[0].rotate.events = utils.arrangeSameValueEvent(judgeline.eventLayers[0].rotate.events);
+        judgeline.eventLayers[0].alpha.events = utils.arrangeSameValueEvent(judgeline.eventLayers[0].alpha.events);
 
         judgeline.calcFloorPosition();
 

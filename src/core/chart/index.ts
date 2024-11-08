@@ -3,14 +3,14 @@ import * as Convert from './convert';
 import { Sprite, Graphics, Text, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
 import Note from './note';
-import type { bpmEvent } from './baseEvents';
+import type { BpmEvent } from './anim/type';
 import Audio from '../audio';
 import { type PhiAssets, ResourceManager } from '../resource';
 import type { SizerData } from '../types/params';
 export default class Chart {
     judgelines: Judgeline[]
     notes: Note[]
-    bpmList: bpmEvent[]
+    bpmList: BpmEvent[]
     offset: number
     isLineTextureReaded: boolean
     music: Audio
@@ -88,10 +88,10 @@ export default class Chart {
         chart.judgelines.forEach((judgeline) => {
             judgeline.eventLayers.forEach((eventLayer) => {
                 /* eventLayer.speed = utils.arrangeSameSingleValueEvent(eventLayer.speed); */
-                eventLayer.moveX = arrangeLineEvents(eventLayer.moveX);
-                eventLayer.moveY = arrangeLineEvents(eventLayer.moveY);
-                eventLayer.rotate = arrangeLineEvents(eventLayer.rotate);
-                eventLayer.alpha = arrangeLineEvents(eventLayer.alpha);
+                eventLayer.moveX.events = arrangeLineEvents(eventLayer.moveX.events);
+                eventLayer.moveY.events = arrangeLineEvents(eventLayer.moveY.events);
+                eventLayer.rotate.events = arrangeLineEvents(eventLayer.rotate.events);
+                eventLayer.alpha.events = arrangeLineEvents(eventLayer.alpha.events);
             });
 
             for (const name in judgeline.extendEvent) {
@@ -288,7 +288,7 @@ export default class Chart {
 }
 
 
-export function arrangeLineEvents(events: any) {
+export function arrangeLineEvents(events: any[]) {
     let oldEvents = events.slice();
     let newEvents2 = [];
     let newEvents = [{ // 以 -99 开始
@@ -368,7 +368,7 @@ export function arrangeLineEvents(events: any) {
 }
 
 
-export function arrangeSingleValueLineEvents(events: any) {
+export function arrangeSingleValueLineEvents(events: any[]) {
     let oldEvents = events.slice();
     let newEvents = [oldEvents.shift()];
 

@@ -3,7 +3,7 @@ import utils from './convert/utils';
 import { Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import EventLayer from './eventlayer';
 import * as font from '../font'
-import type { floorPositionEvent, Event, valueEvent } from './baseEvents';
+import type { floorPositionEvent, Event, ValueEvent } from './anim/type';
 import { type PhiAssets, ResourceManager } from '../resource';
 import type { SizerData } from '../types/params';
 import { chart_log } from './convert';
@@ -34,10 +34,10 @@ export default class Judgeline {
     eventLayers: EventLayer[];
     floorPositions: floorPositionEvent[];
     extendEvent: {
-        color: valueEvent[],
+        color: ValueEvent[],
         scaleX: Event[],
         scaleY: Event[],
-        text: valueEvent[],
+        text: ValueEvent[],
         incline: Event[]
     };
     noteControls: {

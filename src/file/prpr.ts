@@ -2,7 +2,7 @@ import { PrprExtra } from "../core/prpr/prpr";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
 import type { PrPrExtraJSON, PrPrExtraEffect, PrPrExtraVideo } from "../core/prpr/types";
 import { buildBaseBpmEventData, buildRpeEventData, readBaseBpmEventData, readRpeEventData } from "./event";
-import type { rpeEvent } from "../core/chart/baseEvents";
+import type { RPEEvent } from "../core/chart/anim/type";
 
 export function buildVideoEventData(view: WriteBufferDataView, data: PrPrExtraVideo) {
     view.setString(data.path)
@@ -146,7 +146,7 @@ export function buildEffectData(view: WriteBufferDataView, data: PrPrExtraEffect
             }]
         }
     }
-    let allVar: Record<string, rpeEvent[]> = data.vars as any
+    let allVar: Record<string, RPEEvent[]> = data.vars as any
     view.setInt32(Object.keys(allVar).length)
     for (let _var in allVar) {
         view.setString(_var)

@@ -1,6 +1,6 @@
 import type { jsonEventLayer } from "../core/chart/types/judgeLine";
 import { number } from "../core/verify";
-import type { bpmEvent, Event, floorPositionEvent, rpeEvent, valueAndEvent, valueEvent } from "../core/chart/baseEvents";
+import type { BpmEvent, Event, floorPositionEvent, RPEEvent, ValueEvent } from "../core/chart/anim/type";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
 
 export function buildEventData(view: WriteBufferDataView, data: Event) {
@@ -20,7 +20,7 @@ export function readEventData(view: ReadBufferDataView): Event {
     return data
 }
 
-export function buildRpeEventData(view: WriteBufferDataView, data: rpeEvent) {
+export function buildRpeEventData(view: WriteBufferDataView, data: RPEEvent) {
     view.setInt32(data.startTime[0])
     view.setInt32(data.startTime[1])
     view.setInt32(data.startTime[2])
@@ -46,8 +46,8 @@ export function buildRpeEventData(view: WriteBufferDataView, data: rpeEvent) {
     if (data.end.length == 1) data.end = data.end[0]
 }
 
-export function readRpeEventData(view: ReadBufferDataView): rpeEvent {
-    let data: rpeEvent = {} as any;
+export function readRpeEventData(view: ReadBufferDataView): RPEEvent {
+    let data: RPEEvent = {} as any;
     data.startTime = [
         view.getInt32(),
         view.getInt32(),
@@ -77,7 +77,7 @@ export function readRpeEventData(view: ReadBufferDataView): rpeEvent {
     if (data.end.length == 1) data.end = data.end[0]
     return data
 }
-
+/*
 export function buildValueAndEventData(view: WriteBufferDataView, data: valueAndEvent) {
     view.setFloat64(data.startTime)
     view.setFloat64(data.endTime)
@@ -94,7 +94,7 @@ export function readValueAndEventData(view: ReadBufferDataView): valueAndEvent {
     data.end = view.getFloat64()
     data.value = view.getFloat64()
     return data
-}
+}*/
 
 export function buildFloorPositionEventData(view: WriteBufferDataView, data: floorPositionEvent) {
     view.setFloat64(data.startTime)
@@ -111,22 +111,22 @@ export function readFloorPositionEventData(view: ReadBufferDataView): floorPosit
     return data
 }
 
-export function buildNumberValueEventData(view: WriteBufferDataView, data: valueEvent) {
+export function buildNumberValueEventData(view: WriteBufferDataView, data: ValueEvent) {
     view.setFloat64(data.startTime)
     view.setFloat64(data.endTime)
     view.setFloat64(data.value)
 
 }
 
-export function readNumberValueEventData(view: ReadBufferDataView): valueEvent {
-    let data: valueEvent = {} as any;
+export function readNumberValueEventData(view: ReadBufferDataView): ValueEvent {
+    let data: ValueEvent = {} as any;
     data.startTime = view.getFloat64()
     data.endTime = view.getFloat64()
     data.value = view.getFloat64()
     return data
 }
 
-export function buildColorValueEventData(view: WriteBufferDataView, data: valueEvent) {
+export function buildColorValueEventData(view: WriteBufferDataView, data: ValueEvent) {
     view.setFloat64(data.startTime)
     view.setFloat64(data.endTime)
     view.setFloat64(data.value[0])
@@ -136,23 +136,23 @@ export function buildColorValueEventData(view: WriteBufferDataView, data: valueE
 
 }
 
-export function readColorValueEventData(view: ReadBufferDataView): valueEvent {
-    let data: valueEvent = {} as any;
+export function readColorValueEventData(view: ReadBufferDataView): ValueEvent {
+    let data: ValueEvent = {} as any;
     data.startTime = view.getFloat64()
     data.endTime = view.getFloat64()
     data.value = [view.getFloat64(), view.getFloat64(), view.getFloat64(), view.getFloat64()]
     return data
 }
 
-export function buildStringValueEventData(view: WriteBufferDataView, data: valueEvent) {
+export function buildStringValueEventData(view: WriteBufferDataView, data: ValueEvent) {
     view.setFloat64(data.startTime)
     view.setFloat64(data.endTime)
     view.setString(data.value)
 
 }
 
-export function readStringValueEventData(view: ReadBufferDataView): valueEvent {
-    let data: valueEvent = {} as any;
+export function readStringValueEventData(view: ReadBufferDataView): ValueEvent {
+    let data: ValueEvent = {} as any;
     data.startTime = view.getFloat64()
     data.endTime = view.getFloat64()
     data.value = view.getString()
@@ -233,7 +233,7 @@ export function readEventLayerData(view: ReadBufferDataView): jsonEventLayer {
     return data
 }
 
-export function buildBpmEventData(view: WriteBufferDataView, data: bpmEvent) {
+export function buildBpmEventData(view: WriteBufferDataView, data: BpmEvent) {
     view.setFloat64(data.startTime)
     view.setFloat64(data.endTime)
     view.setFloat64(data.bpm)
@@ -241,8 +241,8 @@ export function buildBpmEventData(view: WriteBufferDataView, data: bpmEvent) {
 
 }
 
-export function readBpmEventData(view: ReadBufferDataView): bpmEvent {
-    let data: bpmEvent = {} as any;
+export function readBpmEventData(view: ReadBufferDataView): BpmEvent {
+    let data: BpmEvent = {} as any;
     data.startTime = view.getFloat64()
     data.endTime = view.getFloat64()
     data.bpm = view.getFloat64()

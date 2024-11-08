@@ -1,6 +1,6 @@
 import Chart, { arrangeLineEvents, arrangeSingleValueLineEvents } from "../core/chart";
 import type { jsonJudgeLineData } from "../core/chart/types/judgeLine";
-import {  text } from "../core/verify";
+import { text } from "../core/verify";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
 import type { jsonNoteData } from "../core/chart/types/note";
 import Judgeline from "../core/chart/judgeline";
@@ -320,10 +320,10 @@ export class ChartFile {
         chart.judgelines.forEach((judgeline) => {
             judgeline.eventLayers.forEach((eventLayer) => {
                 /* eventLayer.speed = utils.arrangeSameSingleValueEvent(eventLayer.speed); */
-                eventLayer.moveX = arrangeLineEvents(eventLayer.moveX);
-                eventLayer.moveY = arrangeLineEvents(eventLayer.moveY);
-                eventLayer.rotate = arrangeLineEvents(eventLayer.rotate);
-                eventLayer.alpha = arrangeLineEvents(eventLayer.alpha);
+                eventLayer.moveX.events = arrangeLineEvents(eventLayer.moveX.events);
+                eventLayer.moveY.events = arrangeLineEvents(eventLayer.moveY.events);
+                eventLayer.rotate.events = arrangeLineEvents(eventLayer.rotate.events);
+                eventLayer.alpha.events = arrangeLineEvents(eventLayer.alpha.events);
             });
 
             for (const name in judgeline.extendEvent) {

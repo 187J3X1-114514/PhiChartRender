@@ -21,7 +21,7 @@ function calculateEventBeat(event: any) {
  * @param {Array} events 欲转换的事件组
  * @return {Array} 转换出的事件组
  */
-function calculateEventsBeat(events: any) {
+function calculateEventsBeat(events: any[]) {
     events.forEach((event: any) => {
         event = calculateEventBeat(event);
     });
@@ -76,7 +76,7 @@ function valueCalculator(event: any, Easings: any, currentTime: any, easingsOffs
 function calculateRealTime(_bpmList: any, _events: any) {
     let bpmList = _bpmList.slice();
     let events = _events.slice();
-
+    
     events.forEach((event: any) => {
         for (let bpmIndex = 0, bpmLength = bpmList.length; bpmIndex < bpmLength; bpmIndex++) {
             let bpm = bpmList[bpmIndex];
@@ -207,7 +207,7 @@ function calculateHoldBetween(_bpmList: any) {
  * @param {Array} _events 欲合并相同值的事件组
  * @return {Array} 已合并相同值的事件组
  */
-function arrangeSameValueEvent(_events: any) {
+function arrangeSameValueEvent(_events: any[]) {
     if (!_events || _events.length <= 0) return [];
 
     let events = _events.slice();
@@ -235,7 +235,7 @@ function arrangeSameValueEvent(_events: any) {
  * @param {Array} events 欲合并相同值的速度事件组
  * @return {Array} 已合并相同值的速度事件组
  */
-function arrangeSameSingleValueEvent(events: any) {
+function arrangeSameSingleValueEvent(events: any[]) {
     if (!events || events.length <= 0) return [];
 
     let newEvents = [];
