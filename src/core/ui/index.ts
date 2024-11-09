@@ -14,6 +14,7 @@ export default class UIManager implements baseUIManager {
         Score: UIElement,
         Name: UIElement,
         Level: UIElement,
+        Bar: UIElement
     }
     private game: PhiGame
     private size?: SizerData
@@ -43,7 +44,8 @@ export default class UIManager implements baseUIManager {
             Combo: hasAttachUIJL['combo'] ? hasAttachUIJL['combo'] : UIElement.from(attachUI.Combo, this),
             Score: hasAttachUIJL['score'] ? hasAttachUIJL['score'] : UIElement.from(attachUI.Score, this),
             Name: hasAttachUIJL['name'] ? hasAttachUIJL['name'] : UIElement.from(attachUI.Name, this),
-            Level: hasAttachUIJL['level'] ? hasAttachUIJL['level'] : UIElement.from(attachUI.Level, this)
+            Level: hasAttachUIJL['level'] ? hasAttachUIJL['level'] : UIElement.from(attachUI.Level, this),
+            Bar: hasAttachUIJL['bar'] ? hasAttachUIJL['bar'] : UIElement.from(attachUI.Bar, this)
         }
         this.backgrounds.big.texture = game.chart.bg
         this.backgrounds.small.texture = game.chart.bg
@@ -51,21 +53,29 @@ export default class UIManager implements baseUIManager {
         this.backgrounds.smallCover.rect(0, 0, this.backgrounds.small.texture.width, this.backgrounds.small.texture.height).fill({ color: 0x000 })
     }
     reset() { }
-    createSprites() {
-        let stage = this.game.renders.UIContainer
+    createElement() {
         this.element.Combo.create()
         this.element.ComboNumber.create()
         this.element.Score.create()
         this.element.Name.create()
         this.element.Level.create()
         this.element.Pause.create()
+        this.element.Bar.create()
+    }
+    addToScreen() {
+        let stage = this.game.renders.UIContainer
         stage.addChild(this.element.Combo.sprite)
         stage.addChild(this.element.ComboNumber.sprite)
         stage.addChild(this.element.Score.sprite)
         stage.addChild(this.element.Name.sprite)
         stage.addChild(this.element.Level.sprite)
         stage.addChild(this.element.Pause.sprite)
+        stage.addChild(this.element.Bar.sprite)
         stage.addChild(this.PauseBtnOutLine)
+    }
+    createSprites() {
+        this.createElement()
+        this.addToScreen()
         this.element.Pause.sprite.on("pointerdown", () => {
             this.pauseBtnClickCallBack()
         })
@@ -80,15 +90,20 @@ export default class UIManager implements baseUIManager {
         this.game.renders.gameContainer.addChild(this.backgrounds.smallCover)
         this.backgrounds.smallCover.alpha = 1 - this.game._settings.bgDim
         this.backgrounds.bigCover.alpha = 0.6
+        if (this.game.getAntialiasing().FXAA) this.PauseBtnOutLine.filters = this.game.getAntialiasing().FXAA!
+    }
+    resizeElement() {
+        this.element.Combo.resize(this.size!)
+        this.element.ComboNumber.resize(this.size!)
+        this.element.Score.resize(this.size!)
+        this.element.Name.resize(this.size!)
+        this.element.Level.resize(this.size!)
+        this.element.Pause.resize(this.size!)
+        this.element.Bar.resize(this.size!)
     }
     resizeSprites(size: SizerData, _isEnded: boolean) {
         this.size = size
-        this.element.Combo.resize(size)
-        this.element.ComboNumber.resize(size)
-        this.element.Score.resize(size)
-        this.element.Name.resize(size)
-        this.element.Level.resize(size)
-        this.element.Pause.resize(size)
+        this.resizeElement()
         this.backgroundContainer.x = 0
         this.backgroundContainer.y = 0
         this.backgrounds.big.position.set(0, 0)
@@ -134,6 +149,7 @@ export default class UIManager implements baseUIManager {
         this.element.Name.calcTime(currentTime, this.size!)
         this.element.Level.calcTime(currentTime, this.size!)
         this.element.Pause.calcTime(currentTime, this.size!)
+        this.element.Bar.calcTime(currentTime, this.size!)
         {
             if ((+this.game.judgement.score.text.combo) > 2) {
                 this.element.ComboNumber.setText(this.game.judgement.score.text.combo)
@@ -188,6 +204,7 @@ export default class UIManager implements baseUIManager {
         this.element.Name.calcTime(0, size)
         this.element.Level.calcTime(0, size)
         this.element.ComboNumber.calcTime(0, size)
+        this.element.Bar.calcTime(0, size)
         if (isStart) {
             this.setUIAniOffsetY(-((uiFadeInFn(progress) * 120) - 120))
         } else {
@@ -203,6 +220,7 @@ export default class UIManager implements baseUIManager {
 
         this.element.Name.sprite.y = this.element.Name.y + offset
         this.element.Level.sprite.y = this.element.Level.y + offset
+        this.element.Bar.sprite.y = this.element.Bar.y - offset
     }
 
     calcOtherAni() {
@@ -264,6 +282,14 @@ export default class UIManager implements baseUIManager {
                 x = this.settings.pos.x.Level
                 y = this.settings.pos.y.Level
                 break
+            case attachUI.Bar:
+                ox = 0
+                oy = 0
+                sx = 1
+                sy = 1
+                x = 0
+                y = 0
+                break
         }
         return {
             offsetX: ox,
@@ -273,6 +299,9 @@ export default class UIManager implements baseUIManager {
             X: x,
             Y: y
         } as UIElementSettings
+    }
+    getGameProgress(): number {
+        return this.game.chart.music.progress
     }
 }
 

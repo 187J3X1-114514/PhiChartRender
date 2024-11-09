@@ -319,38 +319,6 @@ mdui-top-app-bar *#avatar {
     }
 }
 
-
-.fadein-scale {
-    animation: scale-in 0.3s var(--mdui-motion-easing-emphasized-accelerate);
-    animation-fill-mode: forwards;
-    transform: scale(0.8);
-}
-
-@keyframes scale-in {
-    0% {
-        transform: scale(0.9);
-    }
-
-    25% {
-        transform: scale(1.05);
-    }
-
-    50% {
-        transform: scale(0.95);
-    }
-
-    90% {
-        transform: scale(1.01);
-    }
-
-    to {
-        transform: scale(1.0)
-    }
-}
-
-
-
-
 .arrow-active {
     transform: rotate(180deg);
 }
@@ -670,7 +638,6 @@ mdui-navigation-drawer {
 #top-app-bar {
     /*background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.2);*/
     left: 80px !important;
-    z-index: 3 !important;
     box-shadow: 0 2.75px 9px 0 rgba(var(--mdui-color-shadow), 40%), 0 0.25px 3px 0 rgba(var(--mdui-color-shadow), 3.9%);
 }
 

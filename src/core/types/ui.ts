@@ -60,8 +60,10 @@ export enum attachUI {
     Score,
     Name,
     Level,
+    Bar
 }
 
 export abstract class baseUIManager{
     abstract getUIElementSettings(type:attachUI):UIElementSettings
+    abstract getGameProgress():number
 }

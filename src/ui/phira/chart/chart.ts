@@ -329,7 +329,6 @@ export class ChartPage {
         this.cards!.append(rootCard)
         setTimeout(() => {
             rootCard.style.opacity = '1'
-            rootCard.classList.add("fadein-scale")
         }, 100 + this.chartCount * 60)
         this.resize()
         rootCard.addEventListener("click", () => {

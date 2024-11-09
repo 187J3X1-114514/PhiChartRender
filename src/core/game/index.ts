@@ -17,7 +17,6 @@ const uk = (undefined as unknown) as any
 const ukObj = ({} as unknown) as any
 export default class PhiGame {
     sprites: {
-        progressBar: Graphics,
         fakeJudgeline: Sprite
     } = ukObj
     chart: Chart = uk
@@ -72,6 +71,8 @@ export default class PhiGame {
     private antialiasing: Antialiasing = uk
     public renderTarget: RenderTarget = uk
     private async init(_params: GameParams) {
+        if (_params.settings.noteScale) _params.settings.noteScale = 8080 / _params.settings.noteScale;
+        (window as any).curPhiGame = this
         this._params = _params
         let params = { ..._params };
         if (!params.render) params.render = {};
@@ -118,7 +119,7 @@ export default class PhiGame {
         this.renders.UIContainer = new Container();
         this.renders.UIContainer.zIndex = 30;
         this.renders.mainContainer.addChild(this.renders.UIContainer);
-
+        this.renders.UIContainer.visible = false
         this.renders.videoContainer = new Container();
         this.renders.videoContainer.zIndex = -4;
         this.renders.gameContainer.addChild(this.renders.videoContainer);
@@ -159,7 +160,7 @@ export default class PhiGame {
         /* ===== 用户设置暂存 ===== */
         this._settings = {
             resolution: verify.number(params.render.resolution, window.devicePixelRatio, 1),
-            noteScale: verify.number(params.settings.noteScale, 8000),
+            noteScale: verify.number(params.settings.noteScale, 8080),
             bgDim: verify.number(params.settings.bgDim, 0.5, 0, 1),
             offset: verify.number(params.settings.audioOffset, 0),
             speed: verify.number(params.settings.speed, 1, 0, 2),
@@ -173,8 +174,10 @@ export default class PhiGame {
         };
         this.renderTarget = new RenderTarget()
         this.antialiasing = new Antialiasing(this.app)
+        this.initRender()
         this.ui = new UIManager(this)
         this.ui.createSprites()
+        this.ui.backgroundContainer.zIndex = 9999999
         this.effects.setGame(this)
         this.effects.init()
         this.chart.music.reset();
@@ -188,10 +191,11 @@ export default class PhiGame {
 
         this.resize(false);
         if (_params.render.resizeTo) _params.render.resizeTo.append(this.app.canvas as HTMLCanvasElement)
-        this.initRender()
+
     }
 
     createSprites() {
+
         this.app.stage.eventMode = "static"
         this.rootContainer.eventMode = "static"
         this.renders.gameContainer.eventMode = "static"
@@ -218,17 +222,11 @@ export default class PhiGame {
         this.judgement.stage = this.renders.UIContainer;
         this.judgement.createSprites(this._settings.showInputPoint);
 
-        // 进度条
-        this.sprites.progressBar = new Graphics();
-        this.sprites.progressBar.alpha = 0.75;
-        this.sprites.progressBar.zIndex = 99999;
-
-        this.renders.UIContainer.addChild(this.sprites.progressBar);
-
         // 假判定线，过场动画用
         this.sprites.fakeJudgeline = new Sprite(this.assets.judgeLine);
+        this.sprites.fakeJudgeline.visible = false
         this.sprites.fakeJudgeline.anchor.set(0.5);
-        this.sprites.fakeJudgeline.zIndex = 99999;
+        this.sprites.fakeJudgeline.zIndex = 999;
         this.sprites.fakeJudgeline.scale.y = this.renders.sizer.lineHeightScale
         if (this._settings.showAPStatus) this.sprites.fakeJudgeline.tint = 0xFFECA0;
         this.renders.UIContainer.addChild(this.sprites.fakeJudgeline);
@@ -255,8 +253,9 @@ export default class PhiGame {
         this.renders.mainContainer.sortChildren();
         this.rootContainer.sortChildren();
         this.resize();
-        this.ui.backgroundContainer.zIndex = 9999999
-        this.sprites.progressBar.x = this.sprites.progressBar.width
+        this.renders.gameContainer.visible = false
+        this.ui.backgroundContainer.visible = true
+        this.ui.backgroundContainer.zIndex = 9999999999
 
     }
     upFPS(d: Ticker) {
@@ -272,7 +271,6 @@ export default class PhiGame {
         this.renders.mainContainer.interactive = true
         this.resize();
         this.effects.reset()
-        this.ui.backgroundContainer.zIndex = 0
         if (this.renders.fpsText) {
             this.app.ticker.remove((d) => {
                 this.upFPS(d)
@@ -291,10 +289,13 @@ export default class PhiGame {
         this._gameStartTime = Date.now();
         this.chart.noteJudgeCallback = this.judgement.calcNote;
         this.app.ticker.add(() => this.gameTick());
+        this.sprites.fakeJudgeline.visible = true
+        this.renders.UIContainer.visible = true
+        this.renders.gameContainer.visible = true
+        this.ui.backgroundContainer.zIndex = 0
 
         for (const judgeline of this.chart.judgelines) {
             if (!judgeline.sprite) continue;
-
             judgeline.sprite.alpha = 0;
         };
         for (const note of this.chart.notes) {
@@ -452,15 +453,6 @@ export default class PhiGame {
         }
 
         if (!this._isEnded && this.sprites) {
-            if (this.sprites.progressBar) {
-                let PBarW = this.renders.sizer.width
-                let PBarH = 12
-                let PBarWW = 3
-                this.sprites.progressBar.clear()
-                this.sprites.progressBar.rect(0, 0, PBarW - PBarWW, PBarH).fill({ color: "#919191" })
-                this.sprites.progressBar.rect(PBarW - PBarWW, 0, PBarWW, PBarH).fill({ color: "#FFFFFF" })
-                this.sprites.progressBar.scale.y = this.renders.sizer.heightPercent * 0.85
-            }
 
             if (this.sprites.fakeJudgeline) {
                 this.sprites.fakeJudgeline.position.x = this.renders.sizer.width / 2;
@@ -568,7 +560,6 @@ export default class PhiGame {
                         judgement.calcTick(currentTime);
                         for (let x = 0, length = functions.tick.length; x < length; x++) functions.tick[x](this, currentTime);
                     }
-                    sprites.progressBar.x = -(sprites.progressBar as Graphics).width * (1 - (currentTime / chart.music.duration))
                     break;
                 }
             case 2:
@@ -583,13 +574,14 @@ export default class PhiGame {
                 }
         }
     }
-
+    easeInOutCubic(x: number): number {
+        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    }
     calcGameAnimateTick(isStart = true) {
         let _progress = (Date.now() - (isStart ? this._gameStartTime : this._gameEndTime)) / 1000,
             progress = (isStart ? 1 - Math.pow(1 - _progress, 4) : Math.pow(1 - _progress, 4));
-        this.sprites.progressBar.position.y = -(this.renders.sizer.heightPercent * 12) * (1 - progress);
-        this.sprites.fakeJudgeline.width = this.renders.sizer.width * progress;
-
+        this.sprites.fakeJudgeline.width = this.renders.sizer.width * this.easeInOutCubic(progress);
+        this.renders.gameContainer.alpha = progress;
         if (_progress >= 1) {
             if (isStart) {
                 this._animateStatus = 1;
@@ -659,17 +651,20 @@ export default class PhiGame {
     }
 
     private initRender() {
+        this.antialiasing.initFXAA()
         if (this._params.settings.antialias && this._params.settings.antialiasType == 1) {
-            this.antialiasing.initFXAA()
+
         }
         this.app.stage.addChild(this.rootContainer)
-        console.log(this.app)
     }
 
     static async create(params: GameParams) {
         const game = new this()
         await game.init(params)
         return game
+    }
+    getAntialiasing() {
+        return this.antialiasing
     }
 }
 

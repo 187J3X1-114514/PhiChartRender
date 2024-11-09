@@ -46,7 +46,7 @@ export class PlayS {
             //width: document.documentElement.clientWidth,
             //height: document.documentElement.clientHeight,
             autoDensity: true,
-            antialias: false,
+            antialias: true,
             //backgroundAlpha: 1,
             hello: true,
             resizeTo: document.documentElement,
@@ -63,7 +63,7 @@ export class PlayS {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1, antialias: true, antialiasType: 1
+                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1, antialias: false, antialiasType: 1,noteScale:1.2
             }
         })
         let r = new ResizeObserver(() => { this.game!.resize(true) })

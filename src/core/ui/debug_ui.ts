@@ -30,6 +30,9 @@ export default class debugUIManger implements baseUIManager {
             Level: UIElement.from(attachUI.Level, this)
         }
     }
+    getGameProgress(): number {
+        return 0.5
+    }
     reset() { }
     createSprites() {
         this.element.Combo.create()

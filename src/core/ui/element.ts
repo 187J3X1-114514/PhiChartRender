@@ -1,7 +1,7 @@
 import EventLayer from '../chart/eventlayer';
 import * as font from '../font'
 import type { Event, ValueEvent } from '../chart/anim/type';
-import { Sprite, Text, TextStyle } from 'pixi.js';
+import { Graphics, Sprite, Text, TextStyle } from 'pixi.js';
 import { type SizerData } from '../types/params';
 import { pauseButton } from './tex';
 import Judgeline from '../chart/judgeline';
@@ -9,7 +9,7 @@ import { attachUI, type UIElementSettings, baseUIManager } from "../types/ui"
 
 export class UIElement {
     private eventLayers: EventLayer[];
-    public sprite: Text | Sprite = new Sprite()
+    public sprite: Text | Sprite | Graphics = undefined as any
     private textStyle?: TextStyle
     private extendEvent: {
         color: ValueEvent[],
@@ -37,6 +37,7 @@ export class UIElement {
     public baseAlpha: number = 1
     public settings: UIElementSettings = undefined as any
     private uiManager: baseUIManager
+    private sizerData?: SizerData
     private constructor(type: attachUI, ui: baseUIManager) {
         this.eventLayers = []
         this.uiManager = ui
@@ -54,7 +55,8 @@ export class UIElement {
             c.height = 4096
             return c.getContext("2d")!
         })()
-        this.isText = this.type == attachUI.Pause ? false : true
+
+        this.isText = (this.type == attachUI.Pause || this.type == attachUI.Bar) ? false : true
     }
     static from(opt: Judgeline | attachUI, ui: baseUIManager): UIElement {
         let e
@@ -84,6 +86,9 @@ export class UIElement {
                 case 'level':
                     type = attachUI.Level
                     break
+                case 'bar':
+                    type = attachUI.Bar
+                    break
             }
             e = new this(type, ui)
             e.settings = ui.getUIElementSettings(type)
@@ -103,9 +108,16 @@ export class UIElement {
     }
     create() {
         if (!this.isText) {
-            this.sprite = new Sprite(pauseButton)
-            this.sprite.eventMode = 'static';
-            this.sprite.cursor = 'pointer';
+            if (this.type == attachUI.Pause) {
+                this.sprite = new Sprite(pauseButton)
+                this.sprite.eventMode = 'static';
+                this.sprite.cursor = 'pointer';
+            }
+            if (this.type == attachUI.Bar) {
+                this.sprite = new Graphics()
+                this.baseAlpha = 0.8
+            }
+
         } else {
             let textAlign = "center"
             switch (this.type) {
@@ -130,7 +142,8 @@ export class UIElement {
             })
         }
         this.sprite.zIndex = 114514
-        this.sprite.anchor.set(0.5, 0.5)
+        if (!(this.sprite instanceof Graphics)) this.sprite.anchor.set(0.5, 0.5);
+        this.sprite.alpha = 0
     }
 
     calcTime(currentTime: number, size: SizerData) {
@@ -142,6 +155,7 @@ export class UIElement {
         this.deg = 0
         this.scaleX = 1
         this.scaleY = 1
+        this.sizerData = size
         if (this.hasEvent) {
             let __: {
                 alpha: boolean;
@@ -215,7 +229,15 @@ export class UIElement {
             this.sprite.rotation = 0
         }
 
-
+        if (this.type == attachUI.Bar && this.sprite instanceof Graphics) {
+            let PBarW = this.sizerData!.width * this.uiManager.getGameProgress()
+            let PBarH = 12
+            let PBarWW = 3
+            this.sprite.clear()
+            this.sprite.rect(0, 0, PBarW - PBarWW, PBarH).fill({ color: "#919191" })
+            this.sprite.rect(PBarW - PBarWW, 0, PBarWW, PBarH).fill({ color: "#FFFFFF" })
+            this.sprite.scale.y = this.sizerData!.heightPercent * 0.85
+        }
     }
     setText(v?: string, f: boolean = false) {
         if (this.isText && v) {
@@ -231,16 +253,16 @@ export class UIElement {
         switch (this.type) {
             case attachUI.ComboNumber:
                 this.offsetX = 0
-                this.offsetY = 0//-this.sprite.height / 2.2
+                this.offsetY = 0
                 break
             case attachUI.Combo:
                 this.offsetX = 0
-                this.offsetY = 0//this.uiManger.element.ComboNumber.offsetY
+                this.offsetY = 0
                 this.baseAlpha = 0.8
                 break
             case attachUI.Score:
                 this.offsetX = -this.sprite.width / 2
-                this.offsetY = 0//this.uiManger.element.ComboNumber.offsetY
+                this.offsetY = 0
                 break
             case attachUI.Name:
                 this.offsetX = this.sprite.width / 2
@@ -249,6 +271,9 @@ export class UIElement {
                 this.offsetX = -this.sprite.width / 2
                 break
             case attachUI.Pause:
+                this.offsetX = 0
+                break
+            case attachUI.Bar:
                 this.offsetX = 0
                 break
         }
@@ -289,40 +314,20 @@ export class UIElement {
             }
             this.baseScaleX = size.heightPercent
             this.baseScaleY = size.heightPercent
-        } else {
+        } else if (this.type == attachUI.Pause) {
             this.baseScaleX = size.heightPercent * this.settings.scaleX
             this.baseScaleY = size.heightPercent * this.settings.scaleY
             this.x = size.width * this.settings.X
             this.y = size.height * this.settings.Y
+        } else {
+            this.baseScaleX = 1
+            this.baseScaleY = 1
+            this.x = 0
+            this.y = 0
         }
 
     }
-    /*
-    calcAni(size: SizerData, isStart: boolean, progress: number) {
-        this.calcTime(0, size)
-        let isTop = this.type == attachUI.Pause || this.type == attachUI.Score || this.type == attachUI.Combo || this.type == attachUI.ComboNumber
-        progress = Math.min(Math.max(progress, 0), 1)
-        if (isStart) {
-            let y = this.y + this.offsetY
-            let offsetY1 = this.sprite.height
-            let offsetY2 = easeInOutCubic(1 - progress) * offsetY1 * (isTop ? -1 : 1)
-            let minY = isTop ? y - offsetY1 : y
-            let maxY = isTop ? y : y + offsetY1
-            this.sprite.y = Math.min(Math.max(y + offsetY2, minY), maxY)
-        } else {
-            let y = this.y + this.offsetY
-            let offsetY2 = easeOutCubic(progress) * y * (isTop ? -3 : 3)
-            this.sprite.y = (y + offsetY2)
-        }
-    }*/
     updataSettings() {
         this.settings = this.uiManager.getUIElementSettings(this.type)
     }
 }
-/*
-function easeInOutCubic(x: number): number {
-    return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-}
-function easeOutCubic(x: number): number {
-    return 1 - Math.pow(1 - x, 3);
-}*/

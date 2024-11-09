@@ -37,13 +37,6 @@ export class ResourceManager {
                 case FileType.CHART:
                     try {
                         let text = await loadText(file)
-                        let yes = true
-                        let info = await ChartInfo.from(file, this)
-                        let t = file.name.split('/')
-                        t.pop()
-                        info.setRoot(t.join("/"))
-                        let n_ = info.chart.split('/')[info.chart.split('/').length - 1]
-                        if (yes && (n_ != "" && n_ != undefined)) this.charts[n_] = info
                         loadFile = await Chart.from(text)
                     } catch (e) {
                         log.error("加载铺面时出错 ->", e, "源文件 ->", file.name)
@@ -75,13 +68,6 @@ export class ResourceManager {
                         }
                     } else {
                         try {
-                            let yes = true
-                            let info = await ChartInfo.from(file, this)
-                            let t = file.name.split('/')
-                            t.pop()
-                            info.setRoot(t.join("/"))
-                            let n_ = info.chart.split('/')[info.chart.split('/').length - 1]
-                            if (yes && (n_ != "" && n_ != undefined)) this.charts[n_] = info
                             loadFile = await Chart.from(json)
                         } catch (e) {
                             log.error("加载铺面时出错 ->", e, "源文件 ->", file.name)

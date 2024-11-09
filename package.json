@@ -1,6 +1,6 @@
 {
   "name": "phigros_sim_plus",
-  "version": "v0.1.0",
+  "version": "v0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
