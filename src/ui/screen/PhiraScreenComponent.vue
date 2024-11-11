@@ -33,5 +33,5 @@ export default {
 </script>
 
 <template>
-    <div ref="root"></div>
+    <div ref="root" style="transition: all 0.2 ease;"></div>
 </template>

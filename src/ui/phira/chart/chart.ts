@@ -42,6 +42,8 @@ export class ChartPage {
     public pagesBtn1: SegmentedButton = new SegmentedButton()
     public pagesBtn2: SegmentedButton = new SegmentedButton()
 
+    private pagesSpan = document.createElement("span")
+
     private constructor() {
 
     }
@@ -152,6 +154,8 @@ export class ChartPage {
             return _
         })())
         this.pagesBtnG.classList.add("hide")
+        this.pagesSpan.classList.add("hide")
+        this.pagesSpan.classList.add("phira-chart-page-span")
         this.updataPageBtn()
 
         this.searchDiv = document.createElement("div")
@@ -180,7 +184,6 @@ export class ChartPage {
         this.searchBtn = new Button()
         this.searchBtn.variant = "filled"
         this.searchBtn.icon = 'search'
-        this.searchBtn.endIcon = 'arrow_forward'
         this.searchBtn.innerText = I18N.get("ui.screen.phira.chart.text.search")
         this.searchBtn.fullWidth = true
         this.searchDiv.classList.add("search-div")
@@ -195,6 +198,9 @@ export class ChartPage {
         this.rootElement.append(this.searchDiv)
         this.rootElement.append(this.cards)
         this.rootElement.append(this.pagesBtnG)
+        this.rootElement.append(document.createElement("br"))
+        this.rootElement.append(this.pagesSpan)
+
         this.searchBtn.addEventListener("click", async () => {
             this.searchBtn.disabled = true
             this.searchBtn.loading = true
@@ -205,6 +211,11 @@ export class ChartPage {
         })
 
     }
+
+    private updataPagesSpan() {
+        this.pagesSpan.innerText = I18N.get("ui.screen.phira.chart.text.pages").replace("---", this.maxPage.toFixed(0))
+    }
+
     private resize() {
         let ratio = self.devicePixelRatio == 1 ? 1 : self.devicePixelRatio * 0.4
         this.width = Math.min(Math.max((Math.floor(this.cards!.clientWidth * ratio / 270) > 0 ? Math.floor(this.cards!.clientWidth * ratio / 270) : Math.ceil(this.cards!.clientWidth * ratio / 270)), 1), 5)
@@ -349,6 +360,7 @@ export class ChartPage {
     }
     async searchChart() {
         this.pagesBtnG.classList.add("hide")
+        this.pagesSpan.classList.add("hide")
         this.chartCount = 0
         if (account == undefined) {
             snackbar({
@@ -356,6 +368,7 @@ export class ChartPage {
                 action: I18N.get("ui.screen.phira.login.text.login_btn"),
                 onActionClick: async () => {
                     this.pagesBtnG.classList.remove("hide")
+                    this.pagesSpan.classList.remove("hide")
                     await reqLogin()
                 },
                 messageLine: 2
@@ -367,17 +380,19 @@ export class ChartPage {
         scrollIntoView(document.body)
         await this.removeCard()
         let r = await api.search(
-            api.getSearchOrder(this.select1!.value.slice(0, this.select1!.value.length - 1) as string),
-            api.getSearchDivision(this.select2!.value.slice(0, this.select2!.value.length - 1) as string),
+            PhiraAPI.getSearchOrder(this.select1!.value.slice(0, this.select1!.value.length - 1) as string),
+            PhiraAPI.getSearchDivision(this.select2!.value.slice(0, this.select2!.value.length - 1) as string),
             this.search!.value, 30, this.page, this.type
         )
         this.maxPage = r.maxPages
+        this.updataPagesSpan()
         this.updataPageBtn()
 
         for (let v of r.results) {
             this.createChartCard(v)
         }
         this.pagesBtnG.classList.remove("hide")
+        this.pagesSpan.classList.remove("hide")
         let a = setInterval(() => {
             let c = true
             for (let b of this.cards!.getElementsByTagName("mdui-card")) {
@@ -498,8 +513,8 @@ export class ChartPage {
         })
         try {
             await chart.load()
-            await addChartInfo(chart.getChart().src, chartid)
-        } catch(e) {
+            await addChartInfo(chart.getChart(), chartid)
+        } catch (e) {
             console.log(e)
             await removeChartByID(chartid)
             snackbar({

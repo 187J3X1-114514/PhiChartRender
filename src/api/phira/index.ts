@@ -215,10 +215,10 @@ export class PhiraAPI {
         r.maxPages = Math.ceil(r.count / pageNum)
         return r
     }
-    getSearchOrder(string: string): SearchOrder | undefined {
+    static getSearchOrder(string: string): SearchOrder | undefined {
         return Object.values(SearchOrder).find(order => order === string) as SearchOrder | undefined;
     }
-    getSearchDivision(string: string): SearchDivision | undefined {
+    static getSearchDivision(string: string): SearchDivision | undefined {
         return Object.values(SearchDivision).find(order => order === string) as SearchDivision | undefined;
     }
 }

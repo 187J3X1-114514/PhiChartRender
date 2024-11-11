@@ -155,7 +155,7 @@ export default async function loginPage(t: Element): Promise<loginResult> {
         })
         if (await DB.checkInfoData("phira")) {
             try {
-                let p = getCookie(await DB.getInfoData("phira")!)
+                let p = getCookie(await DB.getInfoData("phira")! as string)
                 if (p.email != "" && p.password != "") {
                     emailInput.value = p.email
                     passwordInput.value = p.password

@@ -60,6 +60,7 @@
         "ui.screen.phira.chart.text.error.text.not_login": "未登陆到Phira账号，请先登录Phira账号再进行接下来的操作",
         "ui.screen.phira.chart.text.last_page":"上一页",
         "ui.screen.phira.chart.text.next_page":"下一页",
+        "ui.screen.phira.chart.text.pages":"共 --- 页",
         
         "html.login.phira.in":"登陆Phira账户",
         "html.login.phira.out":"登出Phira账户",

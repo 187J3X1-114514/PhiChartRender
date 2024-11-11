@@ -1,7 +1,9 @@
 import localForage from "localforage";
 import { newLogger } from "../core/log";
 import { I18N } from "./i18n";
-import { BaseChartInfo } from "@/core/chart/chartinfo";
+import { BaseChartInfo, ChartInfo as ChartInfoClass } from "@/core/chart/chartinfo";
+import { Texture } from "pixi.js";
+import { loadTextures } from "@/core/resource/utils";
 
 const log = newLogger("Database")
 localForage.config({
@@ -13,10 +15,10 @@ localForage.config({
     description: 'user data'
 })
 export const UserInfoDB = localForage.createInstance({
-    driver: localForage.LOCALSTORAGE,
+    driver: localForage.INDEXEDDB,
     name: 'USERINFO',
     version: 1.0,
-    size: 2000000,
+    size: 200000000,
     storeName: 'keyvaluepairs',
     description: 'user info'
 })
@@ -83,7 +85,7 @@ export async function getOrCreateCacheDATACallback(url: string, callback: (url: 
     }
 }
 
-export async function getInfoData(key: string): Promise<string> {
+export async function getInfoData(key: string): Promise<string | Blob> {
     return new Promise((r) => {
         UserInfoDB.getItem(key, (e, v) => {
             if (e != null) log.warn(`${I18N.get("log.try_get_userinfo_error")}${key}：${e}`);
@@ -92,7 +94,7 @@ export async function getInfoData(key: string): Promise<string> {
     })
 }
 
-export async function setInfoData(key: string, value: string) {
+export async function setInfoData(key: string, value: string | Blob) {
     return new Promise((r) => {
         UserInfoDB.setItem(key, value, (e) => {
             if (e != null) log.warn(`${I18N.get("log.try_cache_userinfo_error")}${key}：${e}`);
@@ -137,25 +139,29 @@ export async function checkChartByID(id: string) {
     return CacheChartInfo[id] != undefined
 }
 
-export async function addChartInfo(info: BaseChartInfo, id: string | number) {
-    CacheChartInfo[id] = info as any
+export async function addChartInfo(info: ChartInfoClass, id: string | number) {
+    let chartinfo = info.src as ChartInfo
+    await setInfoData(`CHARTIMG+${chartinfo.illustration}`, await info.resManager!.srcFiles[info.illustration]!.getBlob())
+    chartinfo.image = `CHARTIMG+${chartinfo.illustration}`
+    CacheChartInfo[id] = chartinfo
     await saveAllChartInfo()
 }
 
-interface ChartInfo {
+export interface ChartInfo {
     name: string
     music: string
     illustration: string
     chart: string
     charter: string
     level: string
+    image?: string
 }
 
 const CHARTINFO_KEY = "CHARTINFO"
 
 export async function getAllChartInfo(): Promise<Record<string, ChartInfo>> {
     if (await checkInfoData(CHARTINFO_KEY)) {
-        return JSON.parse(await getInfoData(CHARTINFO_KEY))
+        return JSON.parse(await getInfoData(CHARTINFO_KEY) as any)
     } else {
         return {}
     }

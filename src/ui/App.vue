@@ -2,13 +2,14 @@
     <div ref="app">
         <ScreenComponent :screen-name="screenName" :other-data="screenOtherData"></ScreenComponent>
     </div>
-    <span class="info" id="info">{{ `V${PACKAGE_JSON.version.split('v').pop()}-${GIT_HASH.slice(0,
-        7).toLocaleUpperCase()}+pixi_${PIXI_VERSION}@${BUILD_ENV.platform}/${BUILD_ENV.arch}/node${BUILD_ENV.versions.node}@BUILDTIME_${BUILDTIME}`
-        }}</span>
+    <!--
+    <span class="info" id="info">{{ verText }}</span>
+    -->
     <mdui-top-app-bar ref="topAppBar" variant="hide" id="top-app-bar" style="display: flex" class="left-all">
         <div class="top-app-bar-blur"></div>
-        <mdui-top-app-bar-title id="top-app-bar-title">Phigros Simulator Plus {{ 'V' +
-            PACKAGE_JSON.version.split('v').pop() }}</mdui-top-app-bar-title>
+        <LogoComponent style="width: 2em;height: 2em;padding-left: 1em;"></LogoComponent>
+        <mdui-top-app-bar-title id="top-app-bar-title">
+            Phigros Simulator Plus {{ 'V' + PACKAGE_JSON.version.split('v').pop() }}</mdui-top-app-bar-title>
         <div style="flex-grow: 1" id="top-app-bar-other">
         </div>
         <div style="margin: auto 0;height: 100%;white-space:nowrap" id="top-app-bar-other">
@@ -51,11 +52,10 @@
         </div>
     </mdui-top-app-bar>
 
-    <mdui-navigation-rail ref="navigationRail" value="loc" id="navigation-rail"
-        @change="navigationRailTab = navigationRail.value; screenName = navigationRailTab">
+    <mdui-navigation-rail ref="navigationRail" value="welcome" id="navigation-rail">
         <div class="navigation-rail-blur"></div>
-        <mdui-button-icon @click="navigationDrawer.open = !navigationDrawer.open" icon="menu" slot="top"
-            id="top-app-bar-menu" ref="top-app-bar-menu"></mdui-button-icon>
+        <mdui-button-icon @click="navigationDrawer.open = (!navigationDrawer.open) && screenName != 'welcome'"
+            icon="menu" slot="top" id="top-app-bar-menu" ref="top-app-bar-menu"></mdui-button-icon>
         <mdui-button-icon icon="bug_report" slot="bottom" id="debug-btn"></mdui-button-icon>
         <mdui-button-icon icon="settings" slot="bottom"></mdui-button-icon>
         <mdui-tooltip placement="right" slot="bottom" content="{{ I18N('html.src') }}" id="src-text-tooltip">
@@ -63,18 +63,22 @@
                 onclick='window.open("https://github.com/187J3X1-114514/PhiChartRender")'></mdui-button-icon>
         </mdui-tooltip>
 
-        <mdui-navigation-rail-item icon="cloud" class="black-font" id="tab-phira" value="phira"><span>{{
-            I18N("html.tab.phira") }}</span></mdui-navigation-rail-item>
-        <mdui-navigation-rail-item icon="videocam" class="black-font" id="tab-rec" value="rec"><span>{{
-            I18N("html.tab.rec") }}</span></mdui-navigation-rail-item>
-        <mdui-navigation-rail-item icon="insert_drive_file" value="loc" id="tab-local" class="black-font"><span>{{
-            I18N("html.tab.local") }}</span></mdui-navigation-rail-item>
+        <mdui-navigation-rail-item @click="changeScreen('phira')" icon="cloud" class="black-font" id="tab-phira"
+            value="phira"><span>{{
+                I18N("html.tab.phira") }}</span></mdui-navigation-rail-item>
+        <mdui-navigation-rail-item @click="changeScreen('rec')" icon="videocam" class="black-font" id="tab-rec"
+            value="rec"><span>{{
+                I18N("html.tab.rec") }}</span></mdui-navigation-rail-item>
+        <mdui-navigation-rail-item @click="changeScreen('loc')" icon="insert_drive_file" value="loc" id="tab-local"
+            class="black-font"><span>{{
+                I18N("html.tab.local") }}</span></mdui-navigation-rail-item>
+        <mdui-navigation-rail-item ref="navigationRailItem_WEL" value="welcome"
+            style="display: none;"></mdui-navigation-rail-item>
     </mdui-navigation-rail>
-    <mdui-navigation-drawer modal close-on-esc id="navigation-drawer" ref="navigationDrawer" close-on-overlay-click
-        style="top: 64px;">
+    <mdui-navigation-drawer modal close-on-esc id="navigation-drawer" ref="navigationDrawer" close-on-overlay-click>
         <div class="navigation-drawer-blur"></div>
         <mdui-list>
-            <mdui-collapse v-show="navigationRailTab === 'phira'" accordion id="phira-drawer" class="collapse-rail">
+            <mdui-collapse v-show="screenName === 'phira'" accordion id="phira-drawer" class="collapse-rail">
                 <mdui-collapse-item>
                     <mdui-list-item rounded slot="header" icon="class"><span id="html.phira.class-chart">{{
                         I18N("html.phira.class-chart") }}</span><mdui-icon slot="end-icon" class="arrow"
@@ -95,7 +99,7 @@
 
                 </mdui-collapse-item>
             </mdui-collapse>
-            <div id="rec-drawer" v-show="navigationRailTab === 'rec'" class="collapse-rail">
+            <div id="rec-drawer" v-show="screenName === 'rec'" class="collapse-rail">
                 <mdui-list-item rounded nonclickable class="dev-text">
                     <span id="rec-dev-text">
                         {{ I18N("html.dev") }}
@@ -103,7 +107,7 @@
 
                 </mdui-list-item>
             </div>
-            <mdui-collapse accordion id="loc-drawer" v-show="navigationRailTab === 'loc'" class="collapse-rail">
+            <mdui-collapse accordion id="loc-drawer" v-show="screenName === 'loc'" class="collapse-rail">
                 <mdui-list-item rounded id="loc-drawer-1" icon="clear">{{ I18N("html.chart.clear")
                     }}</mdui-list-item>
                 <mdui-list-item rounded id="loc-drawer-2" icon="folder">{{ I18N("html.chart.view")
@@ -143,6 +147,8 @@ import * as DB from "./data"
 import { STATUSTEXT } from './status';
 import { loadFont } from "../core/font";
 import ScreenComponent from "./screen/ScreenComponent.vue"
+import LogoComponent from './component/LogoComponent.vue';
+import { version } from '.';
 await loadFont()
 
 export var account: undefined | PhiraAPI = undefined;
@@ -225,7 +231,7 @@ export async function reqLogout() {
 const modeBtn = ref(null as any);
 const navigationRail = ref(null as any)
 const navigationDrawer = ref(null as any)
-
+const navigationRailItem_WEL = ref()
 async function setThemeP(a: string) {
     if (a != "auto") {
         document.body.style.setProperty("--color", a == "light" ? "#000000" : "#FFFFFF")
@@ -251,14 +257,14 @@ if (Cookies.get("mode")) {
 export default {
     name: 'Main',
     components: {
-        ScreenComponent
+        ScreenComponent,
+        LogoComponent
     },
     data() {
         return {
             I18N: (l: string) => {
                 return I18N.get(l)
             },
-            navigationRailTab: "loc",
             phiraClassType: 2,
             BUILD_ENV: BUILD_ENV,
             BUILDTIME: BUILDTIME,
@@ -266,7 +272,7 @@ export default {
             PACKAGE_JSON: PACKAGE_JSON,
             PIXI_VERSION: PIXI_VERSION,
             THEME: THEME,
-            screenName: "loc",
+            screenName: "welcome",
             screenOtherData: {}
         }
     },
@@ -293,7 +299,8 @@ export default {
             topAppBar,
             app,
             avatar,
-            avatarName
+            avatarName,
+            navigationRailItem_WEL
         };
     },
     methods: {
@@ -331,7 +338,21 @@ export default {
         },
         reqLogin: reqLogin,
         reqLogout: reqLogout,
-        getTheme: () => { return getTheme() }
+        getTheme: () => { return getTheme() },
+        changeScreen(s: string) {
+            navigationDrawer.value.open = false
+            if (s == navigationRail.value.value) {
+                setTimeout(() => {
+                    navigationRail.value.value = "welcome"
+                }, 100)
+
+
+                this.screenName = "welcome"
+            } else {
+                this.screenName = s
+                navigationRail.value.value = s
+            }
+        }
     }
 }
 

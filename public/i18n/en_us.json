@@ -77,6 +77,7 @@
         "html.light_mode":"Light",
         "html.dark_mode":"Dark",
         "html.auto_mode":"System",
-        "ui.screen.phira.chart.text.error.text.file": "An unknown error occurred while loading the chart file"
+        "ui.screen.phira.chart.text.error.text.file": "An unknown error occurred while loading the chart file",
+        "ui.screen.phira.chart.text.pages":"--- pages in total"
     }
 }

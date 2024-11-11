@@ -10,7 +10,7 @@ import Audio from '../audio';
 import { CONST } from '../types/const';
 import { PhiNoteSound } from '../resource/resource_pack';
 
-const particleCountPerClickAnim = 8;
+const particleCountPerClickAnim = 4;
 
 const AllJudgeTimes = {
     bad: 180,

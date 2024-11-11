@@ -152,7 +152,7 @@ mdui-top-app-bar *#avatar {
 .chart-illustration span.chart-name {
     margin-bottom: 36px;
     color: white;
-
+    mix-blend-mode: lighten;
 }
 
 
@@ -168,6 +168,7 @@ mdui-top-app-bar *#avatar {
     font-size: small;
     opacity: 0.6;
     color: white;
+    mix-blend-mode: lighten;
 
 }
 
@@ -177,6 +178,10 @@ mdui-top-app-bar *#avatar {
     transition: all 0.4s ease-in;
 }
 
+.chart-illustration mdui-chip span {
+
+    mix-blend-mode: lighten;
+}
 
 .chart-illustration mdui-chip span.sp {
     background-image: linear-gradient(to left,
@@ -355,7 +360,7 @@ mdui-top-app-bar *#avatar {
     margin-right: 1em;
     width: 25%;
 }
-
+/*
 .search-btn {
     width: 10%;
     height: auto;
@@ -363,13 +368,13 @@ mdui-top-app-bar *#avatar {
     transition:
         transform 0.2s cubic-bezier(.2, 0, 0, 1);
     font-weight: bold;
-    font-size: medium;
-    transform: scale(1);
+    font-size: 16px;
+    transform: scale(1.0);
 }
 
 .search-btn:hover {
     transform: scale(1.08);
-}
+}*/
 
 .fadeIn-active {
     opacity: 1;
@@ -414,12 +419,12 @@ mdui-navigation-rail-item.black-font span {
 }
 
 mdui-navigation-rail {
-    z-index: 201 !important;
+    z-index: 1000 !important;
     box-shadow: 0 2.75px 9px 0 rgba(var(--mdui-color-shadow), 40%), 0 0.25px 3px 0 rgba(var(--mdui-color-shadow), 3.9%);
 }
 
 #top-app-bar-title {
-    padding-left: 1rem;
+    padding-left: 0rem;
 }
 
 #start-o.black {
@@ -550,11 +555,7 @@ html {
     backdrop-filter: blur(30px);
 }
 
-mdui-navigation-drawer::part(panel) {
-    background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.1);
-    border-radius: 0 1.2rem 1.2rem 0 !important;
-    backdrop-filter: blur(30px);
-}
+
 
 .chart-illustration {
     background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.3) !important;
@@ -632,20 +633,15 @@ mdui-navigation-drawer {
     top: 0px;
     left: 0px;
     z-index: -1;
-    /*backdrop-filter: blur(30px);*/
+    backdrop-filter: blur(30px);
 }
 
 #top-app-bar {
-    /*background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.2);*/
+    z-index: 999;
+    background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.2);
     left: 80px !important;
     box-shadow: 0 2.75px 9px 0 rgba(var(--mdui-color-shadow), 40%), 0 0.25px 3px 0 rgba(var(--mdui-color-shadow), 3.9%);
 }
-
-/*
-#top-app-bar.tauri {
-   /* background-color: rgba(0, 0, 0, 0.1) !important;
-}
-*/
 
 .debug-ui {
     z-index: 1000000;
@@ -787,21 +783,37 @@ mdui-navigation-drawer {
     text-align: center;
 }
 
-.phira-chart-root .active{
+.phira-chart-root .active {
     text-align: left;
     padding-bottom: 48px;
-    
+
 }
 
-.phira-chart-root .search-div{
+.phira-chart-root .search-div {
     text-align: left;
 }
 
-.game-pause-root{
+.game-pause-root {}
 
+.chart-illustration mdui-chip span {
+    mix-blend-mode: difference;
+    color: rgb(255, 255, 255)
 }
 
-.chart-illustration mdui-chip span{
-    mix-blend-mode:difference;
-    color:rgb(255,255,255)
+#app mdui-navigation-drawer {
+    margin-top: 64px;
+}
+
+mdui-dialog::part(overlay) {
+    backdrop-filter: blur(10px);
+}
+
+mdui-select::part(menu) {
+    border-radius: 10px;
+}
+.phira-chart-page-span{
+    display: flex;
+    justify-content: center;
+    padding-bottom: 12px;
+    transform: translateY(-10px);
 }
