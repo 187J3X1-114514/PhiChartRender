@@ -12,7 +12,7 @@ interface protocolResult {
 export default async function protocolPage(t: Element): Promise<protocolResult> {
     if (await DB.checkInfoData("protocol")) {
         try {
-            let p = JSON.parse(atob(await DB.getInfoData("protocol")!))
+            let p = JSON.parse(atob(await DB.getInfoData("protocol")! as any))
             if (p.terms_of_use && p.privacy_policy) {
                 return {
                     terms_of_use: true,
