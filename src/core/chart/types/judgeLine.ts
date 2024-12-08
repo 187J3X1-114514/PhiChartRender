@@ -33,6 +33,7 @@ export interface jsonJudgeLineData {
         alpha: Event[],
         scale: Event[],
         x: Event[],
+        y: Event[]
     };
     attachUI: string;
 }

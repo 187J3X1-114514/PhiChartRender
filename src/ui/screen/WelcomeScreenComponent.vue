@@ -54,6 +54,7 @@ export default {
     min-height: calc(100vh - 5rem);
     flex-direction: column;
     transform: translateY(-10%);
+    user-select: text ;
 
 }
 

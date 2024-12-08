@@ -1,5 +1,5 @@
 import { number as verifyNum } from '../../verify';
-import Bezier from 'bezier-easing';
+import { BezierEasing } from '../bezier-easing';
 
 const calcBetweenTime = 0.125; // 1/32
 
@@ -50,7 +50,7 @@ function valueCalculator(event: any, Easings: any, currentTime: any, easingsOffs
     let timePercentStart = 1 - timePercentEnd;
 
     if (event.bezier === 1) {
-        let bezier = Bezier(clamp(event.bezierPoints[0], 0, 1), event.bezierPoints[1], clamp(event.bezierPoints[2], 0, 1), event.bezierPoints[3]);
+        let bezier = BezierEasing(clamp(event.bezierPoints[0], 0, 1), event.bezierPoints[1], clamp(event.bezierPoints[2], 0, 1), event.bezierPoints[3]);
         return event.start * bezier(timePercentStart) + event.end * bezier(timePercentEnd);
     }
     else {
@@ -76,7 +76,7 @@ function valueCalculator(event: any, Easings: any, currentTime: any, easingsOffs
 function calculateRealTime(_bpmList: any, _events: any) {
     let bpmList = _bpmList.slice();
     let events = _events.slice();
-    
+
     events.forEach((event: any) => {
         for (let bpmIndex = 0, bpmLength = bpmList.length; bpmIndex < bpmLength; bpmIndex++) {
             let bpm = bpmList[bpmIndex];
@@ -125,17 +125,27 @@ function calculateEventEase(event: any, Easings: any, easingsOffset = 1, forceLi
         ) &&
         event.start != event.end
     ) {
-        for (let timeIndex = 0, timeCount = Math.ceil(timeBetween / calcBetweenTime); timeIndex < timeCount; timeIndex++) {
-            let currentTime = event.startTime + (timeIndex * calcBetweenTime);
-            let nextTime = event.startTime + ((timeIndex + 1) * calcBetweenTime) <= event.endTime ? event.startTime + ((timeIndex + 1) * calcBetweenTime) : event.endTime;
+        if (typeof event.start == "number" && typeof event.end == "number") {
+            for (let timeIndex = 0, timeCount = Math.ceil(timeBetween / calcBetweenTime); timeIndex < timeCount; timeIndex++) {
+                let currentTime = event.startTime + (timeIndex * calcBetweenTime);
+                let nextTime = event.startTime + ((timeIndex + 1) * calcBetweenTime) <= event.endTime ? event.startTime + ((timeIndex + 1) * calcBetweenTime) : event.endTime;
 
+                result.push({
+                    startTime: currentTime,
+                    endTime: nextTime,
+                    start: valueCalculator(event, Easings, currentTime, easingsOffset),
+                    end: valueCalculator(event, Easings, nextTime, easingsOffset)
+                });
+            }
+        }else{
             result.push({
-                startTime: currentTime,
-                endTime: nextTime,
-                start: valueCalculator(event, Easings, currentTime, easingsOffset),
-                end: valueCalculator(event, Easings, nextTime, easingsOffset)
+                startTime: event.startTime,
+                endTime: event.endTime,
+                start: event.start,
+                end: event.end
             });
         }
+
     }
     else {
         result.push({

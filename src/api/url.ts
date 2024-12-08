@@ -1,6 +1,6 @@
 export const PHIRA_API_CORS = "https://phisimplus.netlify.app/phira-api/"
 export const PHIRA_FILE_CORS = "https://phisimplus.netlify.app/phira-file/"
-export const PHIRA_API_BASE_URL_NO_CORS1 = "https://api.phira.cn/"
+export const PHIRA_API_BASE_URL_NO_CORS1 = "https://phira.5wyxi.com/"
 export const PHIRA_API_BASE_URL_NO_CORS2 = "https://files-cf.phira.cn/"
 export const PHIRA_API_BASE_URL = PHIRA_API_CORS + PHIRA_API_BASE_URL_NO_CORS1
 export const PHIRA_API_BASE_URL_NO_CORS = PHIRA_API_BASE_URL_NO_CORS1

@@ -5,7 +5,8 @@
     <!--
     <span class="info" id="info">{{ verText }}</span>
     -->
-    <mdui-top-app-bar ref="topAppBar" variant="hide" id="top-app-bar" style="display: flex" class="left-all">
+    <mdui-top-app-bar :class="{ 'tauri': ON_TAURI, 'windows': ON_WINDOWS }" ref="topAppBar" variant="hide"
+        id="top-app-bar" style="display: flex" class="left-all">
         <div class="top-app-bar-blur"></div>
         <LogoComponent style="width: 2em;height: 2em;padding-left: 1em;"></LogoComponent>
         <mdui-top-app-bar-title id="top-app-bar-title">
@@ -52,10 +53,12 @@
         </div>
     </mdui-top-app-bar>
 
-    <mdui-navigation-rail ref="navigationRail" value="welcome" id="navigation-rail">
+    <mdui-navigation-rail :class="{ 'tauri': ON_TAURI, 'windows': ON_WINDOWS }" ref="navigationRail" value="welcome"
+        id="navigation-rail">
         <div class="navigation-rail-blur"></div>
         <mdui-button-icon @click="navigationDrawer.open = (!navigationDrawer.open) && screenName != 'welcome'"
-            icon="menu" slot="top" id="top-app-bar-menu" ref="top-app-bar-menu"></mdui-button-icon>
+            icon="menu" slot="top" id="top-app-bar-menu" ref="top-app-bar-menu"
+            :disabled="screenName == 'welcome'"></mdui-button-icon>
         <mdui-button-icon icon="bug_report" slot="bottom" id="debug-btn"></mdui-button-icon>
         <mdui-button-icon icon="settings" slot="bottom"></mdui-button-icon>
         <mdui-tooltip placement="right" slot="bottom" content="{{ I18N('html.src') }}" id="src-text-tooltip">
@@ -66,16 +69,14 @@
         <mdui-navigation-rail-item @click="changeScreen('phira')" icon="cloud" class="black-font" id="tab-phira"
             value="phira"><span>{{
                 I18N("html.tab.phira") }}</span></mdui-navigation-rail-item>
-        <mdui-navigation-rail-item @click="changeScreen('rec')" icon="videocam" class="black-font" id="tab-rec"
-            value="rec"><span>{{
-                I18N("html.tab.rec") }}</span></mdui-navigation-rail-item>
         <mdui-navigation-rail-item @click="changeScreen('loc')" icon="insert_drive_file" value="loc" id="tab-local"
             class="black-font"><span>{{
                 I18N("html.tab.local") }}</span></mdui-navigation-rail-item>
         <mdui-navigation-rail-item ref="navigationRailItem_WEL" value="welcome"
             style="display: none;"></mdui-navigation-rail-item>
     </mdui-navigation-rail>
-    <mdui-navigation-drawer modal close-on-esc id="navigation-drawer" ref="navigationDrawer" close-on-overlay-click>
+    <mdui-navigation-drawer :class="{ 'tauri': ON_TAURI, 'windows': ON_WINDOWS }" modal close-on-esc
+        id="navigation-drawer" ref="navigationDrawer" close-on-overlay-click>
         <div class="navigation-drawer-blur"></div>
         <mdui-list>
             <mdui-collapse v-show="screenName === 'phira'" accordion id="phira-drawer" class="collapse-rail">
@@ -132,9 +133,11 @@
 </template>
 
 <script lang="ts">
+import { get_theme, MAINWINDOW_HWND, ON_TAURI, ON_WINDOWS, RUN_RS_FN, set_theme } from './tauri';
 import { onMounted, ref } from 'vue';
 import { I18N } from "./i18n"
 import { CircularProgress, Dropdown, getTheme, LinearProgress, MenuItem, setTheme, TopAppBar } from 'mdui';
+import * as MDUI from 'mdui';
 import Cookies from 'js-cookie'
 
 import { BUILD_ENV, BUILDTIME, GIT_HASH, PACKAGE_JSON } from "./env";
@@ -148,8 +151,31 @@ import { STATUSTEXT } from './status';
 import { loadFont } from "../core/font";
 import ScreenComponent from "./screen/ScreenComponent.vue"
 import LogoComponent from './component/LogoComponent.vue';
-import { version } from '.';
-await loadFont()
+await loadFont();
+(window as any).MDUI = MDUI;
+
+import { snackbar } from 'mdui/functions/snackbar.js';
+
+try {
+    new SharedArrayBuffer(4)
+} catch {
+    if (ON_TAURI) {
+    } else {
+        if (!(Cookies.get("isreload") == "1")) {
+            snackbar({
+                message: I18N.get("html.thread.error.a")
+            })
+            setTimeout(() => {
+                Cookies.set("isreload", "1")
+                location.reload()
+            }, 10000)
+        } else {
+            snackbar({
+                message: I18N.get("html.thread.error.b")
+            })
+        }
+    }
+}
 
 export var account: undefined | PhiraAPI = undefined;
 export const app = ref<HTMLElement>(null as any)
@@ -241,6 +267,18 @@ async function setThemeP(a: string) {
         document.body.style.setProperty("--color--s", window.matchMedia("(prefers-color-scheme: light)").matches ? "255" : "0")
     }
     THEME.value = a as any
+    if (ON_TAURI) {
+        if (a == "light") {
+            await set_theme(0)
+        }
+        if (a == "dark") {
+            await set_theme(1)
+        }
+        if (a == "auto") {
+            await set_theme(await get_theme() == 0 ? 1 : 0)
+        }
+    }
+
     setTheme(a as any);
 }
 function uModeBtn() {
@@ -273,7 +311,9 @@ export default {
             PIXI_VERSION: PIXI_VERSION,
             THEME: THEME,
             screenName: "welcome",
-            screenOtherData: {}
+            screenOtherData: {},
+            ON_TAURI: ON_TAURI,
+            ON_WINDOWS: ON_WINDOWS
         }
     },
     setup() {
@@ -356,5 +396,7 @@ export default {
     }
 }
 
-
+/*        <mdui-navigation-rail-item @click="changeScreen('rec')" icon="videocam" class="black-font" id="tab-rec"
+            value="rec"><span>{{
+                I18N("html.tab.rec") }}</span></mdui-navigation-rail-item> */
 </script>

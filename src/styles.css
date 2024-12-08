@@ -47,7 +47,8 @@ body {
     font-family: ubuntu, Font, phi;
     margin: 0;
     font-weight: bold;
-    overflow-x: hidden
+    overflow-x: hidden;
+    user-select: none;
 }
 
 mdui-navigation-drawer {
@@ -537,6 +538,7 @@ mdui-navigation-rail {
 
 #navigation-drawer {
     margin-top: 0px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
 html {
@@ -805,8 +807,13 @@ mdui-navigation-drawer {
 }
 
 mdui-dialog::part(overlay) {
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
 }
+
+mdui-dialog::part(panel) {
+    max-width: 40rem !important;
+}
+
 
 mdui-select::part(menu) {
     border-radius: 10px;
@@ -816,4 +823,13 @@ mdui-select::part(menu) {
     justify-content: center;
     padding-bottom: 12px;
     transform: translateY(-10px);
+}
+
+mdui-navigation-rail.tauri.windows{
+    background: transparent;
+}
+
+#top-app-bar.tauri.windows{
+    background-color: rgba(0, 0, 0, 0);
+    box-shadow: 0px 5px 10px -10px rgba(var(--mdui-color-shadow), 40%);
 }

@@ -10,8 +10,10 @@ import { newLogger } from '../log';
 import { PrprVideo } from './video';
 import type { SizerData } from '../types/params';
 import { join } from '../file/utils';
-import type { RPEEvent } from '../chart/anim/type';
+import type { Event, RPEEvent, ValueEvent } from '../chart/anim/type';
 import { deepCopy } from '../utils';
+import { ValueAnim } from '../chart/anim/value';
+import { FloatAnim } from '../chart/anim/float';
 const log = newLogger("prpr拓展")
 export class PrprExtra {
     private game?: PhiGame
@@ -26,7 +28,6 @@ export class PrprExtra {
         if (json.videos) prpr.videos = this.PrprVideoReader(json);
         if (prpr.effects.length == 0) prpr.hasShader = false
         prpr.src = deepCopy(json)
-        console.log(prpr)
         return prpr
     }
 
@@ -232,9 +233,11 @@ export class PrprExtra {
                 beatTime: 0.5
             });
         }
+        console.log(rawVideos)
         result = utils.calculateRealTime(bpmList, calculateVideosBeat(rawVideos)) as PrPrExtraVideo[]
+        console.log(result)
         result.forEach((_video) => {
-            let videoP: Record<string, any> = {
+            let videoP: Record<string, any> = { 
                 ...{ "alpha": _video.alpha ? _video.alpha : 1 },
                 ...{ "dim": _video.dim ? _video.dim : 1 },
             }
@@ -280,6 +283,7 @@ export class PrprExtra {
                 }
             }
         })
+        console.log(result)
         return result
     }
 
@@ -332,38 +336,12 @@ export class PrprExtra {
                     isGlobal: _effect.global || false,
                     vars: {},
                 });
-                for (const name in _effect.vars) {
-                    if (_effect.vars[name] instanceof Array) {
-                        let _values: RPEEvent[] = _effect.vars[name].slice();
-                        if (_values[0]?.startTime && _values[0]?.end instanceof Array && _values.length > 0) {
-                            delete _effect.vars[name]
-                            for (let i = 0, length = (_values[0].start as number[]).length; i < length; i++) {
-                                _effect.vars[name + "@#$%&___" + i] = []
-                            }
-                            for (const event of _values) {
-                                let start = event.start as number[]
-                                let end = event.end as number[]
-                                let is_color = start.length == 4
-                                for (let i = 0, length = start.length; i < length; i++) {
-                                    _effect.vars[name + "@#$%&___" + i].push({
-                                        ...event,
-                                        ...{
-                                            start: start[i] / (is_color ? 255 : 1),
-                                            end: end[i] / (is_color ? 255 : 1)
-                                        }
-                                    })
-                                }
-
-                            }
-                        }
-                    }
-
-                }
+                let vars: Record<string, any> = {}
                 for (const name in _effect.vars) {
                     let _values = _effect.vars[name];
                     if (_values instanceof Array && _values[0]?.startTime) {
-                        let _timedValues: any[] = [];
-                        let values: any[] = [];
+                        let _timedValues: RPEEvent[] = [];
+                        let values: Event[] = [];
 
                         utils.calculateEventsBeat(_values)
                             .sort((a: any, b: any) => a.startTime - b.startTime || b.endTime - a.startTime)
@@ -377,14 +355,15 @@ export class PrprExtra {
                                 else _timedValues.push(_value);
                             }
                             );
+
                         for (const _value of _timedValues) {
                             values.push(...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)));
                         }
                         values.sort((a, b) => a.startTime - b.startTime || b.endTime - a.startTime);
-                        __effect.vars[name] = values;
+                        vars[name] = values;
                     }
                     else {
-                        __effect.vars[name] = [{
+                        vars[name] = [{
                             startTime: -999999,
                             start: _values,
                             end: _values,
@@ -393,20 +372,28 @@ export class PrprExtra {
                     }
                 }
 
+                for (let uni in vars) {
+                    if (vars[uni][0].start instanceof Array) {
+                        __effect.vars[uni] = new ValueAnim()
+                    } else {
+                        __effect.vars[uni] = new FloatAnim()
+                    }
+                    __effect.vars[uni].events = vars[uni]
+                }
                 effectList.push(__effect);
             }
             );
 
         effectList.sort((a, b) => a.startTime - b.startTime);
 
-        effectList.forEach((v) => {
-            for (const name in v.vars) {
-                const values = v.vars[name];
-                if (values.value) {
-                    v.vars[name] = new Array().push(v.vars[name])
-                }
-            }
-        })
+        //effectList.forEach((v) => {
+        //    for (const name in v.vars) {
+        //        const values = v.vars[name];
+        //        if (values.value) {
+        //            v.vars[name] = new Array().push(v.vars[name])
+        //        }
+        //    }
+        //})
         return effectList;
     }
 }

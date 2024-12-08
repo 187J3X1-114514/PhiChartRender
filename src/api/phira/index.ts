@@ -1,4 +1,12 @@
+import { log, ON_TAURI } from '@/ui/tauri'
 import * as API_URL from '../url'
+import { ClientOptions, fetch as TFetch } from '@tauri-apps/plugin-http';
+import { PHIRA_API_BASE_URL_NO_CORS1 } from '../url';
+
+export const AUTOFetch = (input: URL | Request | string, init?: RequestInit & ClientOptions) => {
+    if (ON_TAURI) log.info("请求：" + input)
+    return !ON_TAURI ? fetch(input, init) : TFetch(input, init)
+}
 export interface loginResult {
     api?: PhiraAPI, error: string, status: number, ok: boolean
 }
@@ -107,14 +115,16 @@ export class PhiraAPI {
     async getAvatar() {
         return await new Promise<string>(async (r) => {
             let imageUrl: string = this.userInfo["avatar"]
-            this.fetch(API_URL.proxyPhriaApiURL(imageUrl.replace("https://api.phira.cn/", "")),
+            this.fetch(
+                ON_TAURI ?
+                    imageUrl.replace("https://api.phira.cn/", PHIRA_API_BASE_URL_NO_CORS1) :
+                    API_URL.proxyPhriaApiURL(imageUrl.replace("https://api.phira.cn/", "")
+                    ),
                 'GET',
                 {},
                 undefined
             )
                 .then(response => {
-                    console.log(response)
-                    console.log(response.headers.entries())
                     return response.blob()
                 })
                 .then(blob => {
@@ -134,10 +144,35 @@ export class PhiraAPI {
 
         })
     }
-    fetch(url: string, method?: string, headers?: any, body?: any, noredirect: boolean = false) {
-        return fetch(
-            url,
-            { method: method, headers: { ...headers, 'Authorization': 'Bearer ' + this.userToken }, body: body, ...(noredirect ? { redirect: "manual" } : {}) })
+    fetch(url: string, method?: string, headers?: any, body?: any, noredirect: boolean = false, navite: boolean = true) {
+        if (ON_TAURI && navite) {
+            return AUTOFetch(
+                url,
+                {
+                    method: method,
+                    headers: {
+                        ...headers,
+                        'Authorization': 'Bearer ' + this.userToken
+                    },
+                    body: body,
+                    ...(noredirect ? { redirect: "manual" } : {})
+                }
+            )
+        } else {
+            return fetch(
+                url,
+                {
+                    method: method,
+                    headers: {
+                        ...headers,
+                        'Authorization': 'Bearer ' + this.userToken
+                    },
+                    body: body,
+                    ...(noredirect ? { redirect: "manual" } : {})
+                }
+            )
+        }
+
     }
     async reLogin() {
         let r: { [key: string]: any } = {}
@@ -153,7 +188,7 @@ export class PhiraAPI {
             body: JSON.stringify({
                 email: this.email, password: this.password
             }),
-            timeout:10000
+            timeout: 10000
         })
         fetchJSON = await fetchResult.json()
         if (!fetchResult.ok) {
@@ -210,7 +245,7 @@ export class PhiraAPI {
             })()
         })
         baseUrl = encodeURI(baseUrl)
-        let r = await (await this.fetch(baseUrl, "GET")).json() as searchResult
+        let r = await (await this.fetch(baseUrl, "GET", null, null, undefined, true)).json() as searchResult
         r.page = page
         r.maxPages = Math.ceil(r.count / pageNum)
         return r

@@ -1,7 +1,7 @@
 import { BaseEvent, Event } from "./type";
 
-export interface calculateResult {
-    value: number,
+export interface calculateResult<T> {
+    value: T,
     notDefault: boolean
     eventIndex: number
 }
@@ -9,7 +9,7 @@ export interface calculateResult {
 export abstract class BaseAnim {
     public events: BaseEvent[] = []
 
-    protected valueCalculator(events: Event[], currentTime: number, originValue: number = 0, _eventIndex: number = 0): calculateResult {
+    protected valueCalculator(events: Event[], currentTime: number, originValue: number = 0, _eventIndex: number = 0): calculateResult<number> {
         for (let i = _eventIndex, length = events.length; i < length; i++) {
             let event = events[i];
             if (event.endTime < currentTime) continue;

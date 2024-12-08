@@ -5,6 +5,7 @@ import PhiGame from '../game';
 import { Container, Graphics, Sprite } from 'pixi.js';
 import { defaultUISettings } from './settings';
 import { attachUI, type UISettings, type UIElementSettings, baseUIManager } from "../types/ui"
+import { pauseButton } from './tex';
 export default class UIManager implements baseUIManager {
     private chart: Chart
     public element: {
@@ -28,6 +29,7 @@ export default class UIManager implements baseUIManager {
     } = {
             big: new Sprite(), small: new Sprite(), bigCover: new Graphics(), smallCover: new Graphics()
         }
+    public pauseBtn: Sprite = undefined as any;
     constructor(game: PhiGame, settings: UISettings = defaultUISettings) {
         let chart = game.chart
         this.chart = game.chart
@@ -61,6 +63,15 @@ export default class UIManager implements baseUIManager {
         this.element.Level.create()
         this.element.Pause.create()
         this.element.Bar.create()
+        this.pauseBtn = new Sprite(pauseButton)
+        this.pauseBtn.alpha = 0
+        this.pauseBtn.eventMode = 'static';
+        this.pauseBtn.cursor = 'pointer';
+        this.pauseBtn.on("pointerdown", () => {
+            this.pauseBtnClickCallBack()
+        })
+        this.pauseBtn.zIndex = 99999999
+        this.pauseBtn.anchor.set(0.5)
     }
     addToScreen() {
         let stage = this.game.renders.UIContainer
@@ -72,13 +83,11 @@ export default class UIManager implements baseUIManager {
         stage.addChild(this.element.Pause.sprite)
         stage.addChild(this.element.Bar.sprite)
         stage.addChild(this.PauseBtnOutLine)
+        stage.addChild(this.pauseBtn)
     }
     createSprites() {
         this.createElement()
         this.addToScreen()
-        this.element.Pause.sprite.on("pointerdown", () => {
-            this.pauseBtnClickCallBack()
-        })
         this.backgrounds.big.zIndex = -8
         this.backgrounds.bigCover.zIndex = -7
         this.backgrounds.small.zIndex = -6
@@ -104,6 +113,11 @@ export default class UIManager implements baseUIManager {
     resizeSprites(size: SizerData, _isEnded: boolean) {
         this.size = size
         this.resizeElement()
+        this.pauseBtn.scale.x = this.element.Pause.baseScaleX * 1.3
+        this.pauseBtn.scale.y = this.element.Pause.baseScaleY * 1.3
+        this.pauseBtn.position.x = this.element.Pause.x + this.element.Pause.offsetX
+        this.pauseBtn.position.y = this.element.Pause.y + this.element.Pause.offsetY
+
         this.backgroundContainer.x = 0
         this.backgroundContainer.y = 0
         this.backgrounds.big.position.set(0, 0)
@@ -163,6 +177,11 @@ export default class UIManager implements baseUIManager {
         this.element.Score.setText(this.game.judgement.score.text.score)
         this.element.Name.setText(this.chart.info.name)
         this.element.Level.setText(this.chart.info.difficult)
+
+        this.pauseBtn.scale.x = this.element.Pause.baseScaleX * 1.3
+        this.pauseBtn.scale.y = this.element.Pause.baseScaleY * 1.3
+        this.pauseBtn.position.x = this.element.Pause.x + this.element.Pause.offsetX
+        this.pauseBtn.position.y = this.element.Pause.y + this.element.Pause.offsetY
     }
     private drawPauseBtnOutLine() {
         this.PauseBtnOutLine.clear()
@@ -206,9 +225,9 @@ export default class UIManager implements baseUIManager {
         this.element.ComboNumber.calcTime(0, size)
         this.element.Bar.calcTime(0, size)
         if (isStart) {
-            this.setUIAniOffsetY(-((uiFadeInFn(progress) * 120) - 120))
+            this.setUIAniOffsetY(-((uiFadeInFn(progress * 1.1) * 120) - 120))
         } else {
-            this.setUIAniOffsetY(((uiFadeOutFn(progress) * 120)))
+            this.setUIAniOffsetY(((uiFadeOutFn(progress * 1.1) * 120)))
         }
     }
 

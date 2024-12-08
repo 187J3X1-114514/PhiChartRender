@@ -1,11 +1,16 @@
 import { invoke } from '@tauri-apps/api/core'
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { newLogger } from '../core/log'
-export const ON_TAURI = (window as any).__TAURI__ != undefined
-const log = newLogger("Tauri")
-const topAppBar = document.getElementById("top-app-bar")!
-const navigationDrawer = document.getElementById("navigation-drawer")!
-const navigationRail = document.getElementById("navigation-rail")!
+import { platform } from '@tauri-apps/plugin-os';
+export const ON_TAURI = (window as any).__TAURI_INTERNALS__ != undefined
+export const log = newLogger("Tauri")
+export const OS_NAME = ON_TAURI ? platform() : "web"
+export const ON_WINDOWS = OS_NAME == "windows"
+export const ON_ANDROID = OS_NAME == "android"
+var appWindow: WebviewWindow
+//const topAppBar = document.getElementById("top-app-bar")!
+//const navigationDrawer = document.getElementById("navigation-drawer")!
+//const navigationRail = document.getElementById("navigation-rail")!
 export const RUN_RS_FN = async (name: string, other?: any) => {
     await invoke(name, other)
 }
@@ -19,25 +24,29 @@ export enum BACKGROUND_STYLE {
     COLOR
 }
 if (ON_TAURI) {
-    const appWindow = getCurrentWebviewWindow()
-    document.documentElement.classList.add("transparent")
-    var HWND: number = await invoke("get_window_handle")
-    log.info("主窗口句柄", HWND)
-    MAINWINDOW_HWND = HWND
-    await set_wa(38, 4)
+    appWindow = getCurrentWebviewWindow()
     await main()
 }
 
 export async function set_wa(attribute: number, value: number) {
-    return await invoke("set_wa", { hwnd: HWND, attribute: attribute, value: value })
+    if (!ON_WINDOWS) return
+    return await invoke("set_wa", { hwnd: MAINWINDOW_HWND, attribute: attribute, value: value })
+}
+export async function set_theme(value: number) {
+    if (!ON_WINDOWS) return
+    return await RUN_RS_FN("set_theme", { hwnd: MAINWINDOW_HWND, mode: value })
 }
 export async function get_theme() {
+    if (!ON_WINDOWS) return 
     return await invoke("get_theme") as number
 }
 
 export async function main() {
-    //Cookies.get("backgroundstyle")
-    topAppBar.classList.add("tauri")
-    navigationDrawer.classList.add("tauri")
-    navigationRail.classList.add("tauri")
+    if (ON_WINDOWS) {
+        document.documentElement.classList.add("transparent")
+        var HWND: number = await invoke("get_window_handle")
+        log.info("主窗口句柄", HWND)
+        MAINWINDOW_HWND = HWND
+        await set_wa(38, 4)
+    }
 }

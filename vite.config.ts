@@ -55,9 +55,14 @@ export default defineConfig(async () => ({
     },
     server: {
         strictPort: true,
+        host: '0.0.0.0',
         watch: {
             ignored: ["**/src-tauri/**"],
         },
+        headers: {
+            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Cross-Origin-Opener-Policy": "same-origin",
+        }
     },
     define: {
         GIT_COMMITHASH: "",

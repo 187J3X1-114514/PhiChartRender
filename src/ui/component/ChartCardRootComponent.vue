@@ -22,16 +22,26 @@ export default {
             levelname: string,
             name: string,
             charter: string,
-            click:()=>any
-        }[]>
+            click: () => any
+        }[]>,
+        show_nothing: Boolean
     },
     setup() {
         onMounted(() => {
             ro.observe(root.value)
         })
+
+        const itemRefs = ref<any[]>([])
+        const setItemRef = (el: any) => {
+            if (el) {
+                itemRefs.value.push(el)
+            }
+        }
         return {
             grid_width,
-            root
+            root,
+            setItemRef,
+            itemRefs
         }
     },
     mounted() {
@@ -51,32 +61,46 @@ export default {
 </script>
 
 <template>
+    <span class="chart-card-nothing" v-show="!(charts != undefined && charts.length != 0) && show_nothing">空空如也</span>
     <div ref="root" class="chart-card-root" :style="`grid-template-columns: repeat(${grid_width}, 1fr);`">
         <TransitionGroup name="chart-card">
-            <ChartCardComponent class="" v-for="chart in charts" v-bind="chart" :key="chart.name"></ChartCardComponent>
+            <ChartCardComponent class="" :ref="setItemRef" v-for="chart in charts" v-bind="chart" :key="chart.name">
+            </ChartCardComponent>
         </TransitionGroup>
     </div>
 </template>
 
 <style>
-.chart-card{
-    transition: all 0.5s ease;
-    
+.chart-card {
+    transition: all 0.3s ease;
 }
+
+.chart-card-nothing {
+    display: flex;
+    justify-content: center;
+    font-size: 2.1em;
+    margin-top: 7%;
+    font-style: italic;
+    color: rgba(112, 112, 112, 0.425);
+
+}
+
 .chart-card-root {
     display: grid;
     gap: 20px;
     margin: 10px;
 }
+
 .chart-card-move,
 .chart-card-enter-active,
 .chart-card-leave-active {
-    transition: all 0.5s ease;
+    transition: all 0.3s ease;
 }
 
-.chart-card-enter-to{
+.chart-card-enter-to {
     opacity: 1;
 }
+
 .chart-card-enter-from,
 .chart-card-leave-to {
     opacity: 0;

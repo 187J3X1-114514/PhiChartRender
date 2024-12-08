@@ -3,6 +3,7 @@ import { genDialogBtn } from "../utils/index"
 import * as API_URL from '../../api/url'
 import * as DB from "../data"
 import { i18n, I18N } from "../i18n";
+import { AUTOFetch } from "@/api/phira";
 
 interface protocolResult {
     terms_of_use: boolean
@@ -74,8 +75,8 @@ export default async function protocolPage(t: Element): Promise<protocolResult> 
     protocolDialog2.open = false
     let jump = false
     try {
-        protocol1.innerHTML = (await (await fetch(API_URL.PHIRA_PROTOCOL1_TEXT)).text()).replaceAll("template", "div")
-        protocol2.innerHTML = (await (await fetch(API_URL.PHIRA_PROTOCOL2_TEXT)).text()).replaceAll("template", "div")
+        protocol1.innerHTML = (await (await AUTOFetch(API_URL.PHIRA_PROTOCOL1_TEXT)).text()).replaceAll("template", "div")
+        protocol2.innerHTML = (await (await AUTOFetch(API_URL.PHIRA_PROTOCOL2_TEXT)).text()).replaceAll("template", "div")
     } catch {
         snackbar({
             message: I18N.get("ui.screen.phira.terms_of_use.text.jump_msg"),

@@ -1,6 +1,6 @@
 import type { Config, Context } from '@netlify/edge-functions'
 const ROOT = "proxy"
-const PHIRA_API_BASE_URL = "https://api.phira.cn/"
+const PHIRA_API_BASE_URL = "https://phira.5wyxi.com/"
 async function handlePhiraApi(request: Request, p: string) {
     const allp = p.split("*")
     const response = await fetch(PHIRA_API_BASE_URL + allp[0], {

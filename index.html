@@ -5,13 +5,14 @@
     <link rel="icon" href="logo.svg">
     <script src="coi-serviceworker.js"></script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1.0">
+
     <title>Phigros</title>
     <link rel="stylesheet" href="/src/styles.css" />
     <script type="module" src="/src/main.ts" defer></script>
     <link rel="stylesheet" href="/src/phira.css" />
     <mdui-linear-progress id="load-stage" class="search-load"></mdui-linear-progress>
-    
+
 </head>
 
 <body>
@@ -19,33 +20,6 @@
     <div id="___background" class="___background-two"></div>
 
     <div id="app" class="left-all"></div>
-    <script type="module">
-        import { dialog, alert } from "mdui"
-        import { snackbar } from 'mdui/functions/snackbar.js';
-        import Cookies from 'js-cookie'
-
-        try {
-            new SharedArrayBuffer(4)
-        } catch {
-            if (self.__TAURI__ != undefined) {
-            } else {
-                if (!Cookies.get("isreload") == 1) {
-                    snackbar({
-                        message: I18N.get("html.thread.error.a")
-                    })
-                    setTimeout(() => {
-                        Cookies.set("isreload", "1")
-                        location.reload()
-                    }, 10000)
-                } else {
-                    snackbar({
-                        message: I18N.get("html.thread.error.b")
-                    })
-                }
-            }
-        }
-
-    </script>
     <!--
     <div id="phira-main" class="left-all hide">
         <img class="phira-logo" src="/assets/phira.png">

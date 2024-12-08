@@ -1,7 +1,7 @@
 import type { UISettings } from "../types/ui"
 export const defaultUISettings = {
     scale: {
-        Pause: 0.7,
+        Pause: 0.85,
         ComboNumber: 1.0,
         Combo: 0.95,
         Score: 1.0,

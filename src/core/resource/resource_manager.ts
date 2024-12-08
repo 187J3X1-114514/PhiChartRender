@@ -13,7 +13,7 @@ import { ChartPack } from "../../file/chart_pack"
   这坨屎以后会重写
 */
 
-const log = newLogger("Resource Manger")
+const log = newLogger("Resource Manager")
 
 export class ResourceManager {
     public files: { [key: string]: Texture | Audio | Chart | PrprExtra | string | undefined }

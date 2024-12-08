@@ -2,13 +2,14 @@ import { Button, LinearProgress, TextField, Card, Chip, Select, MenuItem, snackb
 import { dialog } from "mdui/functions/dialog.js";
 import { PhiraAPI, type PhiraAPIChartInfo, SearchDivision, SearchOrder } from "../../../api/phira";
 import { proxyPhriaApiURL } from "../../../api/url";
-import { PlayS as PlayScreen } from "../../play/play";
+import { PlayScreen as PlayScreen } from "../../play/play";
 import { File } from "../../../core/file";
 import { addCacheDATA, addChartByID, addChartInfo, checkCacheDATA, checkChartByID, getCacheDATA, getChartByID, removeChartByID } from "../../data";
 import { generateRandomString } from "../../../core/random";
 import { I18N } from "../../i18n";
 import { account, load, reqLogin, ResPack } from "@/ui/App.vue";
 import { scrollIntoView } from "@/utils";
+import { ON_TAURI } from "@/ui/tauri";
 const NONE_IMG = await (async () => {
     let c = document.createElement("canvas")
     let ctx = c.getContext("2d")!
@@ -217,7 +218,7 @@ export class ChartPage {
     }
 
     private resize() {
-        let ratio = self.devicePixelRatio == 1 ? 1 : self.devicePixelRatio * 0.4
+        let ratio = self.devicePixelRatio == 1 ? 1 : self.devicePixelRatio / 0.6
         this.width = Math.min(Math.max((Math.floor(this.cards!.clientWidth * ratio / 270) > 0 ? Math.floor(this.cards!.clientWidth * ratio / 270) : Math.ceil(this.cards!.clientWidth * ratio / 270)), 1), 5)
         this.cards!.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`
     }
@@ -434,13 +435,14 @@ export class ChartPage {
         })
 
     }
+
     async playChart(data: PhiraAPIChartInfo) {
         load.classList.remove("hide")
         var response
         const fetchFn = async () => {
-
+            console.log(data.file)
             const srcUrl = data.file.replace("https://api.phira.cn/", "");
-            const url = proxyPhriaApiURL(srcUrl);
+            const url = ON_TAURI ? data.file : proxyPhriaApiURL(srcUrl);
             try {
                 this.api.fetch(url)
                 response = await fetch(
@@ -515,7 +517,6 @@ export class ChartPage {
             await chart.load()
             await addChartInfo(chart.getChart(), chartid)
         } catch (e) {
-            console.log(e)
             await removeChartByID(chartid)
             snackbar({
                 message: I18N.get("ui.screen.phira.chart.text.error.text.file")

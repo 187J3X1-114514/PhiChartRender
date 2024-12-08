@@ -1,4 +1,7 @@
+import { BaseAnim } from '@/core/chart/anim/base';
 import Shader from './shader';
+import { FloatAnim } from '@/core/chart/anim/float';
+import { ValueAnim } from '@/core/chart/anim/value';
 
 interface EffectJson {
     shader: any;
@@ -13,7 +16,7 @@ export default class Effect {
     startTime: number;
     endTime: number;
     isGlobal: boolean;
-    vars: Record<string, any>;
+    vars: Record<string, BaseAnim>;
 
     private _currentValue?: Record<string, any>;
 
@@ -28,49 +31,33 @@ export default class Effect {
     }
 
     reset() {
-        this._currentValue = (this.shader !== null && typeof this.shader !== 'string') ? this.shader.uniforms2 : {};
+        this._currentValue = {}
+        if (this.shader instanceof Shader) {
+            let ua = this.shader.getAllDefaultUniform()
+            for (let u in ua) {
+                this._currentValue[u] = ua[u].value
+            }
+        }
     }
 
     calcTime(currentTime: number, screenSize: number[]) {
         if (this.shader === null) return;
 
         const { vars, shader, _currentValue } = this;
-        let array_var: any = {}
-        for (const name in vars) {
-            if (name.includes("@#$%&___")) {
-                array_var[name.split("@#$%&___")[0]] = []
-            }
-        }
         for (const name in vars) {
             const values = vars[name];
-            if (name.includes("@#$%&___")) {
-                array_var[name.split("@#$%&___")[0]][parseInt(name.split("@#$%&___").pop()!)] = valueCalculator(values, currentTime, ((shader as Shader).uniforms2[name.split("@#$%&___")[0]] as any)[parseInt(name.split("@#$%&___").pop()!)])
-                continue
+            if (values instanceof FloatAnim) {
+                values.originValue = this._currentValue![name];
+                _currentValue![name] = values.calculate(currentTime).value;
+            } else if (values instanceof ValueAnim) {
+                let result = values.calculate(currentTime, this._currentValue![name])
+                if (result.notDefault) {
+                    _currentValue![name] = result.value
+                } else if (values.lastResult) {
+                    _currentValue![name] = values.lastResult.value
+                };
             }
-            _currentValue![name] = valueCalculator(values, currentTime, (shader as Shader).uniforms2[name]);
         }
-        (shader as Shader).update({ ..._currentValue, ...array_var, time: currentTime, screenSize: screenSize });
+        (shader as Shader).update({ ..._currentValue, time: currentTime, screenSize: screenSize });
     }
-}
-
-function valueCalculator(values: any[], currentTime: number, defaultValue: any): any {
-    for (let i = 0, length = values.length; i < length; i++) {
-        const value = values[i];
-        if (value.endTime < currentTime) continue;
-        if (value.startTime > currentTime) break;
-        if (value.start === value.end) return value.start;
-
-        if (typeof value.start == "object" || typeof value.end == "object") {
-            return value.end
-        }
-
-        let timePercentEnd = (currentTime - value.startTime) / (value.endTime - value.startTime);
-        let timePercentStart = 1 - timePercentEnd;
-
-        return value.start * timePercentStart + value.end * timePercentEnd;
-
-
-    }
-
-    return defaultValue;
 }

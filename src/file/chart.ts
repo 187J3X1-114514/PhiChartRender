@@ -47,6 +47,7 @@ export function buildOtherEventData(view: WriteBufferDataView, data: jsonJudgeLi
     view.setInt32(data.noteControls.alpha.length)
     view.setInt32(data.noteControls.scale.length)
     view.setInt32(data.noteControls.x.length)
+    view.setInt32(data.noteControls.y.length)
     for (let e of data.floorPositions) {
         let br = new WriteBufferDataView()
         buildFloorPositionEventData(br, e)
@@ -102,6 +103,12 @@ export function buildOtherEventData(view: WriteBufferDataView, data: jsonJudgeLi
         view.setArrayBuffer(br.build())
         br = undefined as any;
     }
+    for (let e of data.noteControls.y) {
+        let br = new WriteBufferDataView()
+        buildEventData(br, e)
+        view.setArrayBuffer(br.build())
+        br = undefined as any;
+    }
 
 }
 
@@ -130,6 +137,7 @@ export function readOtherEventData(view: ReadBufferDataView): jsonJudgeLineData 
     let alphaLength = view.getInt32()
     let scaleLength = view.getInt32()
     let xLength = view.getInt32()
+    let yLength = view.getInt32()
     for (let i = 0, length = floorPositionsLength; i < length; i++) {
         let buf = view.getArrayBuffer()
         data.floorPositions.push(readFloorPositionEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
@@ -165,6 +173,10 @@ export function readOtherEventData(view: ReadBufferDataView): jsonJudgeLineData 
     for (let i = 0, length = xLength; i < length; i++) {
         let buf = view.getArrayBuffer()
         data.noteControls.x.push(readEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
+    }
+    for (let i = 0, length = yLength; i < length; i++) {
+        let buf = view.getArrayBuffer()
+        data.noteControls.y.push(readEventData(new ReadBufferDataView(new DataView(buf.buffer, buf.byteOffset))))
     }
     return data
 }

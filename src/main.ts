@@ -6,7 +6,7 @@ import { createApp } from 'vue'
 import App from './ui/App.vue'
 
 document.body.addEventListener("click", () => {
-    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
+    //if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
 })
 
 export const app = createApp(App)

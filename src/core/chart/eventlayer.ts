@@ -1,9 +1,10 @@
 import { FloatAnim } from "./anim/float";
 import type { Event, ValueEvent } from "./anim/type";
+import { ValueAnim } from "./anim/value";
 import type { jsonEventLayer } from "./types/judgeLine";
 
 export default class EventLayer {
-    public speed: ValueEvent[] = []
+    public speed: ValueAnim = new ValueAnim()
     public moveX: FloatAnim = new FloatAnim();
     public moveY: FloatAnim = new FloatAnim();
     public alpha: FloatAnim = new FloatAnim();
@@ -24,8 +25,7 @@ export default class EventLayer {
     public alphaOriginValue?: number
     public rotateOriginValue?: number
     sort() {
-        const sorter = (a: { startTime: number }, b: { startTime: number }) => a.startTime - b.startTime;
-        this.speed.sort(sorter);
+        this.speed.sort();
         this.moveX.sort();
         this.moveY.sort();
         this.alpha.sort();
@@ -44,12 +44,13 @@ export default class EventLayer {
         let _posY = this.moveY.calculate(currentTime)
         let _alpha = this.alpha.calculate(currentTime)
         let _rotate = this.rotate.calculate(currentTime)
-        this._posX = _posX.value
-        this._posY = _posY.value
-        this._alpha = _alpha.value
-        this._rotate = _rotate.value
-        for (let i = 0, length = this.speed.length; i < length; i++) {
-            let event = this.speed[i];
+        //let _speed = this.speed.calculate(currentTime); <--有问题
+        this._posX = _posX.notDefault ? _posX.value : this._posX
+        this._posY = _posY.notDefault ? _posY.value : this._posY
+        this._alpha = _alpha.notDefault ? _alpha.value : this._alpha
+        this._rotate = _rotate.notDefault ? _rotate.value : this._rotate
+        for (let i = 0, length = this.speed.events.length; i < length; i++) {
+            let event = this.speed.events[i];
             if (event.endTime < currentTime) continue;
             if (event.startTime > currentTime) break;
 
@@ -60,7 +61,7 @@ export default class EventLayer {
 
     exportToJson() {
         return {
-            speed: this.speed,
+            speed: this.speed.events,
             moveX: this.moveX.events,
             moveY: this.moveY.events,
             alpha: this.alpha.events,
@@ -70,12 +71,19 @@ export default class EventLayer {
 
     static from(data: jsonEventLayer) {
         let ev = new EventLayer()
-        ev.speed = data.speed
+        ev.speed.events = data.speed
         ev.alpha.events = data.alpha
         ev.moveX.events = data.moveX
         ev.moveY.events = data.moveY
         ev.rotate.events = data.rotate
         return ev
+    }
+
+    do(fn: (input: Event[]) => Event[]) {
+        this.alpha.events = fn(this.alpha.events)
+        this.moveX.events = fn(this.moveX.events)
+        this.moveY.events = fn(this.moveY.events)
+        this.rotate.events = fn(this.rotate.events)
     }
 
 }

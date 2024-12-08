@@ -159,8 +159,8 @@ export default class Chart {
     }
 
     createSprites(stage: any, size: any, textures: PhiAssets, _uiStage: any = null, zipFiles = new ResourceManager(), _speed = 1, _bgDim = 0.5, multiNoteHL = true, debug = false) {
-        this.judgelines.forEach((judgeline, _index) => {
-            judgeline.createSprite(textures, zipFiles, this.rootPath);
+        this.judgelines.forEach(async (judgeline, _index) => {
+            await judgeline.createSprite(textures, zipFiles, this.rootPath);
 
             judgeline.sprite.position.x = size.width / 2;
             judgeline.sprite.position.y = size.height / 2;

@@ -110,29 +110,9 @@ document.body.append(c)
 import 'mdui/mdui.css'
 import './styles.css'
 import 'mdui/components/icon.js';
-import { reqFullSc } from './ui';
-import './ui/main';
-
-import { ChartFile } from './file/chart';
-import { ReadBufferDataView, WriteBufferDataView } from './file/data_view';
 import Shader from './core/prpr/effect/shader';
-import { PrPrExtraEffect, PrPrExtraVideo } from './core/prpr/types';
-import { buildEffectData, buildVideoEventData, PrprExtraFile, readEffectData, readVideoEventData } from './file/prpr';
-import { RPEEvent } from './core/chart/anim/type';
-import { buildRpeEventData, readRpeEventData } from './file/event';
-import { PrprExtra } from './core/prpr/prpr';
-document.documentElement.addEventListener("click", () => {
-    if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) reqFullSc()
-})
-
-import { ResourceManager } from "./core/resource";
-import Chart from './core/chart';
-import { PlayS } from './ui/play/play';
-import { Application } from 'pixi.js';
-import Game from './core/game';
-import { topAppBar, ResPack } from './ui/App.vue';
-import { ChartPack } from './file/chart_pack';
-
+import { Application, Assets, Sprite } from 'pixi.js';
+/*
 const resM = new ResourceManager()
 await resM.load("test.zip", await (await fetch("test")).blob());
 console.log(resM)
@@ -192,8 +172,8 @@ setTimeout(() => {
     game!.start()
     app!.canvas.classList.remove("push-in")
 }, 620)
+*/
 
-/*
 let app = new Application()
 await app.init({
     width: document.documentElement.clientWidth,
@@ -201,7 +181,7 @@ await app.init({
     autoDensity: true,
     antialias: true,
     backgroundAlpha: 1,
-    preference: "webgpu",
+    preference: "webgl",
     hello: true,
     resizeTo: document.documentElement,
     resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : 1
@@ -210,135 +190,14 @@ await app.init({
 document.body.appendChild(app.canvas)
 app.canvas.classList.add("game")
 app.stage.addChild(new Sprite(await Assets.load("assets/phira.png")))
-let testShader = new Shader(Shader.presetsGL.shockwave, "test", undefined, Shader.presetsWebGPU.shockwave)
+let testShader = new Shader(Shader.presetsGL.circleBlur, "test", undefined)
 let s = performance.now()
 app.ticker.add(() => {
     testShader.update({
         time: (performance.now() - s) / 1000,
         screenSize: [document.documentElement.clientWidth, document.documentElement.clientHeight],
-        progress:0.2,
-        centerX:0.5,
-        centerY:0.5,
-        width:0.1,
-        distortion:1.8,
-        expand:10
+        size : 1
     })
 })
 
-app.stage.filters = [testShader.filter]*/
-/*
-let test = {
-    start: [
-        0,
-        0,
-        1
-    ],
-    end: [
-        542,
-        0,
-        1
-    ],
-    shader: "vignette",
-    vars: {
-        "extend": [
-            {
-                startTime: [
-                    0,
-                    0,
-                    1
-                ],
-                endTime: [
-                    15,
-                    0,
-                    1
-                ],
-                easingType: 1,
-                start: 0.25,
-                end: 0.25
-            },
-            {
-                startTime: [
-                    15,
-                    0,
-                    1
-                ],
-                endTime: [
-                    20,
-                    0,
-                    1
-                ],
-                easingType: 4,
-                start: 0.25,
-                end: 0
-            }
-        ],
-        "radius": [
-            {
-                startTime: [
-                    0,
-                    0,
-                    1
-                ],
-                endTime: [
-                    15,
-                    0,
-                    1
-                ],
-                easingType: 1,
-                start: 15,
-                end: 15
-            },
-            {
-                startTime: [
-                    152,
-                    0,
-                    1
-                ],
-                endTime: [
-                    158,
-                    0,
-                    1
-                ],
-                easingType: 1,
-                start: 15,
-                end: 25
-            }
-        ]
-    }
-} as PrPrExtraEffect
-let wview = new WriteBufferDataView()
-buildEffectData(wview, test)
-let buf = wview.build()
-console.log(buf, test)
-
-let rview = new ReadBufferDataView(new DataView(buf))
-console.log(readEffectData(rview))
-
-/*
-let test = {
-    easingLeft: 0.0,
-    easingRight: 1.0,
-    easingType: 1,
-    end: 128,
-    endTime: [1, 0, 1],
-    start: 514,
-    startTime: [0, 0, 1]
-} as rpeEvent
-
-let wview = new WriteBufferDataView()
-buildRpeEventData(wview,test)
-let buf = wview.build()
-console.log(buf,test)
-
-let rview = new ReadBufferDataView(new DataView(buf))
-console.log(readRpeEventData(rview))*/
-/*
-let d = await(await fetch("extra.json")).json()
-
-let pr = PrprExtra.from(d)
-
-let D = await PrprExtraFile.from(pr)
-console.log(D)
-let D_ = await PrprExtraFile.read(D)
-console.log(pr.src)
-console.log(D_.src)*/
+app.stage.filters = [testShader.filter]

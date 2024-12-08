@@ -5,7 +5,7 @@ export class FloatAnim extends BaseAnim {
     public events: Event[] = []
     public originValue: number = 0
     public eventIndex: number = 0
-    calculate(currentTime: number): calculateResult {
+    calculate(currentTime: number): calculateResult<number> {
         let result = this.valueCalculator(
             this.events,
             currentTime,

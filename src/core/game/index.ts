@@ -121,7 +121,7 @@ export default class PhiGame {
         this.renders.mainContainer.addChild(this.renders.UIContainer);
         this.renders.UIContainer.visible = false
         this.renders.videoContainer = new Container();
-        this.renders.videoContainer.zIndex = -4;
+        this.renders.videoContainer.zIndex = -1;
         this.renders.gameContainer.addChild(this.renders.videoContainer);
 
 
@@ -135,8 +135,9 @@ export default class PhiGame {
             stage: this.renders.gameContainer,
             canvas: this.app.canvas,
             assets: {
-                textures: { normal: this.assets.hitFx, bad: this.assets.hitFx },
+                textures: { normal: this.assets.hitFx, bad: this.assets.note.bad },
                 sounds: this.assets.sound,
+
             },
             hitsound: verify.bool(params.settings.hitsound, true),
             hitsoundVolume: verify.number(params.settings.hitsoundVolume, 1, 0, 1),
@@ -578,10 +579,10 @@ export default class PhiGame {
         return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
     }
     calcGameAnimateTick(isStart = true) {
-        let _progress = (Date.now() - (isStart ? this._gameStartTime : this._gameEndTime)) / 1000,
+        let _progress = (Date.now() - (isStart ? this._gameStartTime : this._gameEndTime)) / 1500,
             progress = (isStart ? 1 - Math.pow(1 - _progress, 4) : Math.pow(1 - _progress, 4));
         this.sprites.fakeJudgeline.width = this.renders.sizer.width * this.easeInOutCubic(progress);
-        this.renders.gameContainer.alpha = progress;
+        this.renders.gameContainer.alpha = _progress;
         if (_progress >= 1) {
             if (isStart) {
                 this._animateStatus = 1;

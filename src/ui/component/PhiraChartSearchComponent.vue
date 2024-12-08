@@ -1,13 +1,16 @@
 <script lang="ts">
 import { onMounted, PropType, ref } from 'vue';
 import { I18N } from '../i18n';
-import { PhiraAPI } from '@/api/phira';
+import { PhiraAPI, SearchDivision, SearchOrder } from '@/api/phira';
 import { Button } from 'mdui';
 const searchBtn = ref<Button>()
 export default {
     props: {
         "searchCallback": Function as PropType<
-            (searchOrder: string, searchDivision: string, searchText: string) => void
+            (searchOrder: SearchOrder, searchDivision: SearchDivision, searchText: string) => void
+        >,
+        "change": Function as PropType<
+            (searchOrder: SearchOrder, searchDivision: SearchDivision, searchText: string) => void
         >
     }
 
@@ -40,18 +43,27 @@ export default {
                     searchBtn.value!.loading = false
                 }
             })()
+        },
+        onchange() {
+            if (this.change == undefined) return;
+            this.change(
+                PhiraAPI.getSearchOrder(this.searchOrder.slice(0, this.searchOrder.length - 1) as string)!,
+                PhiraAPI.getSearchDivision(this.searchDivision.slice(0, this.searchDivision.length - 1) as string)!,
+                this.searchText
+            )
         }
     },
     watch: {
+
     }
 }
 </script>
 
 <template>
     <div class="search-div">
-        <mdui-text-field @input="searchText = $event.target.value" class="search-text" variant="filled" type="text"
-            clearable icon="search" :label="I18N('ui.screen.phira.chart.text.search')"></mdui-text-field>
-        <mdui-select :value="searchOrder" @change="searchOrder = $event.target.value" class="search-select1"
+        <mdui-text-field @input="searchText = $event.target.value; onchange()" class="search-text" variant="filled"
+            type="text" clearable icon="search" :label="I18N('ui.screen.phira.chart.text.search')"></mdui-text-field>
+        <mdui-select :value="searchOrder" @change="searchOrder = $event.target.value; onchange()" class="search-select1"
             variant="filled" placement="auto" :label="I18N('ui.screen.phira.chart.text.select1')">
             <mdui-menu-item value="name_">{{ I18N("ui.screen.phira.chart.text.order.name") }}</mdui-menu-item>
             <mdui-menu-item value="-name_">{{ I18N("ui.screen.phira.chart.text.order.nameReverse") }}</mdui-menu-item>
@@ -62,8 +74,9 @@ export default {
             <mdui-menu-item value="-updated_">{{ I18N("ui.screen.phira.chart.text.order.timeReverse")
                 }}</mdui-menu-item>
         </mdui-select>
-        <mdui-select :value="searchDivision" @change="searchDivision = $event.target.value" class="search-select2"
-            variant="filled" placement="auto" :label="I18N('ui.screen.phira.chart.text.select2')">
+        <mdui-select :value="searchDivision" @change="searchDivision = $event.target.value; onchange()"
+            class="search-select2" variant="filled" placement="auto"
+            :label="I18N('ui.screen.phira.chart.text.select2')">
             <mdui-menu-item value="_">{{ I18N("ui.screen.phira.chart.text.d.ordinary") }}</mdui-menu-item>
             <mdui-menu-item value="plain_">{{ I18N("ui.screen.phira.chart.text.d.difficulty") }}</mdui-menu-item>
             <mdui-menu-item value="troll_">{{ I18N("ui.screen.phira.chart.text.d.shenjin") }}</mdui-menu-item>

@@ -24,6 +24,7 @@ export interface ResourcePackInfo {
         drag: string[]
         hold: string[]
         flick: string[]
+        bad_note_color: string
     }
     judgeLine: {
         ap: string
@@ -90,6 +91,7 @@ export interface PhiAssets {
         tap: pixi.Texture
         drag: pixi.Texture
         flick: pixi.Texture
+        bad: pixi.Texture
     }
     judgeLine: pixi.Texture
 
@@ -126,6 +128,7 @@ export class ResourcePackInfo {
         drag: string[]
         hold: string[]
         flick: string[]
+        bad_note_color: string
     }
     public judgeLine: {
         ap: string
@@ -256,8 +259,10 @@ export class ResourcePack {
             flickMH: await loadTextures(zip.get(info.note.flick[1])!),
             tap: await loadTextures(zip.get(info.note.tap[0])!),
             drag: await loadTextures(zip.get(info.note.drag[0])!),
-            flick: await loadTextures(zip.get(info.note.flick[0])!)
+            flick: await loadTextures(zip.get(info.note.flick[0])!),
+            bad: undefined as any as pixi.Texture
         }
+        note.bad = await genBadNoteTex(note.tap, info.note.bad_note_color)
         log.info('所有Note加载完成')
 
         STATUS.setStatusInfo("sound")
@@ -303,7 +308,33 @@ export class ResourcePack {
 }
 
 
-async function genBadNoteTex(src: pixi.Texture) {
+async function genBadNoteTex(src: pixi.Texture, colorHex: string) {
     const img = src.source.resource as ImageBitmap
+    let color = hexToRGB(colorHex)
+    let el = document.createElement("canvas")
+    el.width = img.width
+    el.height = img.height
+    const ctx = el.getContext("2d")!
+    ctx.drawImage(img, 0, 0);
+    for (let dy = 0; dy < img.height; dy++) {
+        for (let dx = 0; dx < img.width; dx++) {
+            let imgData = ctx.getImageData(dx, dy, 1, 1);
+            for (let i = 0; i < imgData.data.length / 4; i++) {
+                imgData.data[i * 4] = color[0];
+                imgData.data[i * 4 + 1] = color[1];
+                imgData.data[i * 4 + 2] = color[2];
+            }
+            ctx.putImageData(imgData, dx, dy);
+        }
+    }
+
+    return pixi.Texture.from(ctx.canvas)
 
 }
+function hexToRGB(hex: string) {
+    let r = parseInt(hex.substring(1, 3), 16);
+    let g = parseInt(hex.substring(3, 5), 16);
+    let b = parseInt(hex.substring(5, 7), 16);
+    return [r, g, b];
+}
+

@@ -59,5 +59,6 @@ export class i18n {
 }
 
 export const I18N = new i18n();
-(window as any).I18N = I18N
+(window as any).I18N = I18N;
+(window as any).setUserLanguage = i18n.setUserLanguage
 await I18N.load()

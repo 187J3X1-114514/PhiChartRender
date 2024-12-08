@@ -7,6 +7,7 @@ import { PhiEditEasing as Easing } from '../easing'
 import { PhiEdit as utils2 } from './otherUtils'
 import { chart_log } from './index.js';
 import { CONST } from '@/core/types/const';
+import { FloatAnim } from '../anim/float.js';
 export default function PhiEditChartConverter(_chart: any) {
     let rawChart = _chart.split("\n");
     let chart = new Chart();
@@ -16,7 +17,7 @@ export default function PhiEditChartConverter(_chart: any) {
     let chartSimple = {
         bpm: new Array<any>(),
         judgelines: new Array<any>(),
-        _judgelines: new Array<any>(),
+        _judgelines: new Array<Judgeline>(),
         notes: new Array<any>(),
         notesPerLine: new Array<any>(),
         sameTimeNoteCount: {},
@@ -33,11 +34,15 @@ export default function PhiEditChartConverter(_chart: any) {
                 console.warn('Invalid line id: ' + lineId + ', ignored');
                 return;
             }
-            if (!(this._judgelines as any)[lineId]) (this._judgelines as any)[lineId] = new Judgeline({ id: lineId });
-            if ((this._judgelines as any)[lineId].eventLayers.length < 1) (this._judgelines as any)[lineId].eventLayers.push(new EventLayer());
+            if (!(this._judgelines as any)[lineId]) {
+                (this._judgelines)[lineId] = new Judgeline({ id: lineId })
+            }
+            if ((this._judgelines)[lineId].eventLayers.length == 0) {
+                (this._judgelines)[lineId].eventLayers.push(new EventLayer())
+            }
             if (!(this._judgelines as any)[lineId].eventLayers[0][eventName]) throw new Error('No such event type: ' + eventName);
 
-            let events = (this._judgelines as any)[lineId].eventLayers[0][eventName];
+            let events: any[] = ((this._judgelines as any)[lineId].eventLayers[0][eventName] as FloatAnim).events;
             let lastEvent = events[events.length - 1];
 
             if (
@@ -62,7 +67,7 @@ export default function PhiEditChartConverter(_chart: any) {
                     lastEvent.end = event.end;
                 }
                 else {
-                    lastEvent.value = event.value;
+                    (lastEvent as any).value = event.value;
                 }
             }
             else {
@@ -298,31 +303,31 @@ export default function PhiEditChartConverter(_chart: any) {
         judgeline.sortEvent();
 
         // 事件参数补齐
-        judgeline.eventLayers[0].alpha.forEach((event: any, eventIndex: any, array: any) => {
+        judgeline.eventLayers[0].alpha.events.forEach((event: any, eventIndex: any, array: any) => {
             if (isNaN(event.endTime)) event.endTime = eventIndex < array.length - 1 ? array[eventIndex + 1].startTime : 1e5;
             if (isNaN(event.start)) event.start = eventIndex > 0 ? array[eventIndex - 1].end : 0;
         });
-        judgeline.eventLayers[0].moveX.forEach((event: any, eventIndex: any, array: any) => {
+        judgeline.eventLayers[0].moveX.events.forEach((event: any, eventIndex: any, array: any) => {
             if (isNaN(event.endTime)) event.endTime = eventIndex < array.length - 1 ? array[eventIndex + 1].startTime : 1e5;
             if (isNaN(event.start)) event.start = eventIndex > 0 ? array[eventIndex - 1].end : 0;
         });
-        judgeline.eventLayers[0].moveY.forEach((event: any, eventIndex: any, array: any) => {
+        judgeline.eventLayers[0].moveY.events.forEach((event: any, eventIndex: any, array: any) => {
             if (isNaN(event.endTime)) event.endTime = eventIndex < array.length - 1 ? array[eventIndex + 1].startTime : 1e5;
             if (isNaN(event.start)) event.start = eventIndex > 0 ? array[eventIndex - 1].end : 0;
         });
-        judgeline.eventLayers[0].rotate.forEach((event: any, eventIndex: any, array: any) => {
+        judgeline.eventLayers[0].rotate.events.forEach((event: any, eventIndex: any, array: any) => {
             if (isNaN(event.endTime)) event.endTime = eventIndex < array.length - 1 ? array[eventIndex + 1].startTime : 1e5;
             if (isNaN(event.start)) event.start = eventIndex > 0 ? array[eventIndex - 1].end / (Math.PI / 180) : 0;
 
             event.start = event.start * (Math.PI / 180);
             event.end = event.end * (Math.PI / 180);
         });
-        judgeline.eventLayers[0].speed.forEach((event: any, eventIndex: any, array: any) => {
+        judgeline.eventLayers[0].speed.events.forEach((event: any, eventIndex: any, array: any) => {
             if (isNaN(event.endTime)) event.endTime = eventIndex < array.length - 1 ? array[eventIndex + 1].startTime : 1e5;
         });
 
         // Alpha 事件单独进行计算
-        judgeline.eventLayers[0].alpha.forEach((event: any) => {
+        judgeline.eventLayers[0].alpha.events.forEach((event: any) => {
             let noNoteSetsVisibleTime = true;
 
             if (event.start == -1) event.start = -255;
@@ -355,38 +360,23 @@ export default function PhiEditChartConverter(_chart: any) {
             event.end = event.end / 255;
         });
 
-        // 拆分缓动
-        for (const name in judgeline.eventLayers[0]) {
-            if (name == 'speed' || !(judgeline.eventLayers[0][name] instanceof Array)) continue;
-
+        judgeline.eventLayers[0].do((oldEvents) => {
             let newEvents: any[] = [];
-            judgeline.eventLayers[0][name].forEach((event: any) => {
+            for (let event of oldEvents) {
                 utils.calculateEventEase(event, Easing)
                     .forEach((newEvent) => {
                         newEvents.push(newEvent);
                     }
                     );
-            });
-            judgeline.eventLayers[0][name] = newEvents;
-        }
-
-        // 合并相同变化量事件
-        /*
-        for (const name in judgeline.eventLayers[0])
-        {
-            if (name != 'speed' && (judgeline.eventLayers[0][name] instanceof Array))
-            {
-                judgeline.eventLayers[0][name] = utils.arrangeSameValueEvent(judgeline.eventLayers[0][name]);
             }
-        }
-        judgeline.eventLayers[0].speed = utils.arrangeSameSingleValueEvent(judgeline.eventLayers[0].speed);
-        */
+            return newEvents
+        })
 
-        // 计算事件真实时间
-        for (const name in judgeline.eventLayers[0]) {
-            if (!(judgeline.eventLayers[0][name] instanceof Array)) continue;
-            judgeline.eventLayers[0][name] = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0][name]);
-        }
+        judgeline.eventLayers[0].alpha.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].alpha.events);
+        judgeline.eventLayers[0].moveX.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].moveX.events);
+        judgeline.eventLayers[0].moveY.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].moveY.events);
+        judgeline.eventLayers[0].rotate.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].rotate.events);
+        judgeline.eventLayers[0].speed = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].speed);
 
         judgeline.sortEvent();
         judgeline.calcFloorPosition();

@@ -83,6 +83,7 @@ export default {
                 </mdui-segmented-button>
             </div>
         </Transition>
+
     </mdui-segmented-button-group>
 </template>
 
@@ -96,8 +97,11 @@ export default {
 .pager-root {
     transition: all 0.2s cubic-bezier(.2, 0, 0, 1);
     height: 40px;
-    min-width: 30%;
-    max-width: 50%;
+    max-width: 60%;
+    max-height: 5em;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    
 }
 
 .pager-root-enter-active,

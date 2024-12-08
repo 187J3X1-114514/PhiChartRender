@@ -4,8 +4,9 @@ import { ResourceManager, ResourcePack } from "../../core/resource";
 import { File } from "../../core/file";
 import { Application } from "pixi.js";
 import { topAppBar } from "../App.vue";
+import { reqFullSc } from "..";
 
-export class PlayS {
+export class PlayScreen {
     private res: ResourceManager
     private chart?: ChartInfo
     private game?: PhiGame
@@ -41,6 +42,7 @@ export class PlayS {
         }
         await this.chart!.blur(40)
         this.app = new Application()
+
         this.chart_data = this.chart!.get(this.res)
         await this.app.init({
             //width: document.documentElement.clientWidth,
@@ -50,8 +52,8 @@ export class PlayS {
             //backgroundAlpha: 1,
             hello: true,
             resizeTo: document.documentElement,
-            resolution: window.devicePixelRatio,
-            preference: navigator.gpu ? "webgl" : "webgl"
+            resolution: window.devicePixelRatio || 1,
+            preference: "webgl"
         })
 
         this.game = await PhiGame.create({
@@ -63,7 +65,15 @@ export class PlayS {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: autoPlay, shader: true, showInputPoint: true, showFPS: false, bgDim: 0.1, antialias: false, antialiasType: 1,noteScale:1.2
+                autoPlay: autoPlay,
+                shader: true,
+                showInputPoint: false,
+                showFPS: false,
+                bgDim: 0.1,
+                antialias: false,
+                antialiasType: 1,
+                noteScale: 1.2,
+                audioOffset: this.chart!.type == "phira" ? this.chart!.src.offset : 0
             }
         })
         let r = new ResizeObserver(() => { this.game!.resize(true) })

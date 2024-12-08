@@ -116,7 +116,7 @@ export default function RePhiEditChartConverter(_chart: any) {
             eventLayer.sort();
 
             if (
-                eventLayer.speed.length <= 0 &&
+                eventLayer.speed.events.length <= 0 &&
                 eventLayer.moveX.events.length <= 0 &&
                 eventLayer.moveY.events.length <= 0 &&
                 eventLayer.alpha.events.length <= 0 &&
@@ -124,13 +124,13 @@ export default function RePhiEditChartConverter(_chart: any) {
             ) {
                 return;
             }
-            eventLayer.speed = utils.calculateRealTime(rawChart.BPMList, eventLayer.speed);
+            let speed = utils.calculateRealTime(rawChart.BPMList, eventLayer.speed.events);
             eventLayer.moveX.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.moveX.events);
             eventLayer.moveY.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.moveY.events);
             eventLayer.alpha.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.alpha.events);
             eventLayer.rotate.events = utils.calculateRealTime(rawChart.BPMList, eventLayer.rotate.events);
 
-            eventLayer.speed.forEach((event: any) => {
+            speed.forEach((event: any) => {
                 event.value = event.value / (0.6 / (120 / 900));
             });
             eventLayer.moveX.events.forEach((event) => {
@@ -159,6 +159,7 @@ export default function RePhiEditChartConverter(_chart: any) {
             eventLayer.moveY.events = fixEvent(eventLayer.moveY.events)
             eventLayer.alpha.events = fixEvent(eventLayer.alpha.events)
             eventLayer.rotate.events = fixEvent(eventLayer.rotate.events)
+            eventLayer.speed.events = speed
             eventLayer.sort();
             judgeline.eventLayers.push(eventLayer);
         });
@@ -252,7 +253,7 @@ export default function RePhiEditChartConverter(_chart: any) {
         judgeline.noteControls.alpha = utils2.calculateNoteControls(_judgeline.alphaControl, 'alpha', 1);
         judgeline.noteControls.scale = utils2.calculateNoteControls(_judgeline.sizeControl, 'size', 1);
         judgeline.noteControls.x = utils2.calculateNoteControls(_judgeline.posControl, 'pos', 1);
-        // judgeline.noteControls.y = calculateNoteControls(_judgeline.yControl, 'y', 1);
+        judgeline.noteControls.y = utils2.calculateNoteControls(_judgeline.yControl, 'y', 1);
 
         // 事件排序并计算 floorPosition
         judgeline.sortEvent();
@@ -371,9 +372,8 @@ function convertChartFormat(rawChart: any) {
             judgeline.bpmfactor = 1;
             judgeline.father = -1;
             judgeline.zOrder = 0;
-
             judgeline.eventLayers.forEach((eventLayer: EventLayer) => {
-                eventLayer.speed.forEach((event: any) => {
+                eventLayer.speed.events.forEach((event: any) => {
                     event.easingLeft = 0;
                     event.easingRight = 1;
                 });

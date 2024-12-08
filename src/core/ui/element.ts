@@ -110,8 +110,6 @@ export class UIElement {
         if (!this.isText) {
             if (this.type == attachUI.Pause) {
                 this.sprite = new Sprite(pauseButton)
-                this.sprite.eventMode = 'static';
-                this.sprite.cursor = 'pointer';
             }
             if (this.type == attachUI.Bar) {
                 this.sprite = new Graphics()

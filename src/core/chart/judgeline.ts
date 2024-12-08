@@ -8,6 +8,8 @@ import { type PhiAssets, ResourceManager } from '../resource';
 import type { SizerData } from '../types/params';
 import { chart_log } from './convert';
 import type { jsonEventLayer, jsonJudgeLineData } from './types/judgeLine';
+import { AnimatedGIF } from '@pixi/gif';
+
 const blackJudgeLine = (() => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
@@ -44,11 +46,11 @@ export default class Judgeline {
         alpha: Event[],
         scale: Event[],
         x: Event[],
-        /* y: [] */
+        y: Event[]
     };
 
 
-    sprite: Sprite | Text;
+    sprite: Sprite | Text | AnimatedGIF;
     speed = 1;
     x = 0.5;
     y = 0.5;
@@ -90,7 +92,7 @@ export default class Judgeline {
             alpha: [],
             scale: [],
             x: [],
-            /* y: [] */
+            y: []
         };
         this.isText = false;
 
@@ -163,8 +165,8 @@ export default class Judgeline {
 
         let noSpeedEventsLayerCount = 0;
         this.eventLayers.forEach((eventLayer) => {
-            eventLayer.speed = utils.arrangeSameSingleValueEvent(eventLayer.speed);
-            if (eventLayer.speed.length < 1) noSpeedEventsLayerCount++;
+            eventLayer.speed.events = utils.arrangeSameSingleValueEvent(eventLayer.speed.events);
+            if (eventLayer.speed.events.length < 1) noSpeedEventsLayerCount++;
         });
 
         if (noSpeedEventsLayerCount == this.eventLayers.length) {
@@ -174,6 +176,7 @@ export default class Judgeline {
                 endTime: 1e4,
                 value: 1
             });
+            console.log(this)
         }
 
         let sameTimeSpeedEventAlreadyExist: any = {};
@@ -183,8 +186,8 @@ export default class Judgeline {
         this.floorPositions = [];
 
         this.eventLayers.forEach((eventLayer, eventLayerIndex) => {
-            eventLayer.speed.forEach((event, eventIndex) => {
-                event.endTime = eventLayer.speed[eventIndex + 1] ? eventLayer.speed[eventIndex + 1].startTime : 1e4;
+            eventLayer.speed.events.forEach((event, eventIndex) => {
+                event.endTime = eventLayer.speed.events[eventIndex + 1] ? eventLayer.speed.events[eventIndex + 1].startTime : 1e4;
 
                 let eventTime = (event.startTime).toFixed(3);
 
@@ -199,11 +202,11 @@ export default class Judgeline {
                 sameTimeSpeedEventAlreadyExist[eventTime] = true;
             });
 
-            if (eventLayerIndex === 0 && eventLayer.speed[0].startTime > 0) {
-                eventLayer.speed.unshift({
+            if (eventLayerIndex === 0 && eventLayer.speed.events[0].startTime > 0) {
+                eventLayer.speed.events.unshift({
                     startTime: 1 - 100,
-                    endTime: eventLayer.speed[0] ? eventLayer.speed[0].startTime : 1e4,
-                    value: eventLayer.speed[0] ? eventLayer.speed[0].value : 1
+                    endTime: eventLayer.speed.events[0] ? eventLayer.speed.events[0].startTime : 1e4,
+                    value: eventLayer.speed.events[0] ? eventLayer.speed.events[0].value : 1
                 });
             }
         });
@@ -256,7 +259,7 @@ export default class Judgeline {
         this.eventLayers.forEach((eventLayer) => {
             let currentValue = 0;
 
-            for (const event of eventLayer.speed) {
+            for (const event of eventLayer.speed.events) {
                 if (event.endTime < time) continue;
                 if (event.startTime > time) break;
                 currentValue = event.value!;
@@ -268,24 +271,30 @@ export default class Judgeline {
         return result;
     }
 
-    createSprite(texture: PhiAssets, zipFiles: ResourceManager, rp = "") {
+    async createSprite(texture: PhiAssets, zipFiles: ResourceManager, rp = "") {
         this.textureName = undefined
         if (!this.isText) {
             this.textureName = this.texture
             let tex
             if (this.texture) {
+
                 tex = zipFiles.get(rp + "/" + this.texture) as Texture
                 if (tex) {
-
+                    if ((this.texture as string).endsWith("gif")) {
+                        this.sprite = AnimatedGIF.fromBuffer(await zipFiles.srcFiles[rp + "/" + this.texture]!.async("arraybuffer"));
+                        (this.sprite as AnimatedGIF).play()
+                    } else {
+                        this.sprite = new Sprite(tex);
+                    }
                 } else {
                     chart_log.warn(`ID为${this.id}的判定线的材质获取失败，名称 ${this.texture} 完整路径 ${rp + "/" + this.texture}`)
                     tex = texture.judgeLine
+                    this.sprite = new Sprite(tex);
                 }
             } else {
                 tex = texture.judgeLine
+                this.sprite = new Sprite(tex);
             }
-
-            this.sprite = new Sprite(tex);
 
 
             if (this.texture) {
@@ -379,12 +388,13 @@ export default class Judgeline {
             let event = this.extendEvent.color[i];
             if (event.endTime < currentTime) continue;
             if (event.startTime > currentTime) break;
-            if (!this.wasBlack && !this.isText && calcGray(event.value) >= 0.98) {
-                this.sprite.tint = 0xFFFFFF
-                this.toBlack()
-                break
-            }
-            this.color = this.sprite.tint = event.value;
+            //if (!this.wasBlack && !this.isText && calcGray(event.value) >= 0.98) {
+            //    this.sprite.tint = 0xFFFFFF
+            //    this.toBlack()
+            //    break
+            //}
+            this.color = event.value
+            this.sprite.tint = event.value;
         }
 
         for (let i = 0, length = this.extendEvent.incline.length; i < length; i++) {
@@ -427,8 +437,6 @@ export default class Judgeline {
             this.sprite.tint = color
         } else if (this.extendEvent.color.length == 0) {
             this.sprite.tint = color
-        } else {
-            this.sprite.tint = 0xFFFFFF
         }
     }
     toBlack() {

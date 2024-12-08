@@ -78,6 +78,7 @@ export default class Judgement {
     judgeTimes: any;
     judgePoints: JudgePoint[] = [];
     clickParticleContainer: Container = new Container();
+    badNoteContainer: Container<BadNoteSprite> = new Container<BadNoteSprite>();
     renderSize: SizerData = undefined as any;
     _clickAnimBaseScale: any;
     _holdBetween: number = 0;
@@ -115,16 +116,16 @@ export default class Judgement {
     }
 
     createSprites(showInputPoint = true) {
-        this.clickParticleContainer = new Container();
         this.clickParticleContainer.zIndex = 99999;
         this.stage.addChild(this.clickParticleContainer);
+        this.badNoteContainer.zIndex = 99998;
+        this.stage.addChild(this.badNoteContainer);
 
         this.score.createSprites(this.stage);
         this.input.createSprite(this.stage, showInputPoint);
 
         this._clickAnimBaseScale = {
-            normal: 256 / this.textures.normal[0].width,
-            bad: 256 / this.textures.bad[0].width
+            normal: 256 / this.textures.normal[0].width
         };
     }
 
@@ -160,6 +161,17 @@ export default class Judgement {
             particle.position.x = particle.distance * particle.cosr - particle.distance * particle.sinr + particle.basePos.x;
             particle.position.y = particle.distance * particle.cosr + particle.distance * particle.sinr + particle.basePos.y;
         }
+        for (let i = 0, length = this.badNoteContainer.children.length; i < length; i++) {
+            const sprite: BadNoteSprite = this.badNoteContainer.children[i]
+            if (!sprite) break;
+            const currentTimeProgress = (this.currentTime - sprite.startTime) / 500;
+            if (currentTimeProgress >= 1) {
+                sprite.destroy(false)
+                continue;
+            }
+            sprite.alpha = 1 - currentTimeProgress
+
+        }
     }
 
     updataAnim() {
@@ -194,7 +206,7 @@ export default class Judgement {
 
     pushNoteJudge(note: Note) {
         this.score.pushJudge(note.score, this.chart.judgelines);
-        if (note.score! > 2) {
+        if (note.score! >= 2) {
             this.createClickAnimate(note);
             if (note.score! >= 3) this.playHitsound(note);
         }
@@ -202,14 +214,14 @@ export default class Judgement {
 
     createClickAnimate(note: Note) {
         if (note.score! >= 3) {
-            let anim = new AnimatedSprite(note.score! >= 3 ? this.textures.normal : this.textures.bad, false),
+            let anim = new AnimatedSprite(this.textures.normal, false),
                 baseScale = this.renderSize.noteScale * 5.6;
             (anim as any).startTime = this.currentTime
             this.anims.push(anim)
             if (note.score! >= 3 && note.type != CONST.NoteType.Hold) anim.position.set(note.judgelineX, note.judgelineY);
             else anim.position.copyFrom(note.sprite.position);
 
-            anim.scale.set((note.score! >= 3 ? this._clickAnimBaseScale.normal : this._clickAnimBaseScale.bad) * baseScale);
+            anim.scale.set((this._clickAnimBaseScale.normal) * baseScale);
             anim.tint = note.score === 4 ? 0xFFECA0 : note.score === 3 ? 0xB4E1FF : 0x6c4343;
             anim.anchor.set(0.5, 0.5)
             anim.loop = false;
@@ -239,13 +251,16 @@ export default class Judgement {
                 anim.angle = note.sprite.angle;
             }
             this.stage.addChild(anim);
-        } else if (note.score == 2 && note.type == CONST.NoteType.Tap) {
-            if (note.scoreTime == undefined || NaN) return
-            let sprite = new Sprite()
+            return
+        }
+        if (note.type == CONST.NoteType.Tap) {
+            let sprite = new BadNoteSprite(this.textures.bad)
             sprite.scale.copyFrom(note.sprite.scale)
             sprite.position.copyFrom(note.sprite.position)
-            sprite.alpha = (this.currentTime - note.scoreTime) / 500
-            this.stage.addChild(sprite);
+            sprite.anchor.copyFrom((note.sprite as Sprite).anchor)
+            sprite.angle = note.sprite.angle
+            sprite.startTime = (note.time - note.scoreTime!) * 1000
+            this.badNoteContainer.addChild(sprite);
         }
     }
 
@@ -487,3 +502,6 @@ export default class Judgement {
     }
 }
 
+class BadNoteSprite extends Sprite {
+    public startTime: number = NaN
+}

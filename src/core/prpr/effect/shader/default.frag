@@ -1,4 +1,6 @@
-in vec2 vTextureCoord;
+precision highp float;
+
+varying vec2 vTextureCoord;
 uniform sampler2D uTexture;
 
 void main(void)
