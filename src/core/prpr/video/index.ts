@@ -17,15 +17,16 @@ export class PrprVideo {
     public end: number = 0
     static from(tex: Texture, data: PrPrExtraVideo) {
         let pv = new this()
-        if (tex._source.resource instanceof HTMLVideoElement) {
-            pv.video = tex._source.resource
+        console.log(data, tex)
+        if (tex.source.resource instanceof HTMLVideoElement) {
+            pv.video = tex.source.resource
             pv.video.pause()
         }
         pv.scaleType = data.scale as any
         pv.alpha = data.alpha as any
         pv.dim = data.dim as any
         pv.start = data.time as any as number
-        pv.end = pv.start + pv.video.duration
+        pv.end = pv.start + (tex.source.resource as HTMLVideoElement).duration
         pv.sprite = new Container()
         pv.videoSprite = new Sprite(tex)
         pv.dimSprite = new Graphics()

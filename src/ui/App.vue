@@ -155,6 +155,11 @@ await loadFont();
 (window as any).MDUI = MDUI;
 
 import { snackbar } from 'mdui/functions/snackbar.js';
+import { reqFullSc } from '.';
+
+if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) document.body.addEventListener("click", () => {
+    reqFullSc()
+})
 
 try {
     new SharedArrayBuffer(4)

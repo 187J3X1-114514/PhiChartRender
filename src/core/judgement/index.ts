@@ -9,7 +9,10 @@ import Note from '../chart/note';
 import Audio from '../audio';
 import { CONST } from '../types/const';
 import { PhiNoteSound } from '../resource/resource_pack';
-
+const MAX_PLAYING_SOUND = 500
+var PLAYING_SOUND = 0
+const MAX_PARTICLE = 1500
+var PARTICLECount = 0
 const particleCountPerClickAnim = 4;
 
 const AllJudgeTimes = {
@@ -102,6 +105,18 @@ export default class Judgement {
             good: (!params.challangeMode ? AllJudgeTimes.good : AllJudgeTimes.goodChallenge) / 1000,
             bad: (!params.challangeMode ? AllJudgeTimes.bad : AllJudgeTimes.badChallenge) / 1000
         };
+        this.sounds.drag.onend = () => {
+            PLAYING_SOUND = PLAYING_SOUND - 1;
+        }
+        this.sounds.hold.onend = () => {
+            PLAYING_SOUND = PLAYING_SOUND - 1;
+        }
+        this.sounds.tap.onend = () => {
+            PLAYING_SOUND = PLAYING_SOUND - 1;
+        }
+        this.sounds.flick.onend = () => {
+            PLAYING_SOUND = PLAYING_SOUND - 1;
+        }
         this.reset();
     }
 
@@ -148,7 +163,8 @@ export default class Judgement {
             const currentTimeProgress = (this.currentTime - particle.startTime) / 500;
 
             if (currentTimeProgress >= 1) {
-                // this.clickParticleContainer.removeChild(particle);
+                this.clickParticleContainer.removeChild(particle);
+                PARTICLECount = PARTICLECount - 1
                 particle.destroy(false);
                 continue;
             }
@@ -229,6 +245,7 @@ export default class Judgement {
             if (note.score! >= 3) {
                 let currentParticleCount = 0;
                 while (currentParticleCount < particleCountPerClickAnim) {
+                    if (MAX_PARTICLE < PARTICLECount) break;
                     let particle: any = new Sprite(ClickAnimatePointCache);
                     (particle as Sprite).anchor.set(0.5, 0.5)
                     particle.tint = note.score === 4 ? 0xFFECA0 : 0xB4E1FF;
@@ -245,6 +262,7 @@ export default class Judgement {
                     this.clickParticleContainer.addChild(particle);
 
                     currentParticleCount++;
+                    PARTICLECount++
                 }
             }
             else {
@@ -268,27 +286,33 @@ export default class Judgement {
         if (!this._hitsound) return;
         if (note.hitsound) (note.hitsound as Audio).play();
         else {
-            switch (note.type) {
-                case CONST.NoteType.Tap:
-                    {
-                        this.sounds.tap.play();
-                        break;
-                    }
-                case CONST.NoteType.Hold:
-                    {
-                        this.sounds.hold.play();
-                        break;
-                    }
-                case CONST.NoteType.Drag:
-                    {
-                        this.sounds.drag.play();
-                        break;
-                    }
-                case CONST.NoteType.Flick:
-                    {
-                        this.sounds.flick.play();
-                        break;
-                    }
+            if (PLAYING_SOUND <= MAX_PLAYING_SOUND) {
+                switch (note.type) {
+                    case CONST.NoteType.Tap:
+                        {
+                            this.sounds.tap.play();
+                            PLAYING_SOUND++
+                            break;
+                        }
+                    case CONST.NoteType.Hold:
+                        {
+                            this.sounds.hold.play();
+                            PLAYING_SOUND++
+                            break;
+                        }
+                    case CONST.NoteType.Drag:
+                        {
+                            this.sounds.drag.play();
+                            PLAYING_SOUND++
+                            break;
+                        }
+                    case CONST.NoteType.Flick:
+                        {
+                            this.sounds.flick.play();
+                            PLAYING_SOUND++
+                            break;
+                        }
+                }
             }
         }
     }

@@ -155,6 +155,7 @@ export default function RePhiEditChartConverter(_chart: any) {
                 event.start = (Math.PI / 180) * event.start;
                 event.end = (Math.PI / 180) * event.end;
             });
+            eventLayer.sort();
             eventLayer.moveX.events = fixEvent(eventLayer.moveX.events)
             eventLayer.moveY.events = fixEvent(eventLayer.moveY.events)
             eventLayer.alpha.events = fixEvent(eventLayer.alpha.events)

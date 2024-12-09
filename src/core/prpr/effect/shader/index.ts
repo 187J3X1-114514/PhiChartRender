@@ -4,7 +4,7 @@ import { Filter } from 'pixi.js';
 import defaultShaderGL from './default.vert?raw'
 import defaultShaderGLFrag from './default.frag?raw'
 import defaultShaderGPU from './default.wgsl?raw'
-const defaultValueReg = /uniform\s+(\w+)\s+(\w+);.*/g;
+const defaultValueReg = /uniform\s+(\w+)\s+(\w+).*;.*/g;
 
 interface uniData {
     value: any, type: string
@@ -33,13 +33,13 @@ export default class Shader {
             }
             switch (type) {
                 case 'float':
-                    this.uniforms2[name] = { value: value != undefined ? value : vars ? (vars[name] ? vars[name][0].start : 0) : 0, type: "f32" };
+                    this.uniforms2[name] = { value: value != undefined ? value : vars ? (vars[name] ? vars[name][0]?.start : 0) : 0, type: "f32" };
                     break;
                 case 'vec2':
-                    this.uniforms2[name] = { value: value != undefined ? value : vars ? (vars[name] ? vars[name][0].start : [0, 0]) : [0, 0], type: "vec2<f32>" };
+                    this.uniforms2[name] = { value: value != undefined ? value : vars ? (vars[name] ? vars[name][0]?.start : [0, 0]) : [0, 0], type: "vec2<f32>" };
                     break;
                 case 'vec4':
-                    this.uniforms2[name] = { value: value != undefined ? value : vars ? (vars[name] ? vars[name][0].start : [0, 0, 0, 1]) : [0, 0, 0, 1], type: "vec4<f32>" };
+                    this.uniforms2[name] = { value: value != undefined ? value : vars ? (vars[name] ? vars[name][0]?.start : [0, 0, 0, 1]) : [0, 0, 0, 1], type: "vec4<f32>" };
                     break;
 
                 default:
@@ -48,7 +48,7 @@ export default class Shader {
             }
         }
         );
-        this.defaultUniform = {...this.uniforms2}
+        this.defaultUniform = { ...this.uniforms2 }
         this.uniforms = {
             time: { value: 0, type: "f32" },
             screenSize: { value: [0, 0], type: "vec2<f32>" },
@@ -131,10 +131,10 @@ export default class Shader {
 
     }
 
-    getDefaultUniform(name:string){
+    getDefaultUniform(name: string) {
         return this.defaultUniform[name].value
     }
-    getAllDefaultUniform(){
+    getAllDefaultUniform() {
         return this.defaultUniform
     }
 

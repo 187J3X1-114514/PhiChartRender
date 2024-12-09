@@ -376,7 +376,7 @@ export default function PhiEditChartConverter(_chart: any) {
         judgeline.eventLayers[0].moveX.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].moveX.events);
         judgeline.eventLayers[0].moveY.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].moveY.events);
         judgeline.eventLayers[0].rotate.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].rotate.events);
-        judgeline.eventLayers[0].speed = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].speed);
+        judgeline.eventLayers[0].speed.events = utils.calculateRealTime(chartSimple.bpm, judgeline.eventLayers[0].speed.events);
 
         judgeline.sortEvent();
         judgeline.calcFloorPosition();

@@ -582,7 +582,11 @@ export default class PhiGame {
         let _progress = (Date.now() - (isStart ? this._gameStartTime : this._gameEndTime)) / 1500,
             progress = (isStart ? 1 - Math.pow(1 - _progress, 4) : Math.pow(1 - _progress, 4));
         this.sprites.fakeJudgeline.width = this.renders.sizer.width * this.easeInOutCubic(progress);
-        this.renders.gameContainer.alpha = _progress;
+        if (isStart) {
+            this.renders.mainContainer.alpha = _progress+0.25
+        } else {
+            this.renders.mainContainer.alpha = 1 - _progress
+        }
         if (_progress >= 1) {
             if (isStart) {
                 this._animateStatus = 1;
