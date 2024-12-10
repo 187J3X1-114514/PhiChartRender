@@ -94,10 +94,10 @@ export class PrprExtra {
                 this.game!.renders.videoContainer.addChild(video.sprite)
             }
             if (video.start < currentTime && video.end > currentTime) {
-                if (!this.paused) {
-                    video.play()
+                if (this.paused) {
+                    if (!video.video.paused) video.pause()
                 } else {
-                    video.pause()
+                    if (video.video.paused) video.play()
                     continue
                 }
             }
@@ -134,7 +134,12 @@ export class PrprExtra {
         let tempVideos = (this.videos as PrPrExtraVideo[]).splice(0, (this.videos as PrPrExtraVideo[]).length)
         for (let e of tempVideos) {
             let tex = this.game!.zipFiles.get(join(this.game!.chart.rootPath, e.path)) as Texture
-            this.videos.push(PrprVideo.from(tex, e) as any)
+            if (tex.source.resource instanceof HTMLVideoElement) {
+                if (!Number.isNaN(tex.source.resource.duration)) {
+                    this.videos.push(PrprVideo.from(tex, e) as any)
+                }
+            }
+
         }
 
     }
@@ -237,7 +242,7 @@ export class PrprExtra {
         result = utils.calculateRealTime(bpmList, calculateVideosBeat(rawVideos)) as PrPrExtraVideo[]
         console.log(result)
         result.forEach((_video) => {
-            let videoP: Record<string, any> = { 
+            let videoP: Record<string, any> = {
                 ...{ "alpha": _video.alpha ? _video.alpha : 1 },
                 ...{ "dim": _video.dim ? _video.dim : 1 },
             }

@@ -15,6 +15,8 @@ export class PrprVideo {
     public dimSprite: Graphics = {} as any
     public start: number = 0
     public end: number = 0
+    public paused:boolean = true
+    private _currentTime: number = 0
     static from(tex: Texture, data: PrPrExtraVideo) {
         let pv = new this()
         console.log(data, tex)
@@ -46,7 +48,7 @@ export class PrprVideo {
         this._alpha = 1
         this._dim = 1
         //同步
-        //this.video.currentTime = Math.min(Math.max(currentTime - this.start, 0), this.video.duration)
+        this._currentTime = currentTime
         for (let i = 0, length = this.alpha.length; i < length; i++) {
             let event = this.alpha[i];
             if (event.start == event.end) { this._alpha = event.start; continue; }
@@ -71,10 +73,14 @@ export class PrprVideo {
         this.dimSprite.alpha = 1 - this._dim
     }
     pause() {
-        this.videoSprite.texture._source.resource.pause()
+        this.video.currentTime = Math.min(Math.max((this._currentTime) - this.start, 0), this.video.duration)
+        this.video.pause()
+        this.paused = true
     }
     play() {
-        this.videoSprite.texture._source.resource.play()
+        this.video.currentTime = Math.min(Math.max((this._currentTime) - this.start, 0), this.video.duration)
+        this.video.play()
+        this.paused = false
     }
     resize(size: SizerData) {
         let scaleX

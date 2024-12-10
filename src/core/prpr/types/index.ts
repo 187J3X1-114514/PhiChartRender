@@ -11,8 +11,6 @@ export interface PrPrExtraVideo {
     scale: string,
     alpha: number | RPEEvent[],
     dim: number | RPEEvent[],
-    startTime: number[],
-    endTime: number[],
     easingType: number,
     easingLeft: number,
     easingRight: number

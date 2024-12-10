@@ -99,7 +99,23 @@ export class ResourceManager {
                             video.src = URL.createObjectURL(await file.async("blob"))
                             video.pause()
                             video.volume = 0
-                            r(Texture.from(video))
+                            let tex = Texture.from(video)
+
+                            let st = performance.now()
+                            let t = setInterval(() => {
+                                if (performance.now() - st > 10000) {
+                                    clearInterval(t)
+                                    log.error("加载视频超时", "源文件 ->", file.name)
+                                    r(undefined as any)
+                                } else {
+                                    if (tex.source.resource instanceof HTMLVideoElement) {
+                                        if (!Number.isNaN(tex.source.resource.duration)) {
+                                            clearInterval(t)
+                                            r(tex)
+                                        }
+                                    }
+                                }
+                            }, 50)
                         })
 
                     } catch (e) {

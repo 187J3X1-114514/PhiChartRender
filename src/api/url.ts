@@ -15,7 +15,7 @@ export const PHIRA_PROTOCOL2_TEXT = "https://phisimplus.netlify.app/phira-Privac
 
 export function proxyPhriaApiURL(p: string) {
     if (!window.location.origin.includes("phisimplus.netlify.app")) {
-        return window.location.origin + "/proxy/phira-api+" + p
+        return window.location.protocol + "//" + window.location.hostname + ":" + "8888" + "/proxy/phira-api+" + p
     } else {
         return "https://phisimplus.netlify.app/proxy/phira-api+" + p
     }

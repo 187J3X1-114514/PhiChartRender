@@ -143,7 +143,8 @@ const SFILES = [
     "apk",
     "appx",
     "zst",
-    "tzst"
+    "tzst",
+    "pez"
 ]
 
 export function isArchive(name: string | undefined) {

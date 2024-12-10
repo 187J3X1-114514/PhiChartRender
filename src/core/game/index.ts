@@ -578,12 +578,15 @@ export default class PhiGame {
     easeInOutCubic(x: number): number {
         return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
     }
+    easeInOutQuart(x: number): number {
+        return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
+    }
     calcGameAnimateTick(isStart = true) {
         let _progress = (Date.now() - (isStart ? this._gameStartTime : this._gameEndTime)) / 1500,
-            progress = (isStart ? 1 - Math.pow(1 - _progress, 4) : Math.pow(1 - _progress, 4));
-        this.sprites.fakeJudgeline.width = this.renders.sizer.width * this.easeInOutCubic(progress);
+            progress = (!isStart ? 1 - _progress : _progress);
+        this.sprites.fakeJudgeline.width = this.renders.sizer.width * this.easeInOutQuart(progress);
         if (isStart) {
-            this.renders.mainContainer.alpha = _progress+0.25
+            this.renders.mainContainer.alpha = _progress + 0.25
         } else {
             this.renders.mainContainer.alpha = 1 - _progress
         }
