@@ -345,24 +345,29 @@ export class PrprExtra {
                 for (const name in _effect.vars) {
                     let _values = _effect.vars[name];
                     if (_values instanceof Array && _values[0]?.startTime) {
-                        let _timedValues: RPEEvent[] = [];
+                        let _timedValues: RPEEvent[] = utils.calculateEventsBeat(_values)
+                            .sort((a: any, b: any) => a.startTime - b.startTime || b.endTime - a.startTime);
                         let values: Event[] = [];
-
-                        utils.calculateEventsBeat(_values)
-                            .sort((a: any, b: any) => a.startTime - b.startTime || b.endTime - a.startTime)
-                            .forEach((_value: any, index: any, arr: any) => {
-                                let prevValue = arr[index - 1];
-
-                                if (!prevValue) _timedValues.push(_value);
-                                else if (_value.startTime == prevValue.startTime) {
-                                    if (_value.endTime >= prevValue.endTime) _timedValues[_timedValues.length - 1] = _value;
-                                }
-                                else _timedValues.push(_value);
-                            }
-                            );
-
+                        /*
+                                                utils.calculateEventsBeat(_values)
+                                                    .sort((a: any, b: any) => a.startTime - b.startTime || b.endTime - a.startTime)
+                                                    .forEach((_value: any, index: any, arr: any) => {
+                                                        let prevValue = arr[index - 1];
+                                                        _timedValues.push(_value);
+                                                        
+                                                        if (!prevValue) _timedValues.push(_value);
+                                                        else if (_value.startTime == prevValue.startTime) {
+                                                            if (_value.endTime >= prevValue.endTime) _timedValues[_timedValues.length - 1] = _value;
+                                                        }
+                                                        else _timedValues.push(_value);
+                                                    }
+                                                    );
+                        */
+                        if (name == "power") { console.log(_timedValues) }
                         for (const _value of _timedValues) {
+                            if (name == "power")  console.log(_value)
                             values.push(...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)));
+                            if (name == "power")  console.log(values,utils.calculateEventEase(_value, RePhiEditEasing),...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)))
                         }
                         values.sort((a, b) => a.startTime - b.startTime || b.endTime - a.startTime);
                         vars[name] = values;

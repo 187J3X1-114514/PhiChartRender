@@ -113,7 +113,7 @@ function calculateEventEase(event: any, Easings: any, easingsOffset = 1, forceLi
     let result = [];
     let timeBetween = event.endTime - event.startTime;
 
-    if (!event) return [];
+    if (!event) debugger;
 
     if (
         (
@@ -123,7 +123,8 @@ function calculateEventEase(event: any, Easings: any, easingsOffset = 1, forceLi
                 event.easingType <= Easings.length
             )
         ) &&
-        event.start != event.end
+        event.start != event.end &&
+        event.startTime != event.endTime
     ) {
         if (typeof event.start == "number" && typeof event.end == "number") {
             for (let timeIndex = 0, timeCount = Math.ceil(timeBetween / calcBetweenTime); timeIndex < timeCount; timeIndex++) {
@@ -137,7 +138,7 @@ function calculateEventEase(event: any, Easings: any, easingsOffset = 1, forceLi
                     end: valueCalculator(event, Easings, nextTime, easingsOffset)
                 });
             }
-        }else{
+        } else {
             result.push({
                 startTime: event.startTime,
                 endTime: event.endTime,

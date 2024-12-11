@@ -112,6 +112,7 @@ import './styles.css'
 import 'mdui/components/icon.js';
 import Shader from './core/prpr/effect/shader';
 import { Application, Assets, Sprite } from 'pixi.js';
+import { RePhiEditEasing } from './core/chart/easing';
 /*
 const resM = new ResourceManager()
 await resM.load("test.zip", await (await fetch("test")).blob());
@@ -173,7 +174,7 @@ setTimeout(() => {
     app!.canvas.classList.remove("push-in")
 }, 620)
 */
-
+/*
 let app = new Application()
 await app.init({
     width: document.documentElement.clientWidth,
@@ -200,4 +201,22 @@ app.ticker.add(() => {
     })
 })
 
-app.stage.filters = [testShader.filter]
+app.stage.filters = [testShader.filter]*/
+import utils from './core/chart/convert/utils';
+let a = { startTime: 410, endTime: 410, easingType: 4, start: 0, end: 0.05 }
+let b =[ {
+    "time": [
+        0,
+        0,
+        1
+    ],
+    "bpm": 155,
+    "endTime": 5000,
+    "startBeat": 0,
+    "endBeat": 10000,
+    "startTime": 0,
+    "beatTime": 0.3870967741935484
+}]
+console.log(a)
+console.log(utils.calculateEventEase(a, RePhiEditEasing))
+console.log(utils.calculateRealTime(b, utils.calculateEventEase(a, RePhiEditEasing)))
