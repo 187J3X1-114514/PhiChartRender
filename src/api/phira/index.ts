@@ -232,6 +232,35 @@ export class PhiraAPI {
             });
             return updatedUrl;
         }
+        if (searchText != undefined) {
+            if (searchText.trim().startsWith("#")) {
+                let id = (searchText.trim().split("#")[1]).trim()
+                if (id != undefined) {
+                    baseUrl = encodeURI(baseUrl + "/" + id)
+                    try {
+                        let rep = await this.fetch(baseUrl, "GET", null, null, undefined, false)
+                        if (rep.status == 200) {
+                            let r = await rep.json() as PhiraAPIChartInfo
+                            if (r.id != undefined) {
+                                let rr = {
+                                    count: 1,
+                                    maxPages: 1,
+                                    page: 1,
+                                    results: [r]
+                                }
+                                return rr
+                            }
+                        }
+                    } catch (e) { }
+                    return {
+                        count: 0,
+                        maxPages: 0,
+                        page: 0,
+                        results: []
+                    }
+                }
+            }
+        }
         baseUrl = addParams(baseUrl, {
             page: page,
             pageNum: pageNum,
