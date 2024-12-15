@@ -135,6 +135,11 @@ export default {
         }
     },
     watch: {
+        load_done(newV: boolean, oldV: boolean) {
+            if (newV){
+                loadStage.value?.remove()
+            }
+        }
     }
 }
 </script>

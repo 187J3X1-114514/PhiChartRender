@@ -174,7 +174,7 @@ setTimeout(() => {
     app!.canvas.classList.remove("push-in")
 }, 620)
 */
-/*
+
 let app = new Application()
 await app.init({
     width: document.documentElement.clientWidth,
@@ -191,17 +191,18 @@ await app.init({
 document.body.appendChild(app.canvas)
 app.canvas.classList.add("game")
 app.stage.addChild(new Sprite(await Assets.load("assets/phira.png")))
-let testShader = new Shader(Shader.presetsGL.circleBlur, "test", undefined)
+let testShader = new Shader(Shader.presetsGL.fisheye, "test", undefined)
 let s = performance.now()
 app.ticker.add(() => {
     testShader.update({
         time: (performance.now() - s) / 1000,
         screenSize: [document.documentElement.clientWidth, document.documentElement.clientHeight],
-        size : 1
+        power : -0.1
     })
 })
 
-app.stage.filters = [testShader.filter]*/
+app.stage.filters = [testShader.filter]
+/*
 import utils from './core/chart/convert/utils';
 let a = { startTime: 410, endTime: 410, easingType: 4, start: 0, end: 0.05 }
 let b =[ {
@@ -220,3 +221,4 @@ let b =[ {
 console.log(a)
 console.log(utils.calculateEventEase(a, RePhiEditEasing))
 console.log(utils.calculateRealTime(b, utils.calculateEventEase(a, RePhiEditEasing)))
+*/

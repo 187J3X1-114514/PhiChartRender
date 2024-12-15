@@ -56,7 +56,7 @@ export interface GameSettings {
 export interface SizerData {
 
     shaderScreenSize: number[]
-
+    shaderScreenSizeG: number[]
     width: number
     height: number
     widthPercent: number

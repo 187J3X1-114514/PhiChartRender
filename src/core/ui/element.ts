@@ -165,8 +165,6 @@ export class UIElement {
                 let eventLayer = this.eventLayers[i];
                 __.push(eventLayer.calcTime(currentTime))
             }
-
-            //__ = __.reverse()
             for (let i = 0, length = __.length; i < length; i++) {
                 let eventLayer = this.eventLayers[i];
                 if (__[i].x) x = (eventLayer._posX) * size.width;

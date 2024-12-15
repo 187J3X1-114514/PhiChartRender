@@ -141,7 +141,19 @@ export async function checkChartByID(id: string) {
 
 export async function addChartInfo(info: ChartInfoClass, id: string | number) {
     let chartinfo = info.src as ChartInfo
-    await setInfoData(`CHARTIMG+${chartinfo.illustration}`, await info.resManager!.srcFiles[info.illustration]!.getBlob())
+    const canvas = document.createElement("canvas")
+    const ctx = canvas.getContext("2d")!
+    canvas.width = (info.resManager!.files[info.illustration] as Texture).width * 0.75
+    canvas.height = (info.resManager!.files[info.illustration] as Texture).height * 0.75
+    ctx.drawImage(await createImageBitmap(await info.resManager!.srcFiles[info.illustration]!.getBlob()),
+        0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height
+    )
+    let blob = await new Promise<Blob | null>((r) => {
+        canvas.toBlob((b) => {
+            r(b)
+        }, "webp", 0.75)
+    })
+    if (blob != null) await setInfoData(`CHARTIMG+${chartinfo.illustration}`, blob)
     chartinfo.image = `CHARTIMG+${chartinfo.illustration}`
     CacheChartInfo[id] = chartinfo
     await saveAllChartInfo()

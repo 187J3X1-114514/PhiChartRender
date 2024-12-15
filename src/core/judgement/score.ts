@@ -103,7 +103,7 @@ export default class Score {
                             for (const judgeline of judgelines) {
                                 if (!isNaN(judgeline.color)) return;
                                 if (!judgeline.sprite) return;
-                                judgeline.setColor(0xB4E1FF);
+                                judgeline.setColor(0xB4E1FF, true);
                             };
                         }
                     }
@@ -122,7 +122,7 @@ export default class Score {
                         for (const judgeline of judgelines) {
                             if (!isNaN(judgeline.color)) return;
                             if (!judgeline.sprite) return;
-                            judgeline.setColor(0xFFFFFF);
+                            judgeline.setColor(0xFFFFFF, true);
                         };
                     }
                 }

@@ -45,14 +45,14 @@ export class PlayScreen {
 
         this.chart_data = this.chart!.get(this.res)
         await this.app.init({
-            //width: document.documentElement.clientWidth,
-            //height: document.documentElement.clientHeight,
+            width: document.documentElement.clientWidth,
+            height: document.documentElement.clientHeight,
             autoDensity: true,
             antialias: true,
             //backgroundAlpha: 1,
             hello: true,
             resizeTo: document.documentElement,
-            resolution: window.devicePixelRatio || 1,
+            resolution: 2,
             preference: "webgl"
         })
 

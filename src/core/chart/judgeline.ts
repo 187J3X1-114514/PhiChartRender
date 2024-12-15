@@ -15,7 +15,7 @@ const blackJudgeLine = (() => {
     const ctx = canvas.getContext('2d')!;
     canvas.width = 1920
     canvas.height = 3
-    ctx.fillStyle = 'rgba(0,0,0,1)';
+    ctx.fillStyle = 'rgb(0, 0, 0)';
     ctx.fillRect(0, 0, 1920, 3);
     const result = Texture.from(canvas);
     return result;
@@ -282,7 +282,7 @@ export default class Judgeline {
                 if (tex) {
                     if ((this.texture as string).endsWith("gif")) {
                         this.sprite = AnimatedGIF.fromBuffer(await zipFiles.srcFiles[rp + "/" + this.texture]!.async("arraybuffer"));
-                        (this.sprite as AnimatedGIF).play()
+                        (this.sprite as AnimatedGIF).play();
                     } else {
                         this.sprite = new Sprite(tex);
                     }
@@ -432,10 +432,10 @@ export default class Judgeline {
         }
         return defaultValue;
     }
-    setColor(color: number, force: boolean = false) {
-        if (force) {
+    setColor(color: number, judge: boolean = true) {
+        if (!judge) {
             this.sprite.tint = color
-        } else if (this.extendEvent.color.length == 0) {
+        } else if (this.extendEvent.color.length == 0 && !this.isText && this.textureName == undefined) {
             this.sprite.tint = color
         }
     }

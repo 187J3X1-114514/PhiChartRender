@@ -40,7 +40,7 @@ export default class Effect {
         }
     }
 
-    calcTime(currentTime: number, screenSize: number[]) {
+    calcTime(currentTime: number, screenSize: number[], screenSizeG: number[]) {
         if (this.shader === null) return;
 
         const { vars, shader, _currentValue } = this;
@@ -58,6 +58,6 @@ export default class Effect {
                 };
             }
         }
-        (shader as Shader).update({ ..._currentValue, time: currentTime, screenSize: screenSize });
+        (shader as Shader).update({ ..._currentValue, time: currentTime, screenSize: this.isGlobal ? screenSizeG : screenSize });
     }
 }

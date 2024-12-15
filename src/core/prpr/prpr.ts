@@ -70,7 +70,7 @@ export class PrprExtra {
             }
             if (effect.startTime > currentTime) break;
 
-            effect.calcTime(currentTime, renders.sizer.shaderScreenSize);
+            effect.calcTime(currentTime, renders.sizer.shaderScreenSize, renders.sizer.shaderScreenSizeG);
             if (effect.isGlobal) {
                 let temp: any = (rootContainer.filters as Filter[]).slice()
                 temp.push((effect.shader as Shader).filter)

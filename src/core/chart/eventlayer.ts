@@ -44,16 +44,14 @@ export default class EventLayer {
         let _posY = this.moveY.calculate(currentTime)
         let _alpha = this.alpha.calculate(currentTime)
         let _rotate = this.rotate.calculate(currentTime)
-        //let _speed = this.speed.calculate(currentTime); <--有问题
-        this._posX = _posX.notDefault ? _posX.value : this._posX
-        this._posY = _posY.notDefault ? _posY.value : this._posY
-        this._alpha = _alpha.notDefault ? _alpha.value : this._alpha
-        this._rotate = _rotate.notDefault ? _rotate.value : this._rotate
+        this._posX = _posX.value
+        this._posY = _posY.value
+        this._alpha = _alpha.value
+        this._rotate = _rotate.value
         for (let i = 0, length = this.speed.events.length; i < length; i++) {
             let event = this.speed.events[i];
             if (event.endTime < currentTime) continue;
             if (event.startTime > currentTime) break;
-
             this._speed = event.value!;
         }
         return { alpha: _alpha.notDefault, x: _posX.notDefault, y: _posY.notDefault, rotate: _rotate.notDefault }

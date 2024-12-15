@@ -84,10 +84,10 @@ export default {
                 await scrollIntoView(document.body)
                 await this.removeCard()
                 await new Promise((r) => {
-                        setTimeout(() => {
-                            r(null)
-                        }, 200)
-                    })
+                    setTimeout(() => {
+                        r(null)
+                    }, 200)
+                })
                 let r = await api.search(
                     searchOrder,
                     searchDivision,
@@ -158,7 +158,7 @@ export default {
         },
         async removeCard() {
             while (true) {
-                if (charts.value.length == 0) { break; charts.value = [] }
+                if (charts.value.length == 0) { charts.value = []; break; }
                 charts.value.pop()
                 await new Promise((r) => {
                     setTimeout(() => {

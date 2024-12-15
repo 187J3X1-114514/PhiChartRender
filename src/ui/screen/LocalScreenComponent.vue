@@ -4,10 +4,11 @@ import { MenuItem } from 'mdui';
 import { onMounted, ref } from 'vue';
 import { load, ResPack } from '../App.vue';
 import { I18N } from '../i18n';
+import { scrollIntoView } from '@/utils';
 import { PlayScreen } from '../play/play';
-import ChartCardComponent from '../component/ChartCardComponent.vue';
+import PagerComponent from '../component/PagerComponent.vue';
 import ChartCardRootComponent from '../component/ChartCardRootComponent.vue';
-import { getAllChartInfo, getChartByID } from '../data';
+import { ChartInfo, getAllChartInfo, getChartByID } from '../data';
 import { reqFullSc } from '..';
 import { BaseChartInfo } from '@/core/chart/chartinfo';
 function openFilePicker(fn: (c: FileList | null, a: HTMLInputElement, b: Event) => any, accept?: string, multiple?: boolean) {
@@ -25,27 +26,30 @@ const ress = new ResourceManager()
 const autoPlay = ref()
 const chartSelect = ref()
 const root = ref()
-const allchart = ref(await getAllChartInfo())
+const allchart = ref<Record<string, ChartInfo>>({})
+const allchart_split = ref<Record<string, ChartInfo>[]>([])
 const charts = ref<any[]>([]);
-(window as any).test = () => {
-    charts.value.push({
-        image: "00000",
-        level: "00000",
-        levelname: "00000",
-        name: "00000",
-        charter: "00000",
-        click: () => {
-            console.log(0)
+const max_page = ref<number>(1)
+export async function getLoadChart() {
+    console.log("重加载铺面")
+    allchart.value = (await getAllChartInfo())
+    let keys = Object.keys(allchart.value)
+    allchart_split.value = []
+    for (var i = 0; i < keys.length; i += 18) {
+        let list: Record<string, ChartInfo> = {}
+        for (let key of keys.slice(i, i + 18)) {
+            list[key] = allchart.value[key]
         }
-    })
-}
-export async function updataLoadChart() {
-    allchart.value = await getAllChartInfo()
+        allchart_split.value.push(list);
+    }
+    console.log(max_page.value, allchart_split, allchart)
+    max_page.value = allchart_split.value.length
 }
 
 export default {
     components: {
-        ChartCardRootComponent
+        ChartCardRootComponent,
+        PagerComponent
     },
     setup() {
         return {
@@ -53,17 +57,21 @@ export default {
             autoPlay,
             chartSelect,
             charts,
-            allchart
+            allchart,
+            max_page
         }
     },
     unmounted() {
     },
     async mounted() {
-        await this.addLoadChart()
+        charts.value = []
+        await this.updateLoadChart()
     },
     data() {
         return {
-            show: true
+            show: true,
+            show_pager: false,
+            page: 1
         }
     },
     methods: {
@@ -109,18 +117,28 @@ export default {
         I18N: (s: string) => {
             return I18N.get(s)
         },
-        async addLoadChart() {
-            await new Promise((r) => {
-                let i = setInterval(() => {
-                    if (charts.value.length == 0) {
-                        clearInterval(i)
+        async removeCard() {
+            while (true) {
+                if (charts.value.length == 0) { charts.value = []; break; }
+                charts.value.pop()
+                await new Promise((r) => {
+                    setTimeout(() => {
                         r(null)
-                    }
-                    charts.value.pop()
-                }, 100)
+                    }, 30)
+                })
+            }
+            await new Promise((r) => {
+                setTimeout(() => {
+                    r(null)
+                }, 200)
             })
-
-            for (let key in allchart.value) {
+        },
+        async updateLoadChart() {
+            await getLoadChart()
+            await scrollIntoView(document.body)
+            this.show_pager = false
+            await this.removeCard()
+            for (let key in allchart_split.value[this.page - 1]) {
                 let chart = allchart.value[key]
                 charts.value.push({
                     image: chart.image ? chart.image : "-",
@@ -152,11 +170,12 @@ export default {
                     }, 50)
                 })
             }
+            this.show_pager = true
         }
     },
     watch: {
-        allchart() {
-            this.addLoadChart()
+        page() {
+            this.updateLoadChart()
         }
     }
 }
@@ -176,7 +195,13 @@ export default {
 
                 <mdui-switch ref="autoPlay" value="on"></mdui-switch>
             </mdui-card>
-            <ChartCardRootComponent :charts="charts"></ChartCardRootComponent>
+            <div style="display: flex;flex-wrap: wrap;justify-content: center;">
+                <ChartCardRootComponent :charts="charts"></ChartCardRootComponent>
+                <PagerComponent :total="max_page ? max_page : 1" :show="show_pager && charts.length != 0"
+                    :change="(a) => { page = a }">
+                </PagerComponent>
+            </div>
+
         </div>
     </Transition>
 

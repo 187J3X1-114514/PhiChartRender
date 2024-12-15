@@ -72,7 +72,6 @@ export default {
 
 <style>
 .chart-card {
-    transition: all 0.3s ease;
 }
 
 .chart-card-nothing {
@@ -91,10 +90,9 @@ export default {
     margin: 10px;
 }
 
-.chart-card-move,
 .chart-card-enter-active,
 .chart-card-leave-active {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .chart-card-enter-to {

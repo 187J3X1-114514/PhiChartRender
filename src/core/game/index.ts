@@ -216,7 +216,7 @@ export default class PhiGame {
         if (this._settings.showAPStatus) {
             for (const judgeline of this.chart.judgelines) {
                 if (!judgeline.sprite) continue;
-                judgeline.setColor(0xFFECA0)
+                judgeline.setColor(0xFFECA0, true)
             };
         }
 
@@ -365,7 +365,7 @@ export default class PhiGame {
             if (!judgeline.sprite) continue;
 
             judgeline.sprite.alpha = 0;
-            if (this._settings.showAPStatus) judgeline.setColor(0xFFECA0)
+            if (this._settings.showAPStatus) judgeline.setColor(0xFFECA0, true)
         };
         for (const note of this.chart.notes) {
             if (!note.sprite) continue;
@@ -624,7 +624,8 @@ export default class PhiGame {
 
         result.width = height / 9 * 16 < width ? height / 9 * 16 : width;
         result.height = height;
-        result.shaderScreenSize = [width * resolution, height * resolution];
+        result.shaderScreenSize = [result.width * resolution, result.height * resolution];
+        result.shaderScreenSizeG = [width * resolution, height * resolution]
         result.widthPercent = result.width * (9 / 160);
         result.widthOffset = (width - result.width) / 2;
 
