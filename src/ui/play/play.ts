@@ -52,7 +52,7 @@ export class PlayScreen {
             //backgroundAlpha: 1,
             hello: true,
             resizeTo: document.documentElement,
-            resolution: 2,
+            resolution: window.devicePixelRatio,
             preference: "webgl"
         })
 
