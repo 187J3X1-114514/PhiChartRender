@@ -20,7 +20,7 @@ const blackJudgeLine = (() => {
     const result = Texture.from(canvas);
     return result;
 })();
-export var TEXT_RESOLUTION = 3
+export var TEXT_RESOLUTION = 1
 
 
 export default class Judgeline {
