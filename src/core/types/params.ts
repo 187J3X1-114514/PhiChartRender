@@ -3,9 +3,10 @@ import type { ChartData } from "../chart/chartinfo"
 import { ResourceManager } from "../resource"
 import type { PhiAssets } from "../resource/resource_pack"
 import { PrprExtra } from "../prpr/prpr"
+import { WebGLApplication } from "@/gl/WebGLApplication"
 
 export interface GameParams {
-    app: Application
+    app: WebGLApplication
     render: {
         width?: number,
         height?: number,
@@ -34,7 +35,7 @@ export interface GameParams {
         showAPStatus?: boolean,
         shader?: boolean,
         antialias?:boolean,
-        antialiasType?:number //1-fxaa
+        antialiasType?:number //1-fxaa 2-smaa
     }
 
 }

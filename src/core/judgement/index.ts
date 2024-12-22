@@ -176,6 +176,7 @@ export default class Judgement {
 
             particle.position.x = particle.distance * particle.cosr - particle.distance * particle.sinr + particle.basePos.x;
             particle.position.y = particle.distance * particle.cosr + particle.distance * particle.sinr + particle.basePos.y;
+            particle.visible = true
         }
         for (let i = 0, length = this.badNoteContainer.children.length; i < length; i++) {
             const sprite: BadNoteSprite = this.badNoteContainer.children[i]
@@ -258,7 +259,7 @@ export default class Judgement {
                     particle.direction = Math.floor(Math.random() * 360);
                     particle.sinr = Math.sin(particle.direction);
                     particle.cosr = Math.cos(particle.direction);
-
+                    (particle as Sprite).visible = false
                     this.clickParticleContainer.addChild(particle);
 
                     currentParticleCount++;

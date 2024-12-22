@@ -111,8 +111,9 @@ import 'mdui/mdui.css'
 import './styles.css'
 import 'mdui/components/icon.js';
 import Shader from './core/prpr/effect/shader';
-import { Application, Assets, Sprite } from 'pixi.js';
+import { Application, Assets, Container, Sprite, Text, TextStyle } from 'pixi.js';
 import { RePhiEditEasing } from './core/chart/easing';
+import { WebGLApplication } from './gl/WebGLApplication';
 /*
 const resM = new ResourceManager()
 await resM.load("test.zip", await (await fetch("test")).blob());
@@ -175,33 +176,31 @@ setTimeout(() => {
 }, 620)
 */
 
-let app = new Application()
-await app.init({
-    width: document.documentElement.clientWidth,
-    height: document.documentElement.clientHeight,
-    autoDensity: true,
-    antialias: true,
-    backgroundAlpha: 1,
-    preference: "webgl",
-    hello: true,
-    resizeTo: document.documentElement,
-    resolution: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? window.devicePixelRatio : 1
+let app = await WebGLApplication.create(document.createElement("canvas"))
+app.canvas.classList.add("test-game-fs")
+globalThis.addEventListener("resize", () => {
+    app.resize(window.innerWidth, window.innerHeight)
 })
-
 document.body.appendChild(app.canvas)
 app.canvas.classList.add("game")
-app.stage.addChild(new Sprite(await Assets.load("assets/phira.png")))
-let testShader = new Shader(Shader.presetsGL.fisheye, "test", undefined)
-let s = performance.now()
-app.ticker.add(() => {
-    testShader.update({
-        time: (performance.now() - s) / 1000,
-        screenSize: [document.documentElement.clientWidth, document.documentElement.clientHeight],
-        power : -0.1
+let c = new Container()
+let t = new Text({
+    text: "dsfgsdfsdfsdf",
+    style:new TextStyle({
+        fill:"#FFFFFF"
     })
+    
 })
+c.addChild(t)
+let s = new Sprite(await Assets.load("assets/phira.png"))
+s.scale.set(0.5)
+c.addChild(s)
 
-app.stage.filters = [testShader.filter]
+app.setTick(() => {
+    app.renderer.render(c)
+})
+app.start()
+
 /*
 import utils from './core/chart/convert/utils';
 let a = { startTime: 410, endTime: 410, easingType: 4, start: 0, end: 0.05 }

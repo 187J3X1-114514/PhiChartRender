@@ -5,12 +5,13 @@ import { File } from "../../core/file";
 import { Application } from "pixi.js";
 import { topAppBar } from "../App.vue";
 import { reqFullSc } from "..";
+import { WebGLApplication } from "@/gl/WebGLApplication";
 
 export class PlayScreen {
     private res: ResourceManager
     private chart?: ChartInfo
     private game?: PhiGame
-    private app?: Application
+    private app?: WebGLApplication
     private file: File[]
     private resp: ResourcePack
     private chart_data?: ChartData
@@ -28,6 +29,13 @@ export class PlayScreen {
         this.end = f
     }
     async load(autoPlay: boolean = false) {
+        this.app = await WebGLApplication.create(document.createElement("canvas"))
+        globalThis.addEventListener("resize", () => {
+            this.app!.resize(window.innerWidth, window.innerHeight)
+        })
+        document.body.appendChild(this.app.canvas)
+        this.app?.start()
+        
         if (this.chart == undefined) {
             for (let f of this.file) {
                 if (f.extension.toLowerCase() == "zip") {
@@ -41,20 +49,10 @@ export class PlayScreen {
             }
         }
         await this.chart!.blur(40)
-        this.app = new Application()
+
 
         this.chart_data = this.chart!.get(this.res)
-        await this.app.init({
-            width: document.documentElement.clientWidth,
-            height: document.documentElement.clientHeight,
-            autoDensity: true,
-            antialias: true,
-            //backgroundAlpha: 1,
-            hello: true,
-            resizeTo: document.documentElement,
-            resolution: window.devicePixelRatio,
-            preference: "webgl"
-        })
+
 
         this.game = await PhiGame.create({
             app: this.app,
@@ -87,6 +85,7 @@ export class PlayScreen {
         return this.chart!
     }
     start() {
+        
         topAppBar.value.style.display = "none"
         document.body.style.paddingTop = "0px"
         this.app!.canvas.classList.add("push-in")

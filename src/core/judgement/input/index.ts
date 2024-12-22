@@ -64,7 +64,7 @@ export default class Input {
     }
 
     createSprite(stage: any, showInputPoint = true) {
-        if (showInputPoint) {
+        if (true) {
             this.sprite = new Graphics();
             this.sprite.zIndex = 99999;
             stage.addChild(this.sprite);
@@ -129,7 +129,9 @@ export default class Input {
     touchStart(e: any) {
         e.preventDefault();
         for (const i of e.changedTouches) {
-            const { clientX, clientY, identifier } = i;
+            let { clientX, clientY, identifier } = i;
+            clientX *= window.devicePixelRatio 
+            clientY *= window.devicePixelRatio 
             this.addInput('touch', identifier, clientX - this.renderSize.widthOffset, clientY);
         }
     }
@@ -137,7 +139,9 @@ export default class Input {
     touchMove(e: any) {
         e.preventDefault();
         for (const i of e.changedTouches) {
-            const { clientX, clientY, identifier } = i;
+            let { clientX, clientY, identifier } = i;
+            clientX *= window.devicePixelRatio 
+            clientY *= window.devicePixelRatio 
             this.moveInput('touch', identifier, clientX - this.renderSize.widthOffset, clientY);
         }
     }
@@ -151,12 +155,16 @@ export default class Input {
 
     mouseStart(e: any) {
         e.preventDefault();
-        const { clientX, clientY, button } = e;
+        let { clientX, clientY, button } = e;
+        clientX *= window.devicePixelRatio 
+        clientY *= window.devicePixelRatio 
         this.addInput('mouse', button, clientX - this.renderSize.widthOffset, clientY);
     }
 
     mouseMove(e: any) {
-        const { clientX, clientY, button } = e;
+        let { clientX, clientY, button } = e;
+        clientX *= window.devicePixelRatio 
+        clientY *= window.devicePixelRatio 
         this.moveInput('mouse', button, clientX - this.renderSize.widthOffset, clientY);
     }
 

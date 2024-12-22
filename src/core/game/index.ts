@@ -12,6 +12,8 @@ import UIManager from '../ui';
 import { PrprExtra } from '../prpr/prpr';
 import { Antialiasing } from '../antialiasing';
 import { DefaultShader } from '../prpr/effect/shader';
+import { WebGLApplication } from '@/gl/WebGLApplication';
+import { PixiGlRenderTarget } from '@/gl/PixiGlRenderTarget';
 
 const uk = (undefined as unknown) as any
 const ukObj = ({} as unknown) as any
@@ -50,17 +52,16 @@ export default class PhiGame {
                 UIContainer: new Container(),
                 mainContainerMask: new Graphics(),
                 mainContainerCover: new Sprite(),
-                fpsText: new Text(),
+                fpsText: uk,
                 sizer: ({} as any),
                 bg: new Sprite(),
                 pauseButton: new Sprite(),
                 videoContainer: new Container()
             }
         }
-    app: Application = uk
+    app: WebGLApplication = uk
     judgement: Judgement = uk
     private functions: any
-    private processors: any
     assets: PhiAssets = uk
     private lastFPS: number = 0
     private isFirst = true
@@ -70,6 +71,7 @@ export default class PhiGame {
     private _params: GameParams = uk
     private antialiasing: Antialiasing = uk
     public renderTarget: RenderTarget = uk
+    public glRenderTarget: PixiGlRenderTarget = uk
     private async init(_params: GameParams) {
         if (_params.settings.noteScale) _params.settings.noteScale = 8080 / _params.settings.noteScale;
         (window as any).curPhiGame = this
@@ -152,11 +154,6 @@ export default class PhiGame {
             pause: [],
             end: []
         };
-        this.processors = {
-            judgeline: [],
-            note: []
-        };
-
 
         /* ===== 用户设置暂存 ===== */
         this._settings = {
@@ -175,7 +172,7 @@ export default class PhiGame {
         };
         this.renderTarget = new RenderTarget()
         this.antialiasing = new Antialiasing(this.app)
-        this.initRender()
+        await this.initRender()
         this.ui = new UIManager(this)
         this.ui.createSprites()
         this.ui.backgroundContainer.zIndex = 9999999
@@ -196,8 +193,6 @@ export default class PhiGame {
     }
 
     createSprites() {
-
-        this.app.stage.eventMode = "static"
         this.rootContainer.eventMode = "static"
         this.renders.gameContainer.eventMode = "static"
         this.renders.mainContainer.eventMode = "static"
@@ -232,11 +227,12 @@ export default class PhiGame {
         if (this._settings.showAPStatus) this.sprites.fakeJudgeline.tint = 0xFFECA0;
         this.renders.UIContainer.addChild(this.sprites.fakeJudgeline);
 
-        if (this._settings.showFPS) {
+        if (true) {
             this.renders.fpsTextStyle = new TextStyle({
                 fontFamily: font.InGameFontName,
                 align: 'right',
-                fill: 0xFFFFFF
+                fill: 0xFFFFFF,
+                fontSize: 4
             });
             this.renders.fpsText = new Text({
                 text: "FPS: 0",
@@ -244,10 +240,10 @@ export default class PhiGame {
             });
 
             this.renders.fpsText.anchor.x = 1;
-            this.renders.fpsText.alpha = 0.5;
             this.renders.fpsText.zIndex = 999999;
+            this.renders.fpsText.scale.set(0.7)
 
-            this.renders.UIContainer.addChild(this.renders.fpsText);
+            this.rootContainer.addChild(this.renders.fpsText);
         }
         this.renders.gameContainer.sortChildren();
         this.renders.UIContainer.sortChildren();
@@ -259,9 +255,8 @@ export default class PhiGame {
         this.ui.backgroundContainer.zIndex = 9999999999
 
     }
-    upFPS(d: Ticker) {
-        this.renders.fpsText.text = 'FPS: ' + ((this.lastFPS + d.FPS) / 2).toFixed(1)
-        this.lastFPS = d.FPS
+    upFPS() {
+        this.renders.fpsText.text = 'FPS: ' + (this.app.fpsCount.fps).toFixed(1)
     }
     start() {
         if (!this.isFirst) { this.restart(); return }
@@ -272,24 +267,14 @@ export default class PhiGame {
         this.renders.mainContainer.interactive = true
         this.resize();
         this.effects.reset()
-        if (this.renders.fpsText) {
-            this.app.ticker.remove((d) => {
-                this.upFPS(d)
-            })
-            this.app.ticker.add((d) => {
-                this.upFPS(d)
-            })
-        }
 
         this.chart.music.speed = this._settings.speed;
-        this.app.ticker.remove(() => this.gameTick());
         this.chart.music.reset();
         this.chart.reset();
         this.judgement.reset();
         this._animateStatus = 0;
         this._gameStartTime = Date.now();
         this.chart.noteJudgeCallback = this.judgement.calcNote;
-        this.app.ticker.add(() => this.gameTick());
         this.sprites.fakeJudgeline.visible = true
         this.renders.UIContainer.visible = true
         this.renders.gameContainer.visible = true
@@ -315,6 +300,7 @@ export default class PhiGame {
             this.chart.music.seek(a)
         }
         (window as any).curGameMusic = this.chart.music
+        this.app.setTick(() => this.gameTick());
     }
 
     pause() {
@@ -341,7 +327,7 @@ export default class PhiGame {
     }
 
     restart() {
-        this.app.ticker.remove(() => this.gameTick());
+        this.app.setTick(() => this.gameTick());
         window.onblur = () => { this.autoPause() }
         this.chart.music.reset();
 
@@ -357,8 +343,6 @@ export default class PhiGame {
         this._animateStatus = 0;
         this._gameStartTime = Date.now();
         this._gameEndTime = NaN;
-
-        this.app.ticker.add(() => this.gameTick());
         if (this._settings.showAPStatus) this.sprites.fakeJudgeline.tint = 0xFFECA0;
         this.sprites.fakeJudgeline.visible = true;
         for (const judgeline of this.chart.judgelines) {
@@ -377,12 +361,8 @@ export default class PhiGame {
     destroy(removeCanvas = false) {
         const canvas = this.app.canvas;
 
-        this.app.ticker.remove(() => this.gameTick());
+        this.app.setTick(() => { });
         this.chart.music.reset();
-
-        if (this.renders.fpsText) this.app.ticker.remove((d) => {
-            this.upFPS(d)
-        })
 
         this.chart.reset();
         this.judgement.destroySprites();
@@ -392,8 +372,6 @@ export default class PhiGame {
         window.removeEventListener('resize', () => this.resize);
 
         canvas.width = canvas.height = 0;
-
-        this.app.destroy(removeCanvas, { children: false, texture: false, textureSource: false });
         window.onblur = null
     }
 
@@ -403,24 +381,16 @@ export default class PhiGame {
         this.functions[type].push(callback);
     }
 
-    addProcessor(type: string, callback: () => any) {
-        if (!this.processors[type]) return;
-        if (!(callback instanceof Function)) return;
-        this.processors[type].push(callback);
-    }
-
 
 
     resize(withChartSprites = true, shouldResetFakeJudgeLine = true) {
         if (!this.app) return;
         // 计算新尺寸相关数据
-
-        this.renderTarget.resize(this.app.screen.width, this.app.screen.height, this._settings.resolution)
-        this.renders.sizer = this.calcResizer(this.app.screen.width, this.app.screen.height, this._settings.noteScale, this._settings.resolution);
-        this.antialiasing.updata(
+        this.renderTarget.resize(this.app.renderer.screen.width, this.app.renderer.screen.height)
+        this.renders.sizer = this.calcResizer(this.app.renderer.screen.width, this.app.renderer.screen.height, this._settings.noteScale);
+        this.antialiasing.resize(
             this.renders.sizer.shaderScreenSize[0],
             this.renders.sizer.shaderScreenSize[1]
-
         )
         this.ui.resizeSprites(this.renders.sizer, this._isEnded)
         // 主舞台区位置重计算
@@ -440,12 +410,12 @@ export default class PhiGame {
         }
         // 主舞台超宽屏覆盖计算
         if (this.renders.sizer.widerScreen && this.renders.mainContainerCover) {
-            let bgScaleWidth = this.app.screen.width / this.renders.bg.texture.width;
-            let bgScaleHeight = this.app.screen.height / this.renders.bg.texture.height;
+            let bgScaleWidth = this.app.renderer.screen.width / this.renders.bg.texture.width;
+            let bgScaleHeight = this.app.renderer.screen.height / this.renders.bg.texture.height;
             let bgScale = bgScaleWidth > bgScaleHeight ? bgScaleWidth : bgScaleHeight;
 
             this.renders.mainContainerCover.scale.set(bgScale);
-            this.renders.mainContainerCover.position.set(this.app.screen.width / 2, this.app.screen.height / 2);
+            this.renders.mainContainerCover.position.set(this.app.renderer.screen.width / 2, this.app.renderer.screen.height / 2);
 
             this.renders.mainContainerCover.visible = true;
         }
@@ -468,12 +438,12 @@ export default class PhiGame {
 
         // FPS 计数器尺寸计算
         if (this.renders.fpsText) {
-            this.renders.fpsText.position.x = this.renders.sizer.width;
+            this.renders.fpsText.position.x = this.renders.sizer.shaderScreenSizeG[0];
             this.renders.fpsText.position.y = 0;
             this.renders.fpsText.style.fontSize = this.renders.sizer.heightPercent * 32;
             this.renders.fpsText.style.padding = this.renders.sizer.heightPercent * 8;
         }
-
+        this.glRenderTarget = this.app.getGlRenderTarget(this.renderTarget)
         if (withChartSprites) {
             this.judgement.resizeSprites(this.renders.sizer, this._isEnded);
             this.chart.resizeSprites(this.renders.sizer, this._isEnded);
@@ -523,7 +493,7 @@ export default class PhiGame {
         this.calcTickByCurrentTime(currentTime, force)
     }
     calcTickByCurrentTime(currentTime: number, force: boolean = false) {
-        let { chart, judgement, functions, processors, sprites, renders } = this;
+        let { chart, judgement, renders } = this;
         if (currentTime + (this.chart.offset + this._settings.offset) >= this.chart.music.duration && this._animateStatus == 1) {
             this.gameEndCallback()
         }
@@ -540,26 +510,19 @@ export default class PhiGame {
                     if (!this._isPaused || force) {
                         for (let i = 0, length = chart.bpmList.length; i < length; i++) {
                             let bpm = chart.bpmList[i];
-
                             if (bpm.endTime < currentTime) continue;
                             if (bpm.startTime > currentTime) break;
-
                             judgement._holdBetween = bpm.holdBetween;
                         };
-
-                        for (let i = 0, length = chart.judgelines.length; i < length; i++) {
-                            const judgeline = chart.judgelines[i];
+                        for (const judgeline of chart.judgelines) {
                             judgeline.calcTime(currentTime, renders.sizer);
-                            for (let x = 0, length = processors.judgeline.length; x < length; x++) processors.judgeline[x](judgeline, currentTime);
                         };
-                        for (let i = 0, length = chart.notes.length; i < length; i++) {
-                            const note = chart.notes[i];
+                        for (const note of chart.notes) {
                             note.calcTime(currentTime, renders.sizer);
-                            for (let x = 0, length = processors.note.length; x < length; x++) processors.note[x](note, currentTime);
+                            if (note.notCalc) continue
                             judgement.calcNote(currentTime, note);
-                        };
+                        }
                         judgement.calcTick(currentTime);
-                        for (let x = 0, length = functions.tick.length; x < length; x++) functions.tick[x](this, currentTime);
                     }
                     break;
                 }
@@ -610,22 +573,22 @@ export default class PhiGame {
                 this.runCallback('end');
                 this.renders.fpsText.alpha = 0
                 this.renders.mainContainer.alpha = 0
-                this.app.ticker.remove(() => this.gameTick());
+                this.app.setTick(() => { });
                 window.onblur = null
             }
 
         }
         this.ui.calcAni(this.renders.sizer, isStart, _progress)
     }
-    calcResizer(width: number, height: number, noteScale = 8000, resolution = window.devicePixelRatio): SizerData {
+    calcResizer(width: number, height: number, noteScale = 8000): SizerData {
         let result: SizerData = {} as any;
 
 
 
         result.width = height / 9 * 16 < width ? height / 9 * 16 : width;
         result.height = height;
-        result.shaderScreenSize = [result.width * resolution, result.height * resolution];
-        result.shaderScreenSizeG = [width * resolution, height * resolution]
+        result.shaderScreenSize = [result.width, result.height];
+        result.shaderScreenSizeG = [width, height]
         result.widthPercent = result.width * (9 / 160);
         result.widthOffset = (width - result.width) / 2;
 
@@ -649,6 +612,22 @@ export default class PhiGame {
     }
 
     render() {
+        this.upFPS()
+        if (!this._params.settings.antialias) {
+            this.app.renderer.render({
+                container: this.rootContainer
+            })
+        } else {
+            this.app.renderer.render({
+                container: this.rootContainer,
+                target: this.renderTarget
+            })
+
+            this.antialiasing.render()
+            const output = this.antialiasing.output
+            this.app.biltToScreen(output ? output : this.renderTarget)
+
+        }
 
     }
 
@@ -659,12 +638,11 @@ export default class PhiGame {
             )
     }
 
-    private initRender() {
-        this.antialiasing.initFXAA()
-        if (this._params.settings.antialias && this._params.settings.antialiasType == 1) {
-
+    private async initRender() {
+        if (this._params.settings.antialias) {
+            if (this._params.settings.antialiasType == 1) await this.antialiasing.initFXAA()
+            if (this._params.settings.antialiasType == 2) await this.antialiasing.initSMAA()
         }
-        this.app.stage.addChild(this.rootContainer)
     }
 
     static async create(params: GameParams) {

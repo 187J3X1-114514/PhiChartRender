@@ -4,6 +4,7 @@ import Judgeline from './judgeline';
 import Audio from '../audio';
 import { type PhiAssets, ResourceManager } from '../resource';
 import type { jsonNoteData, NoteParam } from './types/note';
+import { CONST } from '../types/const';
 
 
 export default class Note {
@@ -40,6 +41,7 @@ export default class Note {
     public judgelineY?: number
     public sprite: Sprite | Container;
     public params: NoteParam
+    public notCalc: boolean = false
     constructor(params: NoteParam) {
         this.params = params
         this.id = verify.number(params.id, -1, 0);
@@ -160,6 +162,10 @@ export default class Note {
     }
 
     calcTime(currentTime: number, size: any) {
+        if (this.isScoreAnimated && this.isScored && !this.isFake && this.type != CONST.NoteType.Hold) {
+            this.notCalc = true
+            return
+        }
         let _yOffset = size.height * this.yOffset,
             yOffset = _yOffset * (this.isAbove ? -1 : 1),
             originX = size.widthPercent * this.positionX,

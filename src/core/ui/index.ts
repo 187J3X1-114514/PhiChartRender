@@ -29,7 +29,6 @@ export default class UIManager implements baseUIManager {
     } = {
             big: new Sprite(), small: new Sprite(), bigCover: new Graphics(), smallCover: new Graphics()
         }
-    public pauseBtn: Sprite = undefined as any;
     constructor(game: PhiGame, settings: UISettings = defaultUISettings) {
         let chart = game.chart
         this.chart = game.chart
@@ -63,15 +62,13 @@ export default class UIManager implements baseUIManager {
         this.element.Level.create()
         this.element.Pause.create()
         this.element.Bar.create()
-        this.pauseBtn = new Sprite(pauseButton)
-        this.pauseBtn.alpha = 0
-        this.pauseBtn.eventMode = 'static';
-        this.pauseBtn.cursor = 'pointer';
-        this.pauseBtn.on("pointerdown", () => {
-            this.pauseBtnClickCallBack()
+        this.game.app.canvas.addEventListener("pointerdown", (e) => {
+            if (e.clientX - this.size!.widthOffset < 70) {
+                if (e.clientY < 70) {
+                    this.pauseBtnClickCallBack()
+                }
+            }
         })
-        this.pauseBtn.zIndex = 99999999
-        this.pauseBtn.anchor.set(0.5)
     }
     addToScreen() {
         let stage = this.game.renders.UIContainer
@@ -83,7 +80,6 @@ export default class UIManager implements baseUIManager {
         stage.addChild(this.element.Pause.sprite)
         stage.addChild(this.element.Bar.sprite)
         stage.addChild(this.PauseBtnOutLine)
-        stage.addChild(this.pauseBtn)
     }
     createSprites() {
         this.createElement()
@@ -113,10 +109,6 @@ export default class UIManager implements baseUIManager {
     resizeSprites(size: SizerData, _isEnded: boolean) {
         this.size = size
         this.resizeElement()
-        this.pauseBtn.scale.x = this.element.Pause.baseScaleX * 1.3
-        this.pauseBtn.scale.y = this.element.Pause.baseScaleY * 1.3
-        this.pauseBtn.position.x = this.element.Pause.x + this.element.Pause.offsetX
-        this.pauseBtn.position.y = this.element.Pause.y + this.element.Pause.offsetY
 
         this.backgroundContainer.x = 0
         this.backgroundContainer.y = 0
@@ -132,8 +124,8 @@ export default class UIManager implements baseUIManager {
             this.backgrounds.small.visible = true
             this.backgrounds.smallCover.visible = true
             if (size.widerScreen) {
-                let bgScaleWidth = this.game.app.screen.width / this.backgrounds.small.texture.width;
-                let bgScaleHeight = this.game.app.screen.height / this.backgrounds.small.texture.height;
+                let bgScaleWidth = this.game.app.renderer.screen.width / this.backgrounds.small.texture.width;
+                let bgScaleHeight = this.game.app.renderer.screen.height / this.backgrounds.small.texture.height;
                 let bgScale = bgScaleWidth > bgScaleHeight ? bgScaleWidth : bgScaleHeight;
 
                 this.backgrounds.big.scale.set(bgScale);
@@ -177,11 +169,6 @@ export default class UIManager implements baseUIManager {
         this.element.Score.setText(this.game.judgement.score.text.score)
         this.element.Name.setText(this.chart.info.name)
         this.element.Level.setText(this.chart.info.difficult)
-
-        this.pauseBtn.scale.x = this.element.Pause.baseScaleX * 1.3
-        this.pauseBtn.scale.y = this.element.Pause.baseScaleY * 1.3
-        this.pauseBtn.position.x = this.element.Pause.x + this.element.Pause.offsetX
-        this.pauseBtn.position.y = this.element.Pause.y + this.element.Pause.offsetY
     }
     private drawPauseBtnOutLine() {
         this.PauseBtnOutLine.clear()

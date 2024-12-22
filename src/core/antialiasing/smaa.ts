@@ -1,58 +1,117 @@
+import { RenderTarget } from "@/gl/RenderTarget";
 import { SMAABlendShader, SMAAEdgesShader, SMAAWeightsShader } from "./shader/smaa";
-
+import { ShaderProgram, Uniform } from "@/gl/Shader";
+import { SMAA_AreaTexture, SMAA_SearchTexture } from "./smaa_texture";
 export class SMAAPass {
     public gl: WebGL2RenderingContext | WebGLRenderingContext;
 
-    public SMAAEdgesShader?: WebGLShader
-    public SMAAWeightsShader?: WebGLShader
-    public SMAABlendShader?: WebGLShader
+    public SMAAEdgesShader?: ShaderProgram
+    public SMAAWeightsShader?: ShaderProgram
+    public SMAABlendShader?: ShaderProgram
 
-    public inputFrameBuffer?: WebGLFramebuffer;
+    public SMAAEdgesRenderTarget?: RenderTarget
+    public SMAAWeightsRenderTarget?: RenderTarget
+
+    public inputFrameBuffer?: RenderTarget;
+    public outputFrameBuffer?: RenderTarget;
+
+    private SMAA_AreaTexture?: WebGLTexture
+    private SMAA_SearchTexture?: WebGLTexture
 
     constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
         this.gl = gl
         this.initShader()
+        this.initFramebuffer()
+    }
+
+    static async create(gl: WebGL2RenderingContext | WebGLRenderingContext) {
+        let _ = new this(gl)
+        _.SMAA_AreaTexture = await SMAA_AreaTexture(gl)
+        _.SMAA_SearchTexture = await SMAA_SearchTexture(gl)
+        return _
     }
 
     initShader() {
-        this.SMAAEdgesShader = this.glCreateShaderProgram(SMAAEdgesShader.vertexShader, SMAAEdgesShader.fragmentShader)
-        this.SMAAWeightsShader = this.glCreateShaderProgram(SMAAWeightsShader.vertexShader, SMAAWeightsShader.fragmentShader)
-        this.SMAABlendShader = this.glCreateShaderProgram(SMAABlendShader.vertexShader, SMAABlendShader.fragmentShader)
+        this.SMAAEdgesShader = new ShaderProgram(
+            this.gl,
+            SMAAEdgesShader.vertexShader,
+            SMAAEdgesShader.fragmentShader,
+            Uniform.createUniforms(SMAAEdgesShader.uniform)
+        )
+        this.SMAAWeightsShader = new ShaderProgram(
+            this.gl,
+            SMAAWeightsShader.vertexShader,
+            SMAAWeightsShader.fragmentShader,
+            Uniform.createUniforms(SMAAWeightsShader.uniform)
+        )
+        this.SMAABlendShader = new ShaderProgram(
+            this.gl,
+            SMAABlendShader.vertexShader,
+            SMAABlendShader.fragmentShader,
+            Uniform.createUniforms(SMAABlendShader.uniform)
+        )
     }
 
-    private compileShaderSource(shader: WebGLShader, src: string) {
-        this.gl.shaderSource(shader, src);
-        this.gl.compileShader(shader);
+    initFramebuffer() {
+        this.outputFrameBuffer = new RenderTarget(this.gl, this.gl.canvas.width, this.gl.canvas.height)
+        this.SMAAEdgesRenderTarget = new RenderTarget(this.gl, this.gl.canvas.width, this.gl.canvas.height)
+        this.SMAAWeightsRenderTarget = new RenderTarget(this.gl, this.gl.canvas.width, this.gl.canvas.height)
     }
 
-    private glCreateShaderProgram(vertexShaderSrc: string, fragmentShaderSrc: string) {
-        const gl = this.gl
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER)!;
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)!;
-        this.compileShaderSource(vertexShader, vertexShaderSrc)
-        this.compileShaderSource(fragmentShader, fragmentShaderSrc)
-        const program = gl.createProgram()
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        gl.detachShader(program, vertexShader);
-        gl.detachShader(program, fragmentShader);
-        gl.deleteShader(vertexShader);
-        gl.deleteShader(fragmentShader);
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            const linkErrLog = gl.getProgramInfoLog(program);
-            throw linkErrLog
-        }
-        return program
-    }
-
-    setInput(inputFrameBuffer: WebGLFramebuffer) {
+    setInput(inputFrameBuffer: RenderTarget) {
         this.inputFrameBuffer = inputFrameBuffer
     }
 
-    bindFrameBuffer(frameBuffer: WebGLFramebuffer) {
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, frameBuffer)
+    private bindFrameBuffer(frameBuffer: RenderTarget) {
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, frameBuffer.framebuffer)
     }
 
+    renderSMAAEdges() {
+        if (this.SMAAEdgesRenderTarget == undefined) return
+        if (this.inputFrameBuffer == undefined) return
+        if (this.SMAAEdgesShader == undefined) return
+        this.bindFrameBuffer(this.SMAAEdgesRenderTarget)
+        const gl = this.gl
+        this.SMAAEdgesShader.setUniform("tDiffuse", this.inputFrameBuffer.texture)
+        this.SMAAEdgesShader.setUniform("resolution", [gl.canvas.width, gl.canvas.height])
+        this.SMAAEdgesShader.use()
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        this.SMAAEdgesShader.unuse()
+    }
+    renderSMAAWeights() {
+        if (this.SMAAWeightsRenderTarget == undefined) return
+        if (this.SMAAEdgesRenderTarget == undefined) return
+        if (this.SMAAWeightsShader == undefined) return
+        if (this.SMAA_AreaTexture == undefined) return
+        if (this.SMAA_SearchTexture == undefined) return
+        this.bindFrameBuffer(this.SMAAWeightsRenderTarget)
+        const gl = this.gl
+        this.SMAAWeightsShader.setUniform("tDiffuse", this.SMAAEdgesRenderTarget.texture)
+        this.SMAAWeightsShader.setUniform("tArea", this.SMAA_AreaTexture)
+        this.SMAAWeightsShader.setUniform("tSearch", this.SMAA_SearchTexture)
+        this.SMAAWeightsShader.setUniform("resolution", [gl.canvas.width, gl.canvas.height])
+        this.SMAAWeightsShader.use()
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        this.SMAAWeightsShader.unuse()
+    }
+    renderSMAABlend() {
+        if (this.outputFrameBuffer == undefined) return
+        if (this.SMAAWeightsRenderTarget == undefined) return
+        if (this.SMAABlendShader == undefined) return
+        if (this.inputFrameBuffer == undefined) return
+        this.bindFrameBuffer(this.outputFrameBuffer)
+        const gl = this.gl
+        this.SMAABlendShader.setUniform("tDiffuse", this.SMAAWeightsRenderTarget.texture)
+        this.SMAABlendShader.setUniform("tColor", this.inputFrameBuffer.texture)
+        this.SMAABlendShader.setUniform("resolution", [gl.canvas.width, gl.canvas.height])
+        this.SMAABlendShader.use()
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        this.SMAABlendShader.unuse()
+    }
 
+    resize(width: number, height: number) {
+        this.outputFrameBuffer?.resize(width,height)
+        this.SMAAEdgesRenderTarget?.resize(width,height)
+        this.SMAAWeightsRenderTarget?.resize(width,height)
+    }
 }
