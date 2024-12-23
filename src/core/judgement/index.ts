@@ -9,6 +9,7 @@ import Note from '../chart/note';
 import Audio from '../audio';
 import { CONST } from '../types/const';
 import { PhiNoteSound } from '../resource/resource_pack';
+import PhiGame from '../game';
 const MAX_PLAYING_SOUND = 500
 var PLAYING_SOUND = 0
 const MAX_PARTICLE = 1500
@@ -87,9 +88,11 @@ export default class Judgement {
     _holdBetween: number = 0;
     private currentTime: number = 0
     private anims: AnimatedSprite[] = []
+    private game: PhiGame
     constructor(params: any = {}) {
         this.chart = params.chart;
         this.stage = params.stage;
+        this.game = params.game;
         this.textures = params.assets.textures;
         this.sounds = params.assets.sounds;
         this._autoPlay = verify.bool(params.autoPlay, false);
@@ -98,7 +101,7 @@ export default class Judgement {
 
         this.score = new Score(this.chart.totalRealNotes, verify.bool(params.showAPStatus, true), verify.bool(params.challangeMode, false), this._autoPlay);
         this.input = new Input({ canvas: params.canvas, autoPlay: this._autoPlay });
-
+        this.input.onchange = () => this.calcInput
         /* ===== 判定用时间计算 ===== */
         this.judgeTimes = {
             perfect: (!params.challangeMode ? AllJudgeTimes.perfect : AllJudgeTimes.perfectChallenge) / 1000,
@@ -326,6 +329,10 @@ export default class Judgement {
         this.input.destroySprites();
         this.score.destroySprites();
     }
+
+    calcInput() {
+    }
+
     calcNote(currentTime: number, note: Note) {
         if (note.isFake) return; // 忽略假 Note
         if (note.isScored && note.isScoreAnimated) return; // 已记分忽略

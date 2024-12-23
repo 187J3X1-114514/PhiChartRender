@@ -35,7 +35,7 @@ export class PlayScreen {
         })
         document.body.appendChild(this.app.canvas)
         this.app?.start()
-        
+
         if (this.chart == undefined) {
             for (let f of this.file) {
                 if (f.extension.toLowerCase() == "zip") {
@@ -63,12 +63,12 @@ export class PlayScreen {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: autoPlay,
+                autoPlay: false,
                 shader: true,
                 showInputPoint: false,
-                showFPS: false,
+                showPerformanceInfo: false,
                 bgDim: 0.1,
-                antialias: false,
+                antialias: true,
                 antialiasType: 1,
                 noteScale: 1.2,
                 audioOffset: this.chart!.type == "phira" ? this.chart!.src.offset : 0
@@ -85,7 +85,7 @@ export class PlayScreen {
         return this.chart!
     }
     start() {
-        
+
         topAppBar.value.style.display = "none"
         document.body.style.paddingTop = "0px"
         this.app!.canvas.classList.add("push-in")

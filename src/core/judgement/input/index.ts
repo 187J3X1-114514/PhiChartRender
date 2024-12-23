@@ -11,6 +11,7 @@ export default class Input {
     sprite: Graphics | undefined
     _inputPointSize: number = 30
     _isPaused: boolean = false
+    public onchange?: () => void
     constructor(params: any = {}) {
         if (!params.canvas) throw new Error('You cannot add inputs without a canvas');
 
@@ -76,18 +77,21 @@ export default class Input {
         let idx = inputs.findIndex(point => point.type === type && point.id === id);
         if (idx !== -1) inputs.splice(idx, 1);
         inputs.push(new InputPoint(type, id, x, y));
+        this._change()
     }
 
     moveInput(type: string, id: number, x: number, y: number) {
         const { inputs } = this;
         let point = inputs.find(point => point.type === type && point.id === id);
         if (point) point.move(x, y);
+        this._change()
     }
 
     removeInput(type: string, id: number) {
         const { inputs } = this;
         let point = inputs.find(point => point.type === type && point.id === id);
         if (point) point.isActive = false;
+        this._change()
     }
 
     calcTick() {
@@ -130,8 +134,8 @@ export default class Input {
         e.preventDefault();
         for (const i of e.changedTouches) {
             let { clientX, clientY, identifier } = i;
-            clientX *= window.devicePixelRatio 
-            clientY *= window.devicePixelRatio 
+            clientX *= window.devicePixelRatio
+            clientY *= window.devicePixelRatio
             this.addInput('touch', identifier, clientX - this.renderSize.widthOffset, clientY);
         }
     }
@@ -140,8 +144,8 @@ export default class Input {
         e.preventDefault();
         for (const i of e.changedTouches) {
             let { clientX, clientY, identifier } = i;
-            clientX *= window.devicePixelRatio 
-            clientY *= window.devicePixelRatio 
+            clientX *= window.devicePixelRatio
+            clientY *= window.devicePixelRatio
             this.moveInput('touch', identifier, clientX - this.renderSize.widthOffset, clientY);
         }
     }
@@ -156,19 +160,23 @@ export default class Input {
     mouseStart(e: any) {
         e.preventDefault();
         let { clientX, clientY, button } = e;
-        clientX *= window.devicePixelRatio 
-        clientY *= window.devicePixelRatio 
+        clientX *= window.devicePixelRatio
+        clientY *= window.devicePixelRatio
         this.addInput('mouse', button, clientX - this.renderSize.widthOffset, clientY);
     }
 
     mouseMove(e: any) {
         let { clientX, clientY, button } = e;
-        clientX *= window.devicePixelRatio 
-        clientY *= window.devicePixelRatio 
+        clientX *= window.devicePixelRatio
+        clientY *= window.devicePixelRatio
         this.moveInput('mouse', button, clientX - this.renderSize.widthOffset, clientY);
     }
 
     mouseEnd(e: any) {
         this.removeInput('mouse', e.button);
+    }
+
+    private _change() {
+        if (this.onchange) this.onchange()
     }
 }

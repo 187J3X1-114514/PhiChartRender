@@ -223,16 +223,18 @@ export default class Chart {
 
         if (this.notes && this.notes.length > 0) {
             this.notes.forEach((note) => {
-
+                note.baseScale = this.renderSize.noteScale;
+                if (isEnded) note.sprite.alpha = 0;
+                if (note.sprite.destroyed) return
                 if (note.type === 3) {
                     let holdLength = note.holdLength * (note.useOfficialSpeed ? 1 : note.speed) * this.renderSize.noteSpeed / this.renderSize.noteScale;
                     (note.sprite.children[1] as Sprite).height = holdLength;
                     note.sprite.children[2].position.y = -holdLength;
                 }
 
-                note.baseScale = this.renderSize.noteScale;
+
                 note.sprite.scale.set(this.renderSize.noteScale * note.xScale, this.renderSize.noteScale);
-                if (isEnded) note.sprite.alpha = 0;
+
             });
         }
 

@@ -162,8 +162,13 @@ export default class Note {
     }
 
     calcTime(currentTime: number, size: any) {
+        if (this.sprite.destroyed) return
         if (this.isScoreAnimated && this.isScored && !this.isFake && this.type != CONST.NoteType.Hold) {
             this.notCalc = true
+            this.sprite.destroy({
+                texture: false,
+                textureSource: false
+            })
             return
         }
         let _yOffset = size.height * this.yOffset,

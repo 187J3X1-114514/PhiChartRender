@@ -39,10 +39,10 @@ export default class PhiGame {
         UIContainer: Container
         mainContainerMask: Graphics
         mainContainerCover: Container
-        fpsText: Text
+        performanceInfoText: Text
         sizer: SizerData,
         bg: Sprite,
-        fpsTextStyle: TextStyle,
+        performanceInfoTextStyle: TextStyle,
         videoContainer: Container
     } = {
             ...ukObj, ...{
@@ -52,7 +52,7 @@ export default class PhiGame {
                 UIContainer: new Container(),
                 mainContainerMask: new Graphics(),
                 mainContainerCover: new Sprite(),
-                fpsText: uk,
+                performanceInfoText: uk,
                 sizer: ({} as any),
                 bg: new Sprite(),
                 pauseButton: new Sprite(),
@@ -72,6 +72,14 @@ export default class PhiGame {
     private antialiasing: Antialiasing = uk
     public renderTarget: RenderTarget = uk
     public glRenderTarget: PixiGlRenderTarget = uk
+    public currentTime: number = 0
+    private CPUFrameTime: number = 0
+    private JudgeLineFrameTime: number = 0
+    private NoteFrameTime: number = 0
+    private JudgeFrameTime: number = 0
+    private OtherFrameTime: number = 0
+    private GPUFrameTime: number = 0
+    private FrameTime: number = 0
     private async init(_params: GameParams) {
         if (_params.settings.noteScale) _params.settings.noteScale = 8080 / _params.settings.noteScale;
         (window as any).curPhiGame = this
@@ -145,7 +153,8 @@ export default class PhiGame {
             hitsoundVolume: verify.number(params.settings.hitsoundVolume, 1, 0, 1),
             showAPStatus: verify.bool(params.settings.showAPStatus, true),
             challengeMode: verify.bool(params.settings.challengeMode, false),
-            autoPlay: verify.bool(params.settings.autoPlay, false)
+            autoPlay: verify.bool(params.settings.autoPlay, false),
+            game: this
         });
 
         this.functions = {
@@ -162,7 +171,7 @@ export default class PhiGame {
             bgDim: verify.number(params.settings.bgDim, 0.5, 0, 1),
             offset: verify.number(params.settings.audioOffset, 0),
             speed: verify.number(params.settings.speed, 1, 0, 2),
-            showFPS: verify.bool(params.settings.showFPS, true),
+            showPerformanceInfo: verify.bool(params.settings.showPerformanceInfo, true),
             showInputPoint: verify.bool(params.settings.showInputPoint, true),
             multiNoteHL: verify.bool(params.settings.multiNoteHL, true),
             showAPStatus: verify.bool(params.settings.showAPStatus, true),
@@ -228,22 +237,22 @@ export default class PhiGame {
         this.renders.UIContainer.addChild(this.sprites.fakeJudgeline);
 
         if (true) {
-            this.renders.fpsTextStyle = new TextStyle({
+            this.renders.performanceInfoTextStyle = new TextStyle({
                 fontFamily: font.InGameFontName,
                 align: 'right',
                 fill: 0xFFFFFF,
                 fontSize: 4
             });
-            this.renders.fpsText = new Text({
-                text: "FPS: 0",
-                style: this.renders.fpsTextStyle
+            this.renders.performanceInfoText = new Text({
+                text: "PerformanceInfo",
+                style: this.renders.performanceInfoTextStyle
             });
 
-            this.renders.fpsText.anchor.x = 1;
-            this.renders.fpsText.zIndex = 999999;
-            this.renders.fpsText.scale.set(0.7)
+            this.renders.performanceInfoText.anchor.x = 1;
+            this.renders.performanceInfoText.zIndex = 999999;
+            this.renders.performanceInfoText.scale.set(0.7)
 
-            this.rootContainer.addChild(this.renders.fpsText);
+            this.rootContainer.addChild(this.renders.performanceInfoText);
         }
         this.renders.gameContainer.sortChildren();
         this.renders.UIContainer.sortChildren();
@@ -255,8 +264,16 @@ export default class PhiGame {
         this.ui.backgroundContainer.zIndex = 9999999999
 
     }
-    upFPS() {
-        this.renders.fpsText.text = 'FPS: ' + (this.app.fpsCount.fps).toFixed(1)
+    updatePerformanceInfo() {
+        this.renders.performanceInfoText.text =
+            `FPS:${(1000 / this.FrameTime).toFixed(1)}` + "\n" +
+            `Frame:${(this.FrameTime).toFixed(3)}ms` + "\n" +
+            `GPUFrame:${(this.GPUFrameTime).toFixed(3)}ms` + "\n" +
+            `CPUFrame:${(this.CPUFrameTime).toFixed(3)}ms` + "\n" +
+            `JudgeLine:${(this.JudgeLineFrameTime).toFixed(3)}ms` + "\n" +
+            `Note:${(this.NoteFrameTime).toFixed(3)}ms` + "\n" +
+            `Judgement:${(this.JudgeFrameTime).toFixed(3)}ms` + "\n" +
+            `Other:${(this.OtherFrameTime).toFixed(3)}ms`
     }
     start() {
         if (!this.isFirst) { this.restart(); return }
@@ -437,11 +454,11 @@ export default class PhiGame {
         }
 
         // FPS 计数器尺寸计算
-        if (this.renders.fpsText) {
-            this.renders.fpsText.position.x = this.renders.sizer.shaderScreenSizeG[0];
-            this.renders.fpsText.position.y = 0;
-            this.renders.fpsText.style.fontSize = this.renders.sizer.heightPercent * 32;
-            this.renders.fpsText.style.padding = this.renders.sizer.heightPercent * 8;
+        if (this.renders.performanceInfoText) {
+            this.renders.performanceInfoText.position.x = this.renders.sizer.shaderScreenSizeG[0];
+            this.renders.performanceInfoText.position.y = 0;
+            this.renders.performanceInfoText.style.fontSize = this.renders.sizer.heightPercent * 32;
+            this.renders.performanceInfoText.style.padding = this.renders.sizer.heightPercent * 8;
         }
         this.glRenderTarget = this.app.getGlRenderTarget(this.renderTarget)
         if (withChartSprites) {
@@ -488,9 +505,11 @@ export default class PhiGame {
         this.functions[type].forEach((callback: (a: any) => any) => callback(this));
     }
     gameTick(force: boolean = false) {
+        let st = performance.now()
+        this.currentTime = this.chart.music.currentTime - (this.chart.offset + this._settings.offset);
+        this.calcTickByCurrentTime(this.currentTime, force)
         this.render()
-        let currentTime = this.chart.music.currentTime - (this.chart.offset + this._settings.offset);
-        this.calcTickByCurrentTime(currentTime, force)
+        this.FrameTime = performance.now() - st
     }
     calcTickByCurrentTime(currentTime: number, force: boolean = false) {
         let { chart, judgement, renders } = this;
@@ -506,23 +525,37 @@ export default class PhiGame {
                 }
             case 1:
                 {
-                    this.effects.calcTime(currentTime)
+
                     if (!this._isPaused || force) {
+                        let st1 = performance.now()
+                        this.effects.calcTime(currentTime)
                         for (let i = 0, length = chart.bpmList.length; i < length; i++) {
                             let bpm = chart.bpmList[i];
                             if (bpm.endTime < currentTime) continue;
                             if (bpm.startTime > currentTime) break;
                             judgement._holdBetween = bpm.holdBetween;
-                        };
+                        }
+                        let st3 = performance.now()
+                        this.OtherFrameTime = st3 - st1
                         for (const judgeline of chart.judgelines) {
                             judgeline.calcTime(currentTime, renders.sizer);
-                        };
+                        }
+                        let st4 = performance.now()
+                        this.JudgeLineFrameTime = st4 - st3
                         for (const note of chart.notes) {
                             note.calcTime(currentTime, renders.sizer);
+                            if (note.notCalc) continue
+                        }
+                        let st5 = performance.now()
+                        this.NoteFrameTime = st5 - st4
+                        for (const note of chart.notes) {
                             if (note.notCalc) continue
                             judgement.calcNote(currentTime, note);
                         }
                         judgement.calcTick(currentTime);
+                        let st6 = performance.now()
+                        this.JudgeFrameTime = st6 - st5
+                        this.CPUFrameTime = st6 - st1
                     }
                     break;
                 }
@@ -571,7 +604,7 @@ export default class PhiGame {
                 this._isEnded = true;
                 this.effects.cleanShader()
                 this.runCallback('end');
-                this.renders.fpsText.alpha = 0
+                this.renders.performanceInfoText.alpha = 0
                 this.renders.mainContainer.alpha = 0
                 this.app.setTick(() => { });
                 window.onblur = null
@@ -612,7 +645,8 @@ export default class PhiGame {
     }
 
     render() {
-        this.upFPS()
+        let st = performance.now()
+        this.updatePerformanceInfo()
         if (!this._params.settings.antialias) {
             this.app.renderer.render({
                 container: this.rootContainer
@@ -628,7 +662,7 @@ export default class PhiGame {
             this.app.biltToScreen(output ? output : this.renderTarget)
 
         }
-
+        this.GPUFrameTime = performance.now() - st
     }
 
     getDefaultShader() {
