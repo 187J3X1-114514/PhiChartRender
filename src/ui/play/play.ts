@@ -68,7 +68,7 @@ export class PlayScreen {
                 showInputPoint: false,
                 showPerformanceInfo: false,
                 bgDim: 0.1,
-                antialias: true,
+                antialias: false,
                 antialiasType: 1,
                 noteScale: 1.2,
                 audioOffset: this.chart!.type == "phira" ? this.chart!.src.offset : 0
