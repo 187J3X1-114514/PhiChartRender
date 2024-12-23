@@ -24,7 +24,7 @@ function createTexture(gl: WebGL2RenderingContext | WebGLRenderingContext) {
 
 export async function SMAA_AreaTexture(gl: WebGL2RenderingContext | WebGLRenderingContext): Promise<WebGLTexture> {
     return new Promise((r) => {
-        const texture = createTexture(gl)
+        const texture = createTexture(gl)!
         const image = new Image();
         image.src = getAreaTexture();
         image.onload = () => {
@@ -40,8 +40,7 @@ export async function SMAA_AreaTexture(gl: WebGL2RenderingContext | WebGLRenderi
 
 export async function SMAA_SearchTexture(gl: WebGL2RenderingContext | WebGLRenderingContext): Promise<WebGLTexture> {
     return new Promise((r) => {
-        const texture = createTexture(gl)
-        r(texture)
+        const texture = createTexture(gl)!
         const image = new Image();
         image.src = getSearchTexture();
         image.onload = () => {

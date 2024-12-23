@@ -1,4 +1,6 @@
 //●REC
+
+/*
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import PhiGame from '../../core/game'
 import { loadZip } from '../../core/file';
@@ -136,4 +138,4 @@ export class RecordGame {
     get progress() {
         return this.recordedFrame / this.totalFrame
     }
-}
+}*/

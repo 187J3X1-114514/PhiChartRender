@@ -10,14 +10,14 @@ export function buildVideoEventData(view: WriteBufferDataView, data: PrPrExtraVi
     view.setInt32(data.time[0])
     view.setInt32(data.time[1])
     view.setInt32(data.time[2])
-
+/*
     view.setInt32(data.startTime[0])
     view.setInt32(data.startTime[1])
     view.setInt32(data.startTime[2])
 
     view.setInt32(data.endTime[0])
     view.setInt32(data.endTime[1])
-    view.setInt32(data.endTime[2])
+    view.setInt32(data.endTime[2])*/
 
     view.setInt32(data.easingType)
     view.setFloat64(data.easingLeft)
@@ -77,6 +77,7 @@ export function readVideoEventData(view: ReadBufferDataView): PrPrExtraVideo {
         view.getInt32(),
         view.getInt32()
     ]
+    /*
     data.startTime = [
         view.getInt32(),
         view.getInt32(),
@@ -86,7 +87,7 @@ export function readVideoEventData(view: ReadBufferDataView): PrPrExtraVideo {
         view.getInt32(),
         view.getInt32(),
         view.getInt32()
-    ]
+    ]*/
     data.easingType = view.getInt32()
     data.easingLeft = view.getFloat64()
     data.easingRight = view.getFloat64()
