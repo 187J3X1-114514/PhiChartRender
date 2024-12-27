@@ -61,7 +61,7 @@ export default {
 </script>
 
 <template>
-    <span class="chart-card-nothing" v-show="!(charts != undefined && charts.length != 0) && show_nothing">空空如也</span>
+    <span class="chart-card-nothing" v-show="!(charts != undefined && charts.length != 0) && show_nothing">{{ I18N("ui.nothing") }}</span>
     <div ref="root" class="chart-card-root" :style="`grid-template-columns: repeat(${grid_width}, 1fr);`">
         <TransitionGroup name="chart-card">
             <ChartCardComponent class="" :ref="setItemRef" v-for="chart in charts" v-bind="chart" :key="chart.name">

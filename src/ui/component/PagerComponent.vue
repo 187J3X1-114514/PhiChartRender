@@ -44,7 +44,7 @@ export default {
         <Transition name="pager-root">
             <div v-if="show">
                 <mdui-segmented-button :disabled="current === 1" @click="current--">
-                    {{ I18N("ui.screen.phira.chart.text.next_page") }}
+                    {{ I18N("ui.screen.phira.chart.text.last_page") }}
                     <mdui-icon slot="icon" name="keyboard_arrow_left"></mdui-icon>
                 </mdui-segmented-button>
                 <mdui-segmented-button @click="current = 1" v-if="current >= 4" :page="1">1</mdui-segmented-button>
