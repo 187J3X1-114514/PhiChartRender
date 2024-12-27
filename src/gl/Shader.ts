@@ -121,7 +121,7 @@ export class ShaderProgram {
                 this.gl.uniform4f(uniLoc, value[0], value[1], value[2], value[3])
                 break
             case UniformType.FLOAT:
-                this.gl.uniform1f(uniLoc, value[0])
+                this.gl.uniform1f(uniLoc, value)
                 break
         }
         this.gl.useProgram(null)

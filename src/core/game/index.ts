@@ -105,7 +105,7 @@ export default class PhiGame {
         }
 
 
-        this.effects = params.settings.shader ? chart!.prpr as PrprExtra : PrprExtra.none;
+        this.effects = params.settings.prprExtra ? chart!.prpr as PrprExtra : PrprExtra.none;
         if (!this.chart) {
             printImage(0.5, () => { throw new Error('不是哥们，铺呢？') })
         }
@@ -177,7 +177,7 @@ export default class PhiGame {
             showAPStatus: verify.bool(params.settings.showAPStatus, true),
             challengeMode: verify.bool(params.settings.challengeMode, false),
             autoPlay: verify.bool(params.settings.autoPlay, false),
-            shader: verify.bool(params.settings.shader, true)
+            shader: verify.bool(params.settings.prprExtra, true)
         };
         this.renderTarget = new RenderTarget()
         this.antialiasing = new Antialiasing(this.app)
@@ -197,7 +197,12 @@ export default class PhiGame {
         else if (this._settings.speed > 2) throw new Error('Speed too fast');
 
         this.resize(false);
-        if (_params.render.resizeTo) _params.render.resizeTo.append(this.app.canvas as HTMLCanvasElement)
+        if (_params.render.resizeTo) _params.render.resizeTo.append(this.app.canvas as HTMLCanvasElement);
+
+        (window as any).__PIXI_DEVTOOLS__ = {
+            renderer: this.app.renderer,
+            stage:this.rootContainer
+        };
 
     }
 
@@ -236,7 +241,7 @@ export default class PhiGame {
         if (this._settings.showAPStatus) this.sprites.fakeJudgeline.tint = 0xFFECA0;
         this.renders.UIContainer.addChild(this.sprites.fakeJudgeline);
 
-        if (true) {
+        if (this._settings.showPerformanceInfo) {
             this.renders.performanceInfoTextStyle = new TextStyle({
                 fontFamily: font.InGameFontName,
                 align: 'right',
@@ -265,6 +270,7 @@ export default class PhiGame {
 
     }
     updatePerformanceInfo() {
+        if (!this._settings.showPerformanceInfo) return
         this.renders.performanceInfoText.text =
             `FPS:${(1000 / this.FrameTime).toFixed(1)}` + "\n" +
             `Frame:${(this.FrameTime).toFixed(3)}ms` + "\n" +

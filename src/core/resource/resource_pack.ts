@@ -202,6 +202,7 @@ export class ResourcePack {
         this.Assets = a
     }
     static async load(zip: Zip) {
+        const TEXTURE_RESOLUTION = 1
         const data = JSON.parse(await (await zip.get("info.json")!.getBlob()).text())
         const info = ResourcePackInfo.from(data)
         log.info('开始加载资源包 -> ' + zip.name)
@@ -254,14 +255,20 @@ export class ResourcePack {
                 body: holdMHB,
                 end: holdMHE,
             },
-            tapMH: await loadTextures(zip.get(info.note.tap[1])!),
-            dragMH: await loadTextures(zip.get(info.note.drag[1])!),
-            flickMH: await loadTextures(zip.get(info.note.flick[1])!),
-            tap: await loadTextures(zip.get(info.note.tap[0])!),
-            drag: await loadTextures(zip.get(info.note.drag[0])!),
-            flick: await loadTextures(zip.get(info.note.flick[0])!),
+            tapMH: await loadTextures(zip.get(info.note.tap[1])!, TEXTURE_RESOLUTION),
+            dragMH: await loadTextures(zip.get(info.note.drag[1])!, TEXTURE_RESOLUTION),
+            flickMH: await loadTextures(zip.get(info.note.flick[1])!, TEXTURE_RESOLUTION),
+            tap: await loadTextures(zip.get(info.note.tap[0])!, TEXTURE_RESOLUTION),
+            drag: await loadTextures(zip.get(info.note.drag[0])!, TEXTURE_RESOLUTION),
+            flick: await loadTextures(zip.get(info.note.flick[0])!, TEXTURE_RESOLUTION),
             bad: undefined as any as pixi.Texture
         }
+        note.dragMH.source.resolution = TEXTURE_RESOLUTION
+        note.flickMH.source.resolution = TEXTURE_RESOLUTION
+        note.tap.source.resolution = TEXTURE_RESOLUTION
+        note.drag.source.resolution = TEXTURE_RESOLUTION
+        note.flick.source.resolution = TEXTURE_RESOLUTION
+        note.tapMH.source.resolution = TEXTURE_RESOLUTION
         note.bad = await genBadNoteTex(note.tap, info.note.bad_note_color)
         log.info('所有Note加载完成')
 
@@ -290,12 +297,18 @@ export class ResourcePack {
         HitFxH = textureBase.height / info.hitFx.height
         for (let indexH = 0; indexH < info.hitFx.height; indexH++) {
             for (let indexW = 0; indexW < info.hitFx.width; indexW++) {
-                let rectangleHitFxTex = new pixi.Rectangle(HitFxW * indexW, HitFxH * indexH, HitFxW, HitFxH)
-                textureList.push(new pixi.Texture({
+                let rectangleHitFxTex = new pixi.Rectangle(
+                    (HitFxW * indexW),
+                    (HitFxH * indexH),
+                    HitFxW,
+                    HitFxH
+                )
+                let tex = new pixi.Texture({
                     source: textureBase.source,
                     frame: rectangleHitFxTex
                 }
-                ))
+                )
+                textureList.push(tex)
             }
         }
         log.info('打击效果加载完成')

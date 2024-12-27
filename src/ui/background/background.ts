@@ -3,13 +3,10 @@
 //import * as StackBlur from 'stackblur-canvas';
 //import * as presets from '../../core/prpr/effect/shader/presets/index';
 //import { genNoise } from "./utils";
-import { json } from "./json";
-import { iCompileAndStart, ShaderToy } from "./shadertoy/shadertoy";
 export const BACKGROUNDCANVAS = document.createElement("canvas")
 BACKGROUNDCANVAS.id = "background"
 export class background {
     //public app: Application = undefined as any
-    private app__: ShaderToy = undefined as any
     //private shaders: { [key: string]: Shader.Shader } = {}
     private isStop: boolean = false
     private renderFrame:number = 0

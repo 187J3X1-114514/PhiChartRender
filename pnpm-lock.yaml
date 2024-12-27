@@ -25,10 +25,10 @@ importers:
         version: 1.0.2
       '@pixi/gif':
         specifier: ^3.0.1
-        version: 3.0.1(pixi.js@8.6.3)
+        version: 3.0.1(pixi.js@8.6.6)
       '@pixi/sound':
         specifier: ^6.0.1
-        version: 6.0.1(pixi.js@8.6.3)
+        version: 6.0.1(pixi.js@8.6.6)
       '@tauri-apps/api':
         specifier: 2.1.1
         version: 2.1.1
@@ -50,6 +50,9 @@ importers:
       '@tauri-apps/plugin-process':
         specifier: 2.0.0
         version: 2.0.0
+      '@types/howler':
+        specifier: ^2.2.12
+        version: 2.2.12
       assist-worker:
         specifier: ^1.1.0
         version: 1.1.0
@@ -68,6 +71,9 @@ importers:
       git-revision-vite-plugin:
         specifier: ^0.0.11
         version: 0.0.11
+      howler:
+        specifier: ^2.2.4
+        version: 2.2.4
       io-ts:
         specifier: ^2.2.21
         version: 2.2.21(fp-ts@2.16.9)
@@ -94,10 +100,10 @@ importers:
         version: 2.1.3
       pixi-filters:
         specifier: ^6.0.5
-        version: 6.0.5(pixi.js@8.6.3)
+        version: 6.0.5(pixi.js@8.6.6)
       pixi.js:
-        specifier: ^8.6.3
-        version: 8.6.3
+        specifier: ^8.6.6
+        version: 8.6.6
       stackblur-canvas:
         specifier: ^2.7.0
         version: 2.7.0
@@ -1727,6 +1733,9 @@ packages:
 
   '@types/gradient-parser@0.1.5':
     resolution: {integrity: sha512-r7K3NkJz3A95WkVVmjs0NcchhHstC2C/VIYNX4JC6tieviUNo774FFeOHjThr3Vw/WCeMP9kAT77MKbIRlO/4w==}
+
+  '@types/howler@2.2.12':
+    resolution: {integrity: sha512-hy769UICzOSdK0Kn1FBk4gN+lswcj1EKRkmiDtMkUGvFfYJzgaDXmVXkSShS2m89ERAatGIPnTUlp2HhfkVo5g==}
 
   '@types/http-cache-semantics@4.0.4':
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
@@ -3395,6 +3404,9 @@ packages:
     resolution: {integrity: sha512-KTsH9hb+YZHH0IIRf22y0X8mPw8j521W5xRAUeaUlGNBDsf44ixE7ZeyXbUHd/nQ1n04UEhi2ja05/QVOS/CgQ==}
     engines: {node: '>=10.0.0'}
 
+  howler@2.2.4:
+    resolution: {integrity: sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==}
+
   html-tags@3.3.1:
     resolution: {integrity: sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==}
     engines: {node: '>=8'}
@@ -4579,8 +4591,8 @@ packages:
     peerDependencies:
       pixi.js: '>=8.0.0-0'
 
-  pixi.js@8.6.3:
-    resolution: {integrity: sha512-yQcDd8UYdeUsk6TnzY2PFFtDeRMqQQX+MEUNX7iqshIRLW2BmpT9E4nw/y2MXWMZozQs/FfRNkaBPE6SsO1HBw==}
+  pixi.js@8.6.6:
+    resolution: {integrity: sha512-o5pw7G2yuIrnBx0G4npBlmFp+XGNcapI/Ufs62rRj/4XKxc1Zo74YJr/BtEXcXTraTKd+pQvYOLvnfxRjxBMvQ==}
 
   pkg-dir@7.0.0:
     resolution: {integrity: sha512-Ie9z/WINcxxLp27BKOCHGde4ITq9UklYKDzVo1nhk5sqGEXU3FpkwP5GM2voTGJkGd9B3Otl+Q4uwSOeSUtOBA==}
@@ -6832,13 +6844,13 @@ snapshots:
 
   '@pixi/colord@2.9.6': {}
 
-  '@pixi/gif@3.0.1(pixi.js@8.6.3)':
+  '@pixi/gif@3.0.1(pixi.js@8.6.6)':
     dependencies:
-      pixi.js: 8.6.3
+      pixi.js: 8.6.6
 
-  '@pixi/sound@6.0.1(pixi.js@8.6.3)':
+  '@pixi/sound@6.0.1(pixi.js@8.6.6)':
     dependencies:
-      pixi.js: 8.6.3
+      pixi.js: 8.6.6
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -7089,6 +7101,8 @@ snapshots:
   '@types/estree@1.0.6': {}
 
   '@types/gradient-parser@0.1.5': {}
+
+  '@types/howler@2.2.12': {}
 
   '@types/http-cache-semantics@4.0.4': {}
 
@@ -9015,6 +9029,8 @@ snapshots:
     optionalDependencies:
       unix-dgram: 2.0.6
 
+  howler@2.2.4: {}
+
   html-tags@3.3.1: {}
 
   http-cache-semantics@4.1.1: {}
@@ -10280,12 +10296,12 @@ snapshots:
       sonic-boom: 4.2.0
       thread-stream: 3.1.0
 
-  pixi-filters@6.0.5(pixi.js@8.6.3):
+  pixi-filters@6.0.5(pixi.js@8.6.6):
     dependencies:
       '@types/gradient-parser': 0.1.5
-      pixi.js: 8.6.3
+      pixi.js: 8.6.6
 
-  pixi.js@8.6.3:
+  pixi.js@8.6.6:
     dependencies:
       '@pixi/colord': 2.9.6
       '@types/css-font-loading-module': 0.0.12

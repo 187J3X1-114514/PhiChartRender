@@ -10,7 +10,7 @@ import Audio from '../audio';
 import { CONST } from '../types/const';
 import { PhiNoteSound } from '../resource/resource_pack';
 import PhiGame from '../game';
-const MAX_PLAYING_SOUND = 500
+const MAX_PLAYING_SOUND = 114514
 var PLAYING_SOUND = 0
 const MAX_PARTICLE = 1500
 var PARTICLECount = 0
@@ -108,6 +108,7 @@ export default class Judgement {
             good: (!params.challangeMode ? AllJudgeTimes.good : AllJudgeTimes.goodChallenge) / 1000,
             bad: (!params.challangeMode ? AllJudgeTimes.bad : AllJudgeTimes.badChallenge) / 1000
         };
+
         this.sounds.drag.onend = () => {
             PLAYING_SOUND = PLAYING_SOUND - 1;
         }
@@ -124,6 +125,7 @@ export default class Judgement {
     }
 
     reset() {
+        PLAYING_SOUND = 0
         this.judgePoints = [];
         this.score.reset();
         this.input.reset();
@@ -219,7 +221,7 @@ export default class Judgement {
 
                 if (!inputPoint.isTapped) this.judgePoints.push(new JudgePoint(inputPoint, 1));
                 if (inputPoint.isActive) this.judgePoints.push(new JudgePoint(inputPoint, 3));
-                if (inputPoint.isFlickable && !inputPoint.isFlicked) this.judgePoints.push(new JudgePoint(inputPoint, 2));
+                if (inputPoint.isFlickable) this.judgePoints.push(new JudgePoint(inputPoint, 2));
             }
         }
     }
@@ -519,8 +521,7 @@ export default class Judgement {
                                 note.isScored = true;
                                 note.score = 4;
                                 note.scoreTime = NaN;
-
-                                this.judgePoints[i].input.isFlicked = true;
+                                this.judgePoints[i].input.isFlicked = true
                                 this.judgePoints.splice(i, 1);
 
                                 break;

@@ -162,7 +162,7 @@ export default class Note {
     }
 
     calcTime(currentTime: number, size: any) {
-        if (this.sprite.destroyed) return
+        if (this.notCalc) return
         if (this.isScoreAnimated && this.isScored && !this.isFake && this.type != CONST.NoteType.Hold) {
             this.notCalc = true
             this.sprite.destroy({
@@ -176,10 +176,8 @@ export default class Note {
             originX = size.widthPercent * this.positionX,
             _originY = (this.floorPosition - this.judgeline.floorPosition) * (this.type === 3 && this.useOfficialSpeed ? 1 : this.speed) * size.noteSpeed + _yOffset,
             originY = _originY * (this.isAbove ? -1 : 1),
-
             realX = originY * this.judgeline.sinr * -1,
             realY = originY * this.judgeline.cosr,
-
             _holdLength = this.type === 3 ? (this.useOfficialSpeed ? (this.holdTimeLength - currentTime) : (this.endPosition - this.judgeline.floorPosition)) * this.speed * size.noteSpeed : _originY,
             holdLength = this.type === 3 ? _holdLength * (this.isAbove ? -1 : 1) : originY;
 
@@ -188,17 +186,12 @@ export default class Note {
             this.sprite.scale.set(inclineValue * this.baseScale * this.xScale, inclineValue * this.baseScale);
             originX *= inclineValue;
         }
-
         if (this.type !== 3) {
-            // _originY *= this.judgeline.calcNoteControl(_originY, 'y', 1);
             originX *= this.judgeline.calcNoteControl(_originY, 'x', 1);
         }
-
-        if (this.type === 3) // Hold 长度计算
-        {
+        if (this.type === 3) {
             if (this.time <= currentTime && this.holdTimeLength > currentTime) {
                 realX = realY = 0;
-
                 this.sprite.children[0].visible = false;
                 (this.sprite.children[1] as Sprite).height = _holdLength / size.noteScale;
                 this.sprite.children[2].position.y = (this.sprite.children[1] as Sprite).height * -1;
@@ -207,20 +200,12 @@ export default class Note {
                 this.sprite.children[0].visible = true;
             }
         }
-
-        // Note 落在判定线时的绝对位置计算
         this.judgelineX = originX * this.judgeline.cosr + this.judgeline.sprite.position.x;
         this.judgelineY = originX * this.judgeline.sinr + this.judgeline.sprite.position.y;
-
-        // Note 的绝对位置计算
-        realX += this.judgelineX;
-        realY += this.judgelineY;
-
-        // Note 落在判定线时的绝对位置计算（补 y 轴偏移）
-        this.judgelineX += yOffset * this.judgeline.sinr * -1;
-        this.judgelineY += yOffset * this.judgeline.cosr;
-
-        // Note 是否在舞台可视范围内
+        realX += this.judgelineX!;
+        realY += this.judgelineY!;
+        this.judgelineX! += yOffset * this.judgeline.sinr * -1;
+        this.judgelineY! += yOffset * this.judgeline.cosr;
         this.outScreen = !isInArea({
             startX: realX,
             endX: originX * this.judgeline.cosr - holdLength * this.judgeline.sinr + this.judgeline.sprite.position.x,
@@ -230,10 +215,10 @@ export default class Note {
 
         // 推送计算结果到精灵
         this.sprite.visible = !this.outScreen;
+        if (this.outScreen) return
 
         this.sprite.position.x = realX;
         this.sprite.position.y = realY;
-
         this.sprite.angle = this.judgeline.sprite.angle + (this.isAbove ? 0 : 180);
 
         // Note 在舞台可视范围之内时做进一步计算

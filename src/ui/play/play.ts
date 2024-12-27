@@ -64,7 +64,7 @@ export class PlayScreen {
             zipFiles: this.res,
             settings: {
                 autoPlay: false,
-                shader: true,
+                prprExtra: true,
                 showInputPoint: false,
                 showPerformanceInfo: false,
                 bgDim: 0.1,

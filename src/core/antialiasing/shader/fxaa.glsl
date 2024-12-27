@@ -1,139 +1,224 @@
 //https://github.com/mattdesl/glsl-fxaa
+precision highp float;
 
 varying highp vec2 vTextureCoord;
 uniform vec2 screenSize;
 uniform sampler2D uTexture;
 
-void texcoords(
-    vec2 fragCoord,
-    vec2 resolution,
-    out vec2 v_rgbNW,
-    out vec2 v_rgbNE,
-    out vec2 v_rgbSW,
-    out vec2 v_rgbSE,
-    out vec2 v_rgbM
-) {
-    vec2 inverseVP = 1.0 / resolution.xy;
-    v_rgbNW = (fragCoord + vec2(-1.0, -1.0)) * inverseVP;
-    v_rgbNE = (fragCoord + vec2(1.0, -1.0)) * inverseVP;
-    v_rgbSW = (fragCoord + vec2(-1.0, 1.0)) * inverseVP;
-    v_rgbSE = (fragCoord + vec2(1.0, 1.0)) * inverseVP;
-    v_rgbM = vec2(fragCoord * inverseVP);
+// FXAA 3.11 implementation by NVIDIA, ported to WebGL by Agost Biro (biro@archilogic.com)
+//----------------------------------------------------------------------------------
+// File:        es3-kepler\FXAA\assets\shaders/FXAA_DefaultES.frag
+// SDK Version: v3.00
+// Email:       gameworks@nvidia.com
+// Site:        http://developer.nvidia.com/
+//
+// Copyright (c) 2014-2015, NVIDIA CORPORATION. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name of NVIDIA CORPORATION nor the names of its
+//    contributors may be used to endorse or promote products derived
+//    from this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
+// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//----------------------------------------------------------------------------------
+#ifndef FXAA_DISCARD
+	//
+	// Only valid for PC OpenGL currently.
+	// Probably will not work when FXAA_GREEN_AS_LUMA = 1.
+	//
+	// 1 = Use discard on pixels which don't need AA.
+	//     For APIs which enable concurrent TEX+ROP from same surface.
+	// 0 = Return unchanged color on pixels which don't need AA.
+	//
+	#define FXAA_DISCARD 0
+#endif
+/*--------------------------------------------------------------------------*/
+#define FxaaTexTop(t, p) texture2D(t, p, -100.0)
+#define FxaaTexOff(t, p, o, r) texture2D(t, p + (o * r), -100.0)
+/*--------------------------------------------------------------------------*/
+#define NUM_SAMPLES 5
+// assumes colors have premultipliedAlpha, so that the calculated color contrast is scaled by alpha
+float contrast(vec4 a, vec4 b) {
+    vec4 diff = abs(a - b);
+    return max(max(max(diff.r, diff.g), diff.b), diff.a);
 }
 
-/**
-Basic FXAA implementation based on the code on geeks3d.com with the
-modification that the texture2DLod stuff was removed since it's
-unsupported by WebGL.
+		/*============================================================================
 
---
+									FXAA3 QUALITY - PC
 
-From:
-https://github.com/mitsuhiko/webgl-meincraft
+		============================================================================*/
 
-Copyright (c) 2011 by Armin Ronacher.
-
-Some rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-
-    * Redistributions in binary form must reproduce the above
-      copyright notice, this list of conditions and the following
-      disclaimer in the documentation and/or other materials provided
-      with the distribution.
-
-    * The names of the contributors may not be used to endorse or
-      promote products derived from this software without specific
-      prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-#ifndef FXAA_REDUCE_MIN
-    #define FXAA_REDUCE_MIN   (1.0/ 128.0)
-#endif
-#ifndef FXAA_REDUCE_MUL
-    #define FXAA_REDUCE_MUL   (1.0 / 8.0)
-#endif
-#ifndef FXAA_SPAN_MAX
-    #define FXAA_SPAN_MAX     8.0
-#endif
-
-//optimized version for mobile, where dependent 
-//texture reads can be a bottleneck
-vec4 fxaa(
+		/*--------------------------------------------------------------------------*/
+vec4 FxaaPixelShader(
+    vec2 posM,
     sampler2D tex,
-    vec2 fragCoord,
-    vec2 resolution,
-    vec2 v_rgbNW,
-    vec2 v_rgbNE,
-    vec2 v_rgbSW,
-    vec2 v_rgbSE,
-    vec2 v_rgbM
+    vec2 fxaaQualityRcpFrame,
+    float fxaaQualityEdgeThreshold,
+    float fxaaQualityinvEdgeThreshold
 ) {
-    vec4 color;
-    mediump vec2 inverseVP = vec2(1.0 / resolution.x, 1.0 / resolution.y);
-    vec3 rgbNW = texture2D(tex, v_rgbNW).xyz;
-    vec3 rgbNE = texture2D(tex, v_rgbNE).xyz;
-    vec3 rgbSW = texture2D(tex, v_rgbSW).xyz;
-    vec3 rgbSE = texture2D(tex, v_rgbSE).xyz;
-    vec4 texColor = texture2D(tex, v_rgbM);
-    vec3 rgbM = texColor.xyz;
-    vec3 luma = vec3(0.299, 0.587, 0.114);
-    float lumaNW = dot(rgbNW, luma);
-    float lumaNE = dot(rgbNE, luma);
-    float lumaSW = dot(rgbSW, luma);
-    float lumaSE = dot(rgbSE, luma);
-    float lumaM = dot(rgbM, luma);
-    float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
-    float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+    vec4 rgbaM = FxaaTexTop(tex, posM);
+    vec4 rgbaS = FxaaTexOff(tex, posM, vec2(0.0, 1.0), fxaaQualityRcpFrame.xy);
+    vec4 rgbaE = FxaaTexOff(tex, posM, vec2(1.0, 0.0), fxaaQualityRcpFrame.xy);
+    vec4 rgbaN = FxaaTexOff(tex, posM, vec2(0.0, -1.0), fxaaQualityRcpFrame.xy);
+    vec4 rgbaW = FxaaTexOff(tex, posM, vec2(-1.0, 0.0), fxaaQualityRcpFrame.xy);
+			// . S .
+			// W M E
+			// . N .
 
-    mediump vec2 dir;
-    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
-    dir.y = ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+    bool earlyExit = max(max(max(contrast(rgbaM, rgbaN), contrast(rgbaM, rgbaS)), contrast(rgbaM, rgbaE)), contrast(rgbaM, rgbaW)) < fxaaQualityEdgeThreshold;
+			// . 0 .
+			// 0 0 0
+			// . 0 .
 
-    float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) *
-        (0.25 * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN);
+			#if (FXAA_DISCARD == 1)
+    if(earlyExit)
+        FxaaDiscard;
+			#else
+    if(earlyExit)
+        return rgbaM;
+			#endif
 
-    float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
-    dir = min(vec2(FXAA_SPAN_MAX, FXAA_SPAN_MAX), max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX), dir * rcpDirMin)) * inverseVP;
+    float contrastN = contrast(rgbaM, rgbaN);
+    float contrastS = contrast(rgbaM, rgbaS);
+    float contrastE = contrast(rgbaM, rgbaE);
+    float contrastW = contrast(rgbaM, rgbaW);
 
-    vec3 rgbA = 0.5 * (texture2D(tex, fragCoord * inverseVP + dir * (1.0 / 3.0 - 0.5)).xyz +
-        texture2D(tex, fragCoord * inverseVP + dir * (2.0 / 3.0 - 0.5)).xyz);
-    vec3 rgbB = rgbA * 0.5 + 0.25 * (texture2D(tex, fragCoord * inverseVP + dir * -0.5).xyz +
-        texture2D(tex, fragCoord * inverseVP + dir * 0.5).xyz);
+    float relativeVContrast = (contrastN + contrastS) - (contrastE + contrastW);
+    relativeVContrast *= fxaaQualityinvEdgeThreshold;
 
-    float lumaB = dot(rgbB, luma);
-    if((lumaB < lumaMin) || (lumaB > lumaMax))
-        color = vec4(rgbA, texColor.a);
-    else
-        color = vec4(rgbB, texColor.a);
-    return color;
+    bool horzSpan = relativeVContrast > 0.;
+			// . 1 .
+			// 0 0 0
+			// . 1 .
+
+			// 45 deg edge detection and corners of objects, aka V/H contrast is too similar
+    if(abs(relativeVContrast) < .3) {
+				// locate the edge
+        vec2 dirToEdge;
+        dirToEdge.x = contrastE > contrastW ? 1. : -1.;
+        dirToEdge.y = contrastS > contrastN ? 1. : -1.;
+				// . 2 .      . 1 .
+				// 1 0 2  ~=  0 0 1
+				// . 1 .      . 0 .
+
+				// tap 2 pixels and see which ones are "outside" the edge, to
+				// determine if the edge is vertical or horizontal
+
+        vec4 rgbaAlongH = FxaaTexOff(tex, posM, vec2(dirToEdge.x, -dirToEdge.y), fxaaQualityRcpFrame.xy);
+        float matchAlongH = contrast(rgbaM, rgbaAlongH);
+				// . 1 .
+				// 0 0 1
+				// . 0 H
+
+        vec4 rgbaAlongV = FxaaTexOff(tex, posM, vec2(-dirToEdge.x, dirToEdge.y), fxaaQualityRcpFrame.xy);
+        float matchAlongV = contrast(rgbaM, rgbaAlongV);
+				// V 1 .
+				// 0 0 1
+				// . 0 .
+
+        relativeVContrast = matchAlongV - matchAlongH;
+        relativeVContrast *= fxaaQualityinvEdgeThreshold;
+
+        if(abs(relativeVContrast) < .3) { // 45 deg edge
+					// 1 1 .
+					// 0 0 1
+					// . 0 1
+
+					// do a simple blur
+            return mix(rgbaM, (rgbaN + rgbaS + rgbaE + rgbaW) * .25, .4);
+        }
+
+        horzSpan = relativeVContrast > 0.;
+    }
+
+    if(!horzSpan)
+        rgbaN = rgbaW;
+    if(!horzSpan)
+        rgbaS = rgbaE;
+			// . 0 .      1
+			// 1 0 1  ->  0
+			// . 0 .      1
+
+    bool pairN = contrast(rgbaM, rgbaN) > contrast(rgbaM, rgbaS);
+    if(!pairN)
+        rgbaN = rgbaS;
+
+    vec2 offNP;
+    offNP.x = (!horzSpan) ? 0.0 : fxaaQualityRcpFrame.x;
+    offNP.y = (horzSpan) ? 0.0 : fxaaQualityRcpFrame.y;
+
+    bool doneN = false;
+    bool doneP = false;
+
+    float nDist = 0.;
+    float pDist = 0.;
+
+    vec2 posN = posM;
+    vec2 posP = posM;
+
+    int iterationsUsed = 0;
+    int iterationsUsedN = 0;
+    int iterationsUsedP = 0;
+    for(int i = 0; i < NUM_SAMPLES; i++) {
+        iterationsUsed = i;
+
+        float increment = float(i + 1);
+
+        if(!doneN) {
+            nDist += increment;
+            posN = posM + offNP * nDist;
+            vec4 rgbaEndN = FxaaTexTop(tex, posN.xy);
+            doneN = contrast(rgbaEndN, rgbaM) > contrast(rgbaEndN, rgbaN);
+            iterationsUsedN = i;
+        }
+
+        if(!doneP) {
+            pDist += increment;
+            posP = posM - offNP * pDist;
+            vec4 rgbaEndP = FxaaTexTop(tex, posP.xy);
+            doneP = contrast(rgbaEndP, rgbaM) > contrast(rgbaEndP, rgbaN);
+            iterationsUsedP = i;
+        }
+
+        if(doneN || doneP)
+            break;
+    }
+
+    if(!doneP && !doneN)
+        return rgbaM; // failed to find end of edge
+
+    float dist = min(doneN ? float(iterationsUsedN) / float(NUM_SAMPLES - 1) : 1., doneP ? float(iterationsUsedP) / float(NUM_SAMPLES - 1) : 1.);
+
+			// hacky way of reduces blurriness of mostly diagonal edges
+			// but reduces AA quality
+    dist = pow(dist, .5);
+
+    dist = 1. - dist;
+
+    return mix(rgbaM, rgbaN, dist * .5);
 }
 
 void main() {
-    vec2 v_rgbNW;
-    vec2 v_rgbNE;
-    vec2 v_rgbSW;
-    vec2 v_rgbSE;
-    vec2 v_rgbM;
-
-    vec2 fragCoord = vTextureCoord * screenSize;
-    texcoords(fragCoord, screenSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
-    gl_FragColor = fxaa(uTexture, fragCoord, screenSize, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
+    const float edgeDetectionQuality = .2;
+    const float invEdgeDetectionQuality = 1. / edgeDetectionQuality;
+    gl_FragColor = FxaaPixelShader(vTextureCoord, uTexture, screenSize, edgeDetectionQuality, invEdgeDetectionQuality);
 }

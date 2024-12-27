@@ -17,7 +17,7 @@ export interface ChartPackOption {
 
 const DefaultOption: ChartPackOption = {
     compressPack: true,
-    compressImage: true
+    compressImage: false
 }
 async function _base64ToArrayBuffer(base64: string) {
     return await (await fetch(base64)).arrayBuffer();

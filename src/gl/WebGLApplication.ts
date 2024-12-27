@@ -33,7 +33,8 @@ export class WebGLApplication {
             resolution: 1
         })
         this.renderer.hello.init({ hello: true })
-        this.resize(window.innerWidth, window.innerHeight)
+        this.resize(window.innerWidth, window.innerHeight);
+
     }
 
     resize(width: number, height: number) {

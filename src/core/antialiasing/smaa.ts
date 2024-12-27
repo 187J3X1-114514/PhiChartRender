@@ -75,6 +75,10 @@ export class SMAAPass {
         this.SMAAEdgesShader.setUniform("tDiffuse", this.inputFrameBuffer.texture)
         this.SMAAEdgesShader.setUniform("resolution", [gl.canvas.width, gl.canvas.height])
         this.SMAAEdgesShader.use()
+        gl.bindBuffer(gl.ARRAY_BUFFER, null) // 确保绑定必要的缓冲区
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+        gl.enableVertexAttribArray(0) // 启用顶点属性数组
+        gl.enableVertexAttribArray(1) // 启用顶点属性数组
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         this.SMAAEdgesShader.unuse()
     }
@@ -91,6 +95,10 @@ export class SMAAPass {
         this.SMAAWeightsShader.setUniform("tSearch", this.SMAA_SearchTexture)
         this.SMAAWeightsShader.setUniform("resolution", [gl.canvas.width, gl.canvas.height])
         this.SMAAWeightsShader.use()
+        gl.bindBuffer(gl.ARRAY_BUFFER, null) // 确保绑定必要的缓冲区
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+        gl.enableVertexAttribArray(0) // 启用顶点属性数组
+        gl.enableVertexAttribArray(1) // 启用顶点属性数组
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         this.SMAAWeightsShader.unuse()
     }
@@ -105,6 +113,10 @@ export class SMAAPass {
         this.SMAABlendShader.setUniform("tColor", this.inputFrameBuffer.texture)
         this.SMAABlendShader.setUniform("resolution", [gl.canvas.width, gl.canvas.height])
         this.SMAABlendShader.use()
+        gl.bindBuffer(gl.ARRAY_BUFFER, null) // 确保绑定必要的缓冲区
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
+        gl.enableVertexAttribArray(0) // 启用顶点属性数组
+        gl.enableVertexAttribArray(1) // 启用顶点属性数组
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         this.SMAABlendShader.unuse()
     }

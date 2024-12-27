@@ -33,7 +33,7 @@ export interface GameParams {
         autoPlay?: boolean,
         showPerformanceInfo?: boolean,
         showAPStatus?: boolean,
-        shader?: boolean,
+        prprExtra?: boolean,
         antialias?:boolean,
         antialiasType?:number //1-fxaa 2-smaa
     }
