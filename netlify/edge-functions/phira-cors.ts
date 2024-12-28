@@ -9,7 +9,7 @@ async function handlePhiraApi(request: Request, p: string) {
         method: request.method
     })
     console.log(`URL: ${PHIRA_API_BASE_URL + allp[0]} P:${allp} ${"R:"+response.redirected} ${response.status} ${response.headers.get("Location")}`)
-    const newHeader = new Headers(response.headers);
+    const newHeader = new Headers(response.headers)
     if (newHeader.get("Access-Control-Allow-Origin") != null) {
         newHeader.set("Access-Control-Allow-Origin", "*")
     } else {
@@ -39,6 +39,8 @@ export default async (request: Request, context: Context) => {
     const fn = types[type]!
     return await fn(request, p.split("+").pop()!)
 }
+
 export const config: Config = {
     path: ('/' + ROOT + '/*') as any
 }
+

@@ -7,6 +7,7 @@ import { File } from "../file"
 import * as StackBlur from 'stackblur-canvas';
 import { PrprExtra } from "../prpr/prpr"
 import { printImage } from "../utils"
+import { GlobalSettings } from "../global_setting"
 
 export interface PhiraChartInfo extends BaseChartInfo {
     id: number
@@ -147,7 +148,10 @@ export class ChartInfo {
         c.height = img.height
         ctx.drawImage(img, 0, 0)
         StackBlur.canvasRGB(c, 0, 0, img.width, img.height, r)
-        const newImg = Texture.from(await createImageBitmap(c))
+        const newImg = Texture.from(await createImageBitmap(c, {
+            resizeWidth: img.width * GlobalSettings.backgroundResolution!,
+            resizeHeight: img.height * GlobalSettings.backgroundResolution!
+        }))
         this.resManager!.files[this.illustration] = newImg
     }
 }

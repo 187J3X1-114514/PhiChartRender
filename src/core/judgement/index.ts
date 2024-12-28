@@ -10,9 +10,8 @@ import Audio from '../audio';
 import { CONST } from '../types/const';
 import { PhiNoteSound } from '../resource/resource_pack';
 import PhiGame from '../game';
-const MAX_PLAYING_SOUND = 114514
+import { GlobalSettings } from '../global_setting';
 var PLAYING_SOUND = 0
-const MAX_PARTICLE = 1500
 var PARTICLECount = 0
 const particleCountPerClickAnim = 4;
 
@@ -251,7 +250,7 @@ export default class Judgement {
             if (note.score! >= 3) {
                 let currentParticleCount = 0;
                 while (currentParticleCount < particleCountPerClickAnim) {
-                    if (MAX_PARTICLE < PARTICLECount) break;
+                    if (GlobalSettings.maxHitParticleCount! < PARTICLECount) break;
                     let particle: any = new Sprite(ClickAnimatePointCache);
                     (particle as Sprite).anchor.set(0.5, 0.5)
                     particle.tint = note.score === 4 ? 0xFFECA0 : 0xB4E1FF;
@@ -292,7 +291,7 @@ export default class Judgement {
         if (!this._hitsound) return;
         if (note.hitsound) (note.hitsound as Audio).play();
         else {
-            if (PLAYING_SOUND <= MAX_PLAYING_SOUND) {
+            if (PLAYING_SOUND <= GlobalSettings.maxHitSoundEffectCount!) {
                 switch (note.type) {
                     case CONST.NoteType.Tap:
                         {

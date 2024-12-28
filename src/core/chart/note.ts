@@ -5,6 +5,7 @@ import Audio from '../audio';
 import { type PhiAssets, ResourceManager } from '../resource';
 import type { jsonNoteData, NoteParam } from './types/note';
 import { CONST } from '../types/const';
+import { GlobalSettings } from '../global_setting';
 
 
 export default class Note {
@@ -165,10 +166,12 @@ export default class Note {
         if (this.notCalc) return
         if (this.isScoreAnimated && this.isScored && !this.isFake && this.type != CONST.NoteType.Hold) {
             this.notCalc = true
-            this.sprite.destroy({
-                texture: false,
-                textureSource: false
-            })
+            if (GlobalSettings.shouldDestroyNoteSprite!) {
+                this.sprite.destroy({
+                    texture: false,
+                    textureSource: false
+                })
+            }
             return
         }
         let _yOffset = size.height * this.yOffset,

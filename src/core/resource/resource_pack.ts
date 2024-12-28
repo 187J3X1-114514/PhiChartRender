@@ -6,6 +6,7 @@ import { Zip } from "../file"
 import { loadTextures } from "./utils"
 import { newLogger } from "../log"
 import { STATUS } from "../../ui/status"
+import { GlobalSettings } from "../global_setting"
 const log = newLogger("Resource Pack")
 export interface ResourcePackInfo {
     hitFx: {
@@ -202,7 +203,7 @@ export class ResourcePack {
         this.Assets = a
     }
     static async load(zip: Zip) {
-        const TEXTURE_RESOLUTION = 1
+        const TEXTURE_RESOLUTION = GlobalSettings.noteTextureResolution!
         const data = JSON.parse(await (await zip.get("info.json")!.getBlob()).text())
         const info = ResourcePackInfo.from(data)
         log.info('开始加载资源包 -> ' + zip.name)

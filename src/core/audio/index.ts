@@ -47,7 +47,7 @@ export default class Audio {
         this.soundPlay.on("end", () => {
             if (this.onend) this.onend()
         })
-        this.soundPlay.on("progress", (a, b) => {
+        this.soundPlay.on("progress", (a: number, b: number) => {
             this.progress = a
             this.currentTime = a * b
         })
@@ -77,7 +77,7 @@ export default class Audio {
         this.soundPlay.on("end", () => {
             if (this.onend) this.onend()
         })
-        this.soundPlay.on("progress", (a, b) => {
+        this.soundPlay.on("progress", (a: number, b: number) => {
             this.progress = a
             this.currentTime = a * b
         })
