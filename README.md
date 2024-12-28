@@ -1,7 +1,9 @@
 <div align="center">
 <img src="/assets/logo.gif">
-  <h1>PhiChartRender</h1>
+  <h1>PhiChartRender <img src="https://img.shields.io/static/v1?label=%E6%88%91%E7%9A%84%E5%A4%A9%E5%93%AA%EF%BC%8C%E6%98%AF&message=Shitcode&color=7B5804"></h1>
+  
 </div>
+
 此项目是基于MisaLiu/phi-chart-render的改进版本
 
 拥有基于[MDUI](https://www.mdui.org/)的界面，对各种格式铺面更好的支持(RPE,prpr的extra.json)
