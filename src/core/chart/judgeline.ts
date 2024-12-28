@@ -9,6 +9,7 @@ import type { SizerData } from '../types/params';
 import { chart_log } from './convert';
 import type { jsonEventLayer, jsonJudgeLineData } from './types/judgeLine';
 import { AnimatedGIF } from '@pixi/gif';
+import { conimgsize } from './utils';
 
 const blackJudgeLine = (() => {
     const canvas = document.createElement('canvas');
@@ -331,7 +332,7 @@ export default class Judgeline {
         this.y = 0;
         this.alpha = 0;
         this.deg = 0;
-
+        let calcTextureSize = false
         for (let i = 0, length = this.eventLayers.length; i < length; i++) {
             let eventLayer = this.eventLayers[i];
             eventLayer.calcTime(currentTime);
@@ -360,7 +361,7 @@ export default class Judgeline {
             let timePercentStart = 1 - timePercentEnd;
 
             this.scaleX = event.start * timePercentStart + event.end * timePercentEnd;
-            this.sprite.scale.x = this.scaleX * this.baseScaleX;
+            calcTextureSize = true
         }
 
         for (let i = 0, length = this.extendEvent.scaleY.length; i < length; i++) {
@@ -372,7 +373,7 @@ export default class Judgeline {
             let timePercentStart = 1 - timePercentEnd;
 
             this.scaleY = event.start * timePercentStart + event.end * timePercentEnd;
-            this.sprite.scale.y = this.scaleY * this.baseScaleY;
+            calcTextureSize = true
         }
 
         for (let i = 0, length = this.extendEvent.text.length; i < length; i++) {
@@ -408,6 +409,26 @@ export default class Judgeline {
             this.inclineSinr = Math.sin(event.start * timePercentStart + event.end * timePercentEnd);
         }
 
+        if (this.textureName != null) {
+            let texsize = conimgsize(
+                this.sprite.texture.width,
+                this.sprite.texture.height,
+                size.width,
+                size.height
+            );
+            this.sprite.scale.set(
+                (texsize[0] / this.sprite.texture.width) * this.scaleX,
+                (texsize[1] / this.sprite.texture.height) * this.scaleY
+            )
+        } else if (this.isText) {
+            this.spriteStyle!.fontSize = (size.width + size.height) / 75 * 1.35
+            this.sprite.scale.x = this.scaleX * this.baseScaleX;
+            this.sprite.scale.y = this.scaleY * this.baseScaleY;
+        } else {
+            this.sprite.scale.x = this.scaleX * this.baseScaleX;
+            this.sprite.scale.y = this.scaleY * this.baseScaleY;
+        }
+
         this.cosr = Math.cos(this.deg);
         this.sinr = Math.sin(this.deg);
 
@@ -437,12 +458,6 @@ export default class Judgeline {
             this.sprite.tint = color
         } else if (this.extendEvent.color.length == 0 && !this.isText && this.textureName == undefined) {
             this.sprite.tint = color
-        }
-    }
-    toBlack() {
-        if (!this.isText && !this.wasBlack) {
-            (this.sprite as Sprite).texture = blackJudgeLine
-            this.wasBlack = true
         }
     }
 
@@ -504,4 +519,3 @@ function calcGray(v: number[]) {
     let g4 = (R + G + B) / 3;
     return (g1 + g2 + g3 + g4) / 4 / 255
 }
-

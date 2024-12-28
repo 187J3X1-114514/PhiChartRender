@@ -521,7 +521,6 @@ export default class Judgement {
                                 note.score = 4;
                                 note.scoreTime = NaN;
                                 this.judgePoints[i].input.isFlicked = true
-                                this.judgePoints.splice(i, 1);
 
                                 break;
                             }

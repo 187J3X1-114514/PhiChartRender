@@ -6,6 +6,8 @@ import { type PhiAssets, ResourceManager } from '../resource';
 import type { jsonNoteData, NoteParam } from './types/note';
 import { CONST } from '../types/const';
 import { GlobalSettings } from '../global_setting';
+import { noteCanRender } from './utils';
+import { SizerData } from '../types/params';
 
 
 export default class Note {
@@ -66,7 +68,6 @@ export default class Note {
         this.texture = (params.texture && params.texture != '') ? params.texture : null;
         this.hitsound = (params.hitsound && params.hitsound != '') ? params.hitsound : null;
         this.judgeline = params.judgeline!;
-
         this.sprite = new Sprite();
 
         this.reset();
@@ -162,7 +163,7 @@ export default class Note {
         return this.sprite;
     }
 
-    calcTime(currentTime: number, size: any) {
+    calcTime(currentTime: number, size: SizerData) {
         if (this.notCalc) return
         if (this.isScoreAnimated && this.isScored && !this.isFake && this.type != CONST.NoteType.Hold) {
             this.notCalc = true
@@ -209,16 +210,17 @@ export default class Note {
         realY += this.judgelineY!;
         this.judgelineX! += yOffset * this.judgeline.sinr * -1;
         this.judgelineY! += yOffset * this.judgeline.cosr;
+
         this.outScreen = !isInArea({
             startX: realX,
             endX: originX * this.judgeline.cosr - holdLength * this.judgeline.sinr + this.judgeline.sprite.position.x,
             startY: realY,
             endY: holdLength * this.judgeline.cosr + originX * this.judgeline.sinr + this.judgeline.sprite.position.y
-        }, size);
+        }, size)
+
 
         // 推送计算结果到精灵
         this.sprite.visible = !this.outScreen;
-        if (this.outScreen) return
 
         this.sprite.position.x = realX;
         this.sprite.position.y = realY;
@@ -248,8 +250,6 @@ export default class Note {
                 )
             ) this.sprite.visible = false;
 
-            if (!isNaN(this.visibleTime) && this.time - currentTime > this.visibleTime) this.sprite.visible = false;
-
             if (this.judgeline.alpha < 0) {
                 if (this.judgeline.alpha >= -1) this.sprite.visible = false;
                 else if (this.judgeline.alpha >= -2) {
@@ -258,6 +258,8 @@ export default class Note {
                 }
             }
         }
+
+        if (!isNaN(this.visibleTime) && Math.abs(this.time - currentTime) > this.visibleTime) this.sprite.visible = false;
     }
     exportToJson() {
         return { ...this.params, judgeline: this.judgeline.id } as jsonNoteData

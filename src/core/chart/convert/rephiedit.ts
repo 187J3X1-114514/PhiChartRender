@@ -331,7 +331,7 @@ export default function RePhiEditChartConverter(_chart: any) {
                 holdLength: note.holdLength,
                 positionX: (note.positionX / (670 * (9 / 80))),
                 basicAlpha: note.alpha / 255,
-                visibleTime: note.visibleTime < 999999 ? note.visibleTime : NaN,
+                visibleTime: note.visibleTime,
                 yOffset: (note.yOffset / 900),
                 xScale: note.size,
                 isAbove: note.above == 1 ? true : false,

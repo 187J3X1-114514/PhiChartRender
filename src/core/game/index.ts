@@ -201,7 +201,7 @@ export default class PhiGame {
 
         (window as any).__PIXI_DEVTOOLS__ = {
             renderer: this.app.renderer,
-            stage:this.rootContainer
+            stage: this.rootContainer
         };
 
     }
@@ -646,7 +646,9 @@ export default class PhiGame {
         result.textureScale = result.height / 750;
         result.baseFontSize = result.lineScale / result.heightPercent
         result.lineHeightScale = result.height * 0.0075 / this.assets.judgeLine.height
-        result.lineWidthScale = result.height * 5.76 / this.assets.judgeLine.width
+        result.lineWidthScale = result.height * 5.76 / this.assets.judgeLine.width;
+
+        result.note_max_size_half = (((((0.125 * result.width + 0.2 * result.height) / 2) * (noteScale / 8080)) ** 2 + (this.assets.note.holdMH.body.height * 1.1) ** 2) ** 0.5) / 2
         return result;
     }
 

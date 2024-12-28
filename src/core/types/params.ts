@@ -34,8 +34,8 @@ export interface GameParams {
         showPerformanceInfo?: boolean,
         showAPStatus?: boolean,
         prprExtra?: boolean,
-        antialias?:boolean,
-        antialiasType?:number //1-fxaa 2-smaa
+        antialias?: boolean,
+        antialiasType?: number //1-fxaa 2-smaa
     }
 
 }
@@ -80,4 +80,5 @@ export interface SizerData {
 
     lineHeightScale: number
     lineWidthScale: number
+    note_max_size_half: number
 }
