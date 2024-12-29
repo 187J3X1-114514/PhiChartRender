@@ -360,19 +360,19 @@ export default class PhiGame {
 
     destroy() {
         const canvas = this.app.canvas;
-
         this.app.setTick(() => { });
         this.chart.music.reset();
-
         this.chart.reset();
         this.judgement.destroySprites();
-
         this.judgement.input.removeListenerFromCanvas(canvas as HTMLCanvasElement);
-
         window.removeEventListener('resize', () => this.resize);
-
         canvas.width = canvas.height = 0;
         window.onblur = null
+        this.chart.destroySprites()
+        this.renderTarget.destroy()
+        this.ui.destroy()
+        this.prprExtra.destroy();
+        (window as any).__PIXI_DEVTOOLS__ = undefined
     }
 
     on(type: string, callback: () => any) {
@@ -520,7 +520,7 @@ export default class PhiGame {
                             let bpm = chart.bpmList[i];
                             if (bpm.endTime < currentTime) continue;
                             if (bpm.startTime > currentTime) break;
-                            judgement._holdBetween = bpm.holdBetween;
+                            judgement.holdBetween = bpm.holdBetween;
                         }
                         let st3 = performance.now()
                         this.OtherFrameTime = st3 - st1

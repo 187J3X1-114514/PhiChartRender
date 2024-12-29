@@ -7,6 +7,7 @@ export interface GlobalSetting {
     loadCompressedPackageMethod?: "jszip" | "7z-wasm" | "libarchive"
     maxHitParticleCount?: number
     maxHitSoundEffectCount?: number
+    maxHitAnimationCount?: number
 }
 
 export var GlobalSettings: GlobalSetting = {
@@ -19,6 +20,7 @@ const DefaultGlobalSettings: GlobalSetting = {
     shouldDestroyNoteSprite: true,
     loadCompressedPackageMethod: "7z-wasm",
     maxHitParticleCount: 1500,
+    maxHitAnimationCount: 400,
     maxHitSoundEffectCount: 1000
 }
 

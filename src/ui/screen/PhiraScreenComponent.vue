@@ -8,7 +8,7 @@ import { dialog, snackbar } from 'mdui';
 import { AUTOFetch, PhiraAPI, PhiraAPIChartInfo, SearchDivision, SearchOrder } from '@/api/phira';
 import { scrollIntoView } from '@/utils';
 import ChartCardRootComponent from '../component/ChartCardRootComponent.vue';
-import { addCacheDATA, addChartByID, addChartInfo, checkCacheDATA, checkChartByID, checkInfoData, getChartByID, removeChartByID } from '../data';
+import { addCacheDATA, addChartByID, addChartInfo, checkCacheDATA, checkChartByID, checkInfoData, getCacheDATA, getChartByID, removeChartByID } from '../data';
 import { PHIRA_API_BASE_URL_NO_CORS1, proxyPhriaApiURL } from '@/api/url';
 import { generateRandomString } from '@/core/random';
 import { PlayScreen } from '../play/play';
@@ -224,7 +224,13 @@ export default {
             })
             try {
                 await chart.load()
-                await addChartInfo(chart.getChart(), chartid)
+                data.illustration
+                var previewImg
+                if (await checkCacheDATA(data.illustration.split("/").pop()!)) {
+                    previewImg = await getCacheDATA(data.illustration.split("/").pop()!) as Blob
+                }
+                await addChartInfo(chart.getChart(), chartid, previewImg)
+
             } catch (e) {
                 await removeChartByID(chartid)
                 snackbar({

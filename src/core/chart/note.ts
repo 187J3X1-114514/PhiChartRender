@@ -74,6 +74,7 @@ export default class Note {
     }
 
     reset() {
+        this.notCalc = false
         this.isScored = false;
         this.isScoreAnimated = false;
         this.isHolding = false;

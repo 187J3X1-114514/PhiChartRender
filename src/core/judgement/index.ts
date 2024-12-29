@@ -11,8 +11,6 @@ import { CONST } from '../types/const';
 import { PhiNoteSound } from '../resource/resource_pack';
 import PhiGame from '../game';
 import { GlobalSettings } from '../global_setting';
-var PLAYING_SOUND = 0
-var PARTICLECount = 0
 const particleCountPerClickAnim = 4;
 
 const AllJudgeTimes = {
@@ -69,25 +67,28 @@ var ClickAnimatePointCache: Texture;
 })();
 
 export default class Judgement {
-    chart: Chart;
-    stage: Container;
-    textures: any;
-    sounds: PhiNoteSound;
-    _autoPlay: boolean;
-    _hitsound: boolean;
-    _hitsoundVolume: number;
-    score: Score;
-    input: Input;
-    judgeTimes: any;
-    judgePoints: JudgePoint[] = [];
-    clickParticleContainer: Container = new Container();
-    badNoteContainer: Container<BadNoteSprite> = new Container<BadNoteSprite>();
-    renderSize: SizerData = undefined as any;
-    _clickAnimBaseScale: any;
-    _holdBetween: number = 0;
+    private chart: Chart;
+    public stage: Container;
+    private textures: any;
+    public sounds: PhiNoteSound;
+    private _autoPlay: boolean;
+    private _hitsound: boolean;
+    public _hitsoundVolume: number;
+    public score: Score;
+    public input: Input;
+    private judgeTimes: any;
+    private judgePoints: JudgePoint[] = [];
+    public clickParticleContainer: Container = new Container();
+    private badNoteContainer: Container<BadNoteSprite> = new Container<BadNoteSprite>();
+    private renderSize: SizerData = undefined as any;
+    private _clickAnimBaseScale: any;
+    public holdBetween: number = 0;
     private currentTime: number = 0
     private anims: AnimatedSprite[] = []
     private game: PhiGame
+    private playing_hitsound = 0
+    private particleCount = 0
+    private hitAnimationCount = 0
     constructor(params: any = {}) {
         this.chart = params.chart;
         this.stage = params.stage;
@@ -108,28 +109,18 @@ export default class Judgement {
             bad: (!params.challangeMode ? AllJudgeTimes.bad : AllJudgeTimes.badChallenge) / 1000
         };
 
-        this.sounds.drag.onend = () => {
-            PLAYING_SOUND = PLAYING_SOUND - 1;
-        }
-        this.sounds.hold.onend = () => {
-            PLAYING_SOUND = PLAYING_SOUND - 1;
-        }
-        this.sounds.tap.onend = () => {
-            PLAYING_SOUND = PLAYING_SOUND - 1;
-        }
-        this.sounds.flick.onend = () => {
-            PLAYING_SOUND = PLAYING_SOUND - 1;
-        }
         this.reset();
     }
 
     reset() {
-        PLAYING_SOUND = 0
+        this.playing_hitsound = 0
+        this.particleCount = 0
+        this.hitAnimationCount = 0
         this.judgePoints = [];
         this.score.reset();
         this.input.reset();
 
-        this._holdBetween = 0.15;
+        this.holdBetween = 0.15;
 
         if (this.clickParticleContainer) this.clickParticleContainer.removeChildren();
     }
@@ -158,7 +149,7 @@ export default class Judgement {
     calcTick(currentTime: number) {
         this.currentTime = currentTime * 1000
         this.createJudgePoints();
-        this.updataAnim()
+        this.updateAnimations()
         this.input.calcTick();
 
         for (let i = 0, length = this.clickParticleContainer.children.length; i < length; i++) {
@@ -168,7 +159,7 @@ export default class Judgement {
 
             if (currentTimeProgress >= 1) {
                 this.clickParticleContainer.removeChild(particle);
-                PARTICLECount = PARTICLECount - 1
+                this.particleCount = this.particleCount - 1
                 particle.destroy(false);
                 continue;
             }
@@ -195,20 +186,21 @@ export default class Judgement {
         }
     }
 
-    updataAnim() {
-        let temp = this.anims.slice(0, this.anims.length)
-        temp.forEach((v) => {
-            let st = (v as any).startTime
-            let tf = v.totalFrames
-            let cf = Math.round(((this.currentTime - st) / 1000) / ((tf / 60) / tf))
-            if (cf >= tf) {
-                v.destroy()
-                this.anims.splice(this.anims.indexOf(v), 1)
+    updateAnimations() {
+        let animations = this.anims.slice(0, this.anims.length);
+        animations.forEach((animation) => {
+            let startTime = (animation as any).startTime;
+            let totalFrames = animation.totalFrames;
+            let currentFrame = Math.round(((this.currentTime - startTime) / 1000) / ((totalFrames / 60) / totalFrames));
+            if (currentFrame >= totalFrames) {
+                this.hitAnimationCount--
+                animation.destroy();
+                this.anims.splice(this.anims.indexOf(animation), 1);
             } else {
-                v.currentFrame = cf
+                animation.currentFrame = currentFrame;
             }
-            v.alpha = 1 - (v.currentFrame / v.totalFrames);
-        })
+            animation.alpha = 1 - (animation.currentFrame / animation.totalFrames);
+        });
     }
 
     createJudgePoints() {
@@ -235,46 +227,48 @@ export default class Judgement {
 
     createClickAnimate(note: Note) {
         if (note.score! >= 3) {
-            let anim = new AnimatedSprite(this.textures.normal, false),
-                baseScale = this.renderSize.noteScale * 5.6;
-            (anim as any).startTime = this.currentTime
-            this.anims.push(anim)
-            if (note.score! >= 3 && note.type != CONST.NoteType.Hold) anim.position.set(note.judgelineX, note.judgelineY);
-            else anim.position.copyFrom(note.sprite.position);
+            if (this.anims.length < GlobalSettings.maxHitAnimationCount!) {
+                let anim = new AnimatedSprite(this.textures.normal, false),
+                    baseScale = this.renderSize.noteScale * 5.6;
+                (anim as any).startTime = this.currentTime
+                this.anims.push(anim)
+                if (note.score! >= 3 && note.type != CONST.NoteType.Hold) anim.position.set(note.judgelineX, note.judgelineY);
+                else anim.position.copyFrom(note.sprite.position);
 
-            anim.scale.set((this._clickAnimBaseScale.normal) * baseScale);
-            anim.tint = note.score === 4 ? 0xFFECA0 : note.score === 3 ? 0xB4E1FF : 0x6c4343;
-            anim.anchor.set(0.5, 0.5)
-            anim.loop = false;
+                anim.scale.set((this._clickAnimBaseScale.normal) * baseScale);
+                anim.tint = note.score === 4 ? 0xFFECA0 : note.score === 3 ? 0xB4E1FF : 0x6c4343;
+                anim.anchor.set(0.5, 0.5)
+                anim.loop = false;
 
-            if (note.score! >= 3) {
-                let currentParticleCount = 0;
-                while (currentParticleCount < particleCountPerClickAnim) {
-                    if (GlobalSettings.maxHitParticleCount! < PARTICLECount) break;
-                    let particle: any = new Sprite(ClickAnimatePointCache);
-                    (particle as Sprite).anchor.set(0.5, 0.5)
-                    particle.tint = note.score === 4 ? 0xFFECA0 : 0xB4E1FF;
+                if (note.score! >= 3) {
+                    let currentParticleCount = 0;
+                    while (currentParticleCount < particleCountPerClickAnim) {
+                        if (GlobalSettings.maxHitParticleCount! < this.particleCount) break;
+                        let particle: any = new Sprite(ClickAnimatePointCache);
+                        (particle as Sprite).anchor.set(0.5, 0.5)
+                        particle.tint = note.score === 4 ? 0xFFECA0 : 0xB4E1FF;
 
-                    particle.startTime = this.currentTime;
-                    particle.basePos = anim.position;
-                    particle.baseScale = baseScale;
+                        particle.startTime = this.currentTime;
+                        particle.basePos = anim.position;
+                        particle.baseScale = baseScale;
 
-                    particle.distance = particle._distance = Math.random() * 100 + 250;
-                    particle.direction = Math.floor(Math.random() * 360);
-                    particle.sinr = Math.sin(particle.direction);
-                    particle.cosr = Math.cos(particle.direction);
-                    (particle as Sprite).visible = false
-                    this.clickParticleContainer.addChild(particle);
+                        particle.distance = particle._distance = Math.random() * 100 + 250;
+                        particle.direction = Math.floor(Math.random() * 360);
+                        particle.sinr = Math.sin(particle.direction);
+                        particle.cosr = Math.cos(particle.direction);
+                        (particle as Sprite).visible = false
+                        this.clickParticleContainer.addChild(particle);
 
-                    currentParticleCount++;
-                    PARTICLECount++
+                        currentParticleCount++;
+                        this.particleCount++
+                    }
                 }
+                else {
+                    anim.angle = note.sprite.angle;
+                }
+                this.stage.addChild(anim);
+                return
             }
-            else {
-                anim.angle = note.sprite.angle;
-            }
-            this.stage.addChild(anim);
-            return
         }
         if (note.type == CONST.NoteType.Tap) {
             let sprite = new BadNoteSprite(this.textures.bad)
@@ -291,30 +285,31 @@ export default class Judgement {
         if (!this._hitsound) return;
         if (note.hitsound) (note.hitsound as Audio).play();
         else {
-            if (PLAYING_SOUND <= GlobalSettings.maxHitSoundEffectCount!) {
+            if (this.playing_hitsound <= GlobalSettings.maxHitSoundEffectCount!) {
+                this.playing_hitsound++
                 switch (note.type) {
                     case CONST.NoteType.Tap:
                         {
                             this.sounds.tap.play();
-                            PLAYING_SOUND++
+                            setInterval(() => { this.playing_hitsound-- }, this.sounds.tap.duration * 1000)
                             break;
                         }
                     case CONST.NoteType.Hold:
                         {
                             this.sounds.hold.play();
-                            PLAYING_SOUND++
+                            setInterval(() => { this.playing_hitsound-- }, this.sounds.hold.duration * 1000)
                             break;
                         }
                     case CONST.NoteType.Drag:
                         {
                             this.sounds.drag.play();
-                            PLAYING_SOUND++
+                            setInterval(() => { this.playing_hitsound-- }, this.sounds.drag.duration * 1000)
                             break;
                         }
                     case CONST.NoteType.Flick:
                         {
                             this.sounds.flick.play();
-                            PLAYING_SOUND++
+                            setInterval(() => { this.playing_hitsound-- }, this.sounds.flick.duration * 1000)
                             break;
                         }
                 }
@@ -386,7 +381,7 @@ export default class Judgement {
                 if (timeBetween <= this.judgeTimes.bad) this.judgePoints.push(new JudgePoint(input, 3));
             } else if (note.type === 3) {
                 if (!note.isScored && timeBetween <= 0) this.judgePoints.push(new JudgePoint(input, 1));
-                else if (note.isScored && currentTime - note.lastHoldTime! >= this._holdBetween) this.judgePoints.push(new JudgePoint(input, 3));
+                else if (note.isScored && currentTime - note.lastHoldTime! >= this.holdBetween) this.judgePoints.push(new JudgePoint(input, 3));
             } else if (note.type === 4) {
                 if (timeBetween <= this.judgeTimes.bad) this.judgePoints.push(new JudgePoint(input, 2));
             }
@@ -448,7 +443,7 @@ export default class Judgement {
             case CONST.NoteType.Hold:
                 {
                     if (note.isScored) {
-                        if (currentTime - note.lastHoldTime! >= this._holdBetween) {
+                        if (currentTime - note.lastHoldTime! >= this.holdBetween) {
                             this.createClickAnimate(note);
                         }
 
@@ -458,7 +453,7 @@ export default class Judgement {
                             break;
                         }
 
-                        if (currentTime - note.lastHoldTime! >= this._holdBetween) {
+                        if (currentTime - note.lastHoldTime! >= this.holdBetween) {
                             note.lastHoldTime = currentTime;
                             note.isHolding = false;
                         }

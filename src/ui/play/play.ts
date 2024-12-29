@@ -29,7 +29,7 @@ export class PlayScreen {
         this.end = f
     }
     async load(autoPlay: boolean = false) {
-        
+
         this.app = await WebGLApplication.create(document.createElement("canvas"))
         globalThis.addEventListener("resize", () => {
             this.app!.resize(window.innerWidth, window.innerHeight)
@@ -63,7 +63,7 @@ export class PlayScreen {
             assets: this.resp.Assets,
             zipFiles: this.res,
             settings: {
-                autoPlay: false,
+                autoPlay: true,
                 prprExtra: true,
                 showInputPoint: false,
                 showPerformanceInfo: false,
@@ -105,6 +105,9 @@ export class PlayScreen {
         this.end()
         setTimeout(() => {
             this.game!.destroy()
+            this.app!.destroy()
+            this.game = undefined
+            this.app = undefined
         }, 620)
     }
 }

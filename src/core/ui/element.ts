@@ -326,4 +326,7 @@ export class UIElement {
     updataSettings() {
         this.settings = this.uiManager.getUIElementSettings(this.type)
     }
+    destroy() {
+        this.sprite.destroy({ texture: false, textureSource: false })
+    }
 }

@@ -112,6 +112,12 @@ export class PrprExtra {
         this.game!.rootContainer.filters = [DefaultShader.filter];
     }
 
+    destroy(){
+        this.src = null as any
+        this.videos = null as any
+        this.effects = null as any
+    }
+
     init() {
         if (this.game == undefined) return
         let game = this.game!

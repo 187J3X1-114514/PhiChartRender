@@ -139,20 +139,43 @@ export async function checkChartByID(id: string) {
     return CacheChartInfo[id] != undefined
 }
 
-export async function addChartInfo(info: ChartInfoClass, id: string | number) {
+export async function addChartInfo(info: ChartInfoClass, id: string | number, previewImg?: ImageBitmapSource) {
     let chartinfo = info.src as ChartInfo
-    const canvas = document.createElement("canvas")
-    const ctx = canvas.getContext("2d")!
-    canvas.width = (info.resManager!.files[info.illustration] as Texture).width * 0.75
-    canvas.height = (info.resManager!.files[info.illustration] as Texture).height * 0.75
-    ctx.drawImage(await createImageBitmap(await info.resManager!.srcFiles[info.illustration]!.getBlob()),
-        0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height
-    )
-    let blob = await new Promise<Blob | null>((r) => {
-        canvas.toBlob((b) => {
-            r(b)
-        }, "webp", 0.75)
-    })
+    let blob
+    if (previewImg != undefined) {
+        if (previewImg instanceof Blob) {
+            blob = previewImg
+        } else {
+            const canvas = document.createElement("canvas")
+            const ctx = canvas.getContext("2d")!
+            const imageBitmap = await createImageBitmap(previewImg)
+            canvas.width = imageBitmap.width
+            canvas.height = imageBitmap.height
+            ctx.drawImage(imageBitmap,
+                0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height
+            )
+            blob = await new Promise<Blob | null>((r) => {
+                canvas.toBlob((b) => {
+                    r(b)
+                }, "webp")
+            })
+        }
+    } else {
+        const canvas = document.createElement("canvas")
+        const ctx = canvas.getContext("2d")!
+        const imageBitmap = await createImageBitmap(await info.resManager!.srcFiles[info.illustration]!.getBlob())
+        canvas.width = imageBitmap.width * 0.75
+        canvas.height = imageBitmap.height * 0.75
+        ctx.drawImage(imageBitmap,
+            0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height
+        )
+        blob = await new Promise<Blob | null>((r) => {
+            canvas.toBlob((b) => {
+                r(b)
+            }, "webp", 0.6)
+        })
+    }
+
     if (blob != null) await setInfoData(`CHARTIMG+${chartinfo.illustration}`, blob)
     chartinfo.image = `CHARTIMG+${chartinfo.illustration}`
     CacheChartInfo[id] = chartinfo

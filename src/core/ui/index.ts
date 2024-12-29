@@ -145,7 +145,15 @@ export default class UIManager implements baseUIManager {
 
         }
     }
-    destroySprites() { }
+    destroy() { 
+        this.element.Combo.destroy()
+        this.element.ComboNumber.destroy()
+        this.element.Score.destroy()
+        this.element.Name.destroy()
+        this.element.Level.destroy()
+        this.element.Pause.destroy()
+        this.element.Bar.destroy()
+    }
     calcTime(currentTime: number) {
         this.calcOtherAni()
         this.drawPauseBtnOutLine()

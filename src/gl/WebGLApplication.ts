@@ -104,6 +104,17 @@ export class WebGLApplication<T extends BaseCanvas> {
         this.blitToScreenSprite.texture = new Texture(renderTarget.colorTexture)
         this.renderer.render(this.blitToScreenContainer)
     }
+
+    destroy() {
+        if (this.tickInterval) clearInterval(this.tickInterval)
+        this.renderer.destroy();
+        this.canvas.width = 0;
+        this.canvas.height = 0;
+        this.blitToScreenContainer.destroy({ children: true });
+        this.blitToScreenSprite.destroy();
+        this.gl = null as any;
+        this._tick = undefined;
+    }
 }
 
 class FPS {
