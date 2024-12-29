@@ -19,7 +19,6 @@ export default {
         charts: Object as PropType<{
             image: string,
             level: string,
-            levelname: string,
             name: string,
             charter: string,
             click: () => any

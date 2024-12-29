@@ -6,6 +6,7 @@ import { join, NativeFile } from './utils';
 import { Archive as LibArchive } from 'libarchive.js';
 import JSZip from "jszip"
 import { generateRandomString } from "../random";
+import { GlobalSettings } from '../global_setting'
 
 
 
@@ -313,3 +314,5 @@ export async function loadZipUseJSZip(name: string, file: Blob | ArrayBuffer): P
     })
 
 }
+
+log.info("使用" + GlobalSettings.loadCompressedPackageMethod! + "解压")

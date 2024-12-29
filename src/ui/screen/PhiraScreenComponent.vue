@@ -104,21 +104,6 @@ export default {
                     charts.value.push({
                         image: "PHIRA" + chart.illustration,
                         level: chart.level,
-                        levelname: (() => {
-                            if (chart.level.toLowerCase().includes("sp")) {
-                                return "sp"
-                            } else if (chart.level.toLowerCase().includes("at")) {
-                                return "at"
-                            } else if (chart.level.toLowerCase().includes("in")) {
-                                return "in"
-                            } else if (chart.level.toLowerCase().includes("hd")) {
-                                return "hd"
-                            } else if (chart.level.toLowerCase().includes("ez")) {
-                                return "ez"
-                            } else {
-                                return "uk"
-                            }
-                        })(),
                         name: chart.name,
                         charter: chart.charter,
                         click: async () => {

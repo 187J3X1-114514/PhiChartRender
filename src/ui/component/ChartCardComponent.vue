@@ -19,7 +19,6 @@ export default {
     props: {
         image: String,
         level: String,
-        levelname: String,
         name: String,
         charter: String,
         click: Function as PropType<any>
@@ -151,7 +150,7 @@ export default {
         <span class="chart-charter" style="z-index: 5;">{{ charter }}</span>
         <img ref="chartimg" :src="imageurl">
         <mdui-chip class="top-right" type="button" variant="assist" elevated="">
-            <span :class="levelname" style="z-index: 4;">
+            <span style="z-index: 4;">
                 {{ level }}
             </span>
         </mdui-chip>

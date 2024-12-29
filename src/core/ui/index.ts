@@ -62,7 +62,7 @@ export default class UIManager implements baseUIManager {
         this.element.Level.create()
         this.element.Pause.create()
         this.element.Bar.create()
-        this.game.app.canvas.addEventListener("pointerdown", (e) => {
+        this.game.app.canvas.addEventListener("pointerdown", (e: any) => {
             if (e.clientX - this.size!.widthOffset < 70) {
                 if (e.clientY < 70) {
                     this.pauseBtnClickCallBack()
@@ -71,7 +71,7 @@ export default class UIManager implements baseUIManager {
         })
     }
     addToScreen() {
-        let stage = this.game.renders.UIContainer
+        let stage = this.game.container.UIContainer
         stage.addChild(this.element.Combo.sprite)
         stage.addChild(this.element.ComboNumber.sprite)
         stage.addChild(this.element.Score.sprite)
@@ -90,10 +90,10 @@ export default class UIManager implements baseUIManager {
         this.backgrounds.smallCover.zIndex = -5
         this.game.rootContainer.addChild(this.backgroundContainer)
         this.backgroundContainer.addChild(this.backgrounds.big)
-        this.game.renders.gameContainer.addChild(this.backgrounds.small)
+        this.game.container.gameContainer.addChild(this.backgrounds.small)
         this.backgroundContainer.addChild(this.backgrounds.bigCover)
-        this.game.renders.gameContainer.addChild(this.backgrounds.smallCover)
-        this.backgrounds.smallCover.alpha = 1 - this.game._settings.bgDim
+        this.game.container.gameContainer.addChild(this.backgrounds.smallCover)
+        this.backgrounds.smallCover.alpha = 1 - this.game.settings.bgDim
         this.backgrounds.bigCover.alpha = 0.6
         if (this.game.getAntialiasing().FXAA) this.PauseBtnOutLine.filters = this.game.getAntialiasing().FXAA!
     }
@@ -159,7 +159,7 @@ export default class UIManager implements baseUIManager {
         {
             if ((+this.game.judgement.score.text.combo) > 2) {
                 this.element.ComboNumber.setText(this.game.judgement.score.text.combo)
-                this.element.Combo.setText(this.game._settings.autoPlay ? "AUTOPLAY" : "COMBO")
+                this.element.Combo.setText(this.game.settings.autoPlay ? "AUTOPLAY" : "COMBO")
             } else {
                 this.element.ComboNumber.setText(' ')
                 this.element.Combo.setText(' ')
@@ -307,7 +307,7 @@ export default class UIManager implements baseUIManager {
         } as UIElementSettings
     }
     getGameProgress(): number {
-        return this.game.chart.music.progress
+        return this.game.currentTime / this.game.chart.music.duration
     }
 }
 

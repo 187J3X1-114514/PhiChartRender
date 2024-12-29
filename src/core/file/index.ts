@@ -1,7 +1,7 @@
 import { Archive, loadZipUse7zWASM, loadZipUseLibarchivejs, loadZipUseJSZip } from './zip'
 import { File, FileType } from './file'
 import { GlobalSettings } from '../global_setting'
-console.log("使用"+GlobalSettings.loadCompressedPackageMethod!+"解压")
+
 var loadZip: (name: string, file: Blob | ArrayBuffer) => Promise<Archive>
 switch (GlobalSettings.loadCompressedPackageMethod!) {
     case 'jszip':

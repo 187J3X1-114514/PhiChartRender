@@ -2,9 +2,17 @@ import { Container, isWebGLSupported, RenderTexture, Sprite, Texture, WebGLRende
 import { RenderTarget as PixiRenderTarget } from "pixi.js";
 import { PixiGlRenderTarget } from "./PixiGlRenderTarget";
 import { ShaderProgram, Uniform, UniformType } from "./Shader";
-
-export class WebGLApplication {
-    public canvas: HTMLCanvasElement;
+interface BaseCanvas {
+    getContext(contextId: "2d", options?: CanvasRenderingContext2DSettings): CanvasRenderingContext2D | null;
+    getContext(contextId: "bitmaprenderer", options?: ImageBitmapRenderingContextSettings): ImageBitmapRenderingContext | null;
+    getContext(contextId: "webgl", options?: WebGLContextAttributes): WebGLRenderingContext | null;
+    getContext(contextId: "webgl2", options?: WebGLContextAttributes): WebGL2RenderingContext | null;
+    getContext(contextId: string, options?: any): RenderingContext | null;
+    width: number
+    height: number
+}
+export class WebGLApplication<T extends BaseCanvas> {
+    public canvas: T;
     public renderer = new WebGLRenderer()
     public fpsCount: FPS = new FPS(1)
     private _tick?: () => any
@@ -14,8 +22,8 @@ export class WebGLApplication {
     private gl: WebGL2RenderingContext | WebGLRenderingContext = undefined as any
     private blitToScreenContainer: Container = new Container()
     private blitToScreenSprite: Sprite = new Sprite()
-    private constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas
+    private constructor(canvas: T) {
+        this.canvas = canvas as any
         this.blitToScreenContainer.addChild(this.blitToScreenSprite)
     }
     getGLContext(): WebGL2RenderingContext | WebGLRenderingContext {
@@ -38,8 +46,10 @@ export class WebGLApplication {
     }
 
     resize(width: number, height: number) {
-        this.canvas.style.width = width + "px"
-        this.canvas.style.height = height + "px"
+        if (this.canvas instanceof HTMLCanvasElement) {
+            this.canvas.style.width = width + "px"
+            this.canvas.style.height = height + "px"
+        }
         this.canvas.width = width * window.devicePixelRatio
         this.canvas.height = height * window.devicePixelRatio
         this.renderer.resize(width * window.devicePixelRatio, height * window.devicePixelRatio, 1)
@@ -78,8 +88,8 @@ export class WebGLApplication {
         this._tick = fn
     }
 
-    static async create(canvas: HTMLCanvasElement) {
-        const _ = new this(canvas)
+    static async create(canvas: HTMLCanvasElement | OffscreenCanvas) {
+        const _ = new this(canvas as any)
         await _.init()
         return _
     }

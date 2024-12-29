@@ -17,7 +17,7 @@ export default class Input {
 
         this.inputs = [];
         this.renderSize = {} as SizerData
-        this.addListenerToCanvas(params.canvas);
+        if (!params.record && params.canvas instanceof HTMLCanvasElement) this.addListenerToCanvas(params.canvas);
         this.reset();
     }
 
@@ -26,7 +26,6 @@ export default class Input {
     }
 
     addListenerToCanvas(canvas: HTMLCanvasElement) {
-        if (!(canvas instanceof HTMLCanvasElement)) throw new Error('This is not a canvas');
 
         const passiveIfSupported = { passive: false };
 

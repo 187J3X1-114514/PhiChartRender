@@ -11,7 +11,7 @@ export class PlayScreen {
     private res: ResourceManager
     private chart?: ChartInfo
     private game?: PhiGame
-    private app?: WebGLApplication
+    private app?: WebGLApplication<HTMLCanvasElement>
     private file: File[]
     private resp: ResourcePack
     private chart_data?: ChartData
@@ -29,11 +29,11 @@ export class PlayScreen {
         this.end = f
     }
     async load(autoPlay: boolean = false) {
+        
         this.app = await WebGLApplication.create(document.createElement("canvas"))
         globalThis.addEventListener("resize", () => {
             this.app!.resize(window.innerWidth, window.innerHeight)
         })
-        document.body.appendChild(this.app.canvas)
         this.app?.start()
 
         if (this.chart == undefined) {
@@ -75,6 +75,7 @@ export class PlayScreen {
             }
         })
         let r = new ResizeObserver(() => { this.game!.resize(true) })
+        document.body.appendChild(this.app.canvas)
         r.observe(this.app!.canvas)
         this.game.createSprites()
         this.game.on("end", () => {

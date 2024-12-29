@@ -54,7 +54,7 @@ export class PrprExtra {
         }
         this.cleanShader()
         let effects = this.effects
-        let { renders, rootContainer } = this.game!;
+        let { container, rootContainer, renders } = this.game!;
         for (let i = 0, length = effects.length; i < length; i++) {
             const effect = effects[i];
             if (effect.shader === null) continue;
@@ -63,8 +63,8 @@ export class PrprExtra {
                     let index = (rootContainer.filters as Filter[]).indexOf((effect.shader as Shader).filter);
                     if (index > -1) (rootContainer.filters as Filter[]).slice(index, 1)
                 } else {
-                    let index = (renders.gameContainer.filters as Filter[]).indexOf((effect.shader as Shader).filter);
-                    if (index > -1) (renders.gameContainer.filters as Filter[]).slice(index, 1)
+                    let index = (container.gameContainer.filters as Filter[]).indexOf((effect.shader as Shader).filter);
+                    if (index > -1) (container.gameContainer.filters as Filter[]).slice(index, 1)
                 }
                 continue
             }
@@ -76,9 +76,9 @@ export class PrprExtra {
                 temp.push((effect.shader as Shader).filter)
                 rootContainer.filters = temp
             } else {
-                let temp: Filter[] = (renders.gameContainer.filters as Filter[]).slice()
+                let temp: Filter[] = (container.gameContainer.filters as Filter[]).slice()
                 temp.push((effect.shader as Shader).filter)
-                renders.gameContainer.filters = temp
+                container.gameContainer.filters = temp
             }
         }
         for (let i = 0, length = this.videos.length; i < length; i++) {
@@ -86,12 +86,12 @@ export class PrprExtra {
             video.video.volume = 0
             video.sprite.zIndex = this.game!.ui.backgrounds.smallCover.zIndex + 1
             if (video.end < currentTime) {
-                this.game!.renders.videoContainer.removeChild(video.sprite)
+                this.game!.container.videoContainer.removeChild(video.sprite)
                 continue
             }
-            if (video.start < currentTime && video.end > currentTime && !this.game!.renders.videoContainer.children.includes(video.sprite)) {
+            if (video.start < currentTime && video.end > currentTime && !this.game!.container.videoContainer.children.includes(video.sprite)) {
                 video.video.currentTime = 0
-                this.game!.renders.videoContainer.addChild(video.sprite)
+                this.game!.container.videoContainer.addChild(video.sprite)
             }
             if (video.start < currentTime && video.end > currentTime) {
                 if (this.paused) {
@@ -108,7 +108,7 @@ export class PrprExtra {
     }
 
     cleanShader() {
-        this.game!.renders.gameContainer.filters = this.game!.getDefaultShader();
+        this.game!.container.gameContainer.filters = this.game!.getDefaultShader();
         this.game!.rootContainer.filters = [DefaultShader.filter];
     }
 
@@ -127,13 +127,13 @@ export class PrprExtra {
                 effect.shader = Shader.from(shaderRaw, shaderName, e.vars, shaderRawGPU)
             } else {
                 this.effects.splice(this.effects.indexOf(effect), 1)
-                log.warn("没有发现名为", shaderName, "的着色器文件，当前加载的文件列表：", game.zipFiles.getFileList())
+                log.warn("没有发现名为", shaderName, "的着色器文件，当前加载的文件列表：", game.resource.getFileList())
             }
 
         }
         let tempVideos = (this.videos as PrPrExtraVideo[]).splice(0, (this.videos as PrPrExtraVideo[]).length)
         for (let e of tempVideos) {
-            let tex = this.game!.zipFiles.get(join(this.game!.chart.rootPath, e.path)) as Texture
+            let tex = this.game!.resource.get(join(this.game!.chart.rootPath, e.path)) as Texture
             if (tex.source.resource instanceof HTMLVideoElement) {
                 if (!Number.isNaN(tex.source.resource.duration)) {
                     this.videos.push(PrprVideo.from(tex, e) as any)
@@ -186,7 +186,7 @@ export class PrprExtra {
                 case "movecamera":
                     return (Shader.presetsGL as any)['movecamera']
                 default:
-                    return this.formatShader(this.game!.zipFiles.get(this.game!.chart.rootPath + name) as string)
+                    return this.formatShader(this.game!.resource.get(this.game!.chart.rootPath + name) as string)
             }
         } else {
             return (Shader.presetsGL as any)[name]!
@@ -348,26 +348,11 @@ export class PrprExtra {
                         let _timedValues: RPEEvent[] = utils.calculateEventsBeat(_values)
                             .sort((a: any, b: any) => a.startTime - b.startTime || b.endTime - a.startTime);
                         let values: Event[] = [];
-                        /*
-                                                utils.calculateEventsBeat(_values)
-                                                    .sort((a: any, b: any) => a.startTime - b.startTime || b.endTime - a.startTime)
-                                                    .forEach((_value: any, index: any, arr: any) => {
-                                                        let prevValue = arr[index - 1];
-                                                        _timedValues.push(_value);
-                                                        
-                                                        if (!prevValue) _timedValues.push(_value);
-                                                        else if (_value.startTime == prevValue.startTime) {
-                                                            if (_value.endTime >= prevValue.endTime) _timedValues[_timedValues.length - 1] = _value;
-                                                        }
-                                                        else _timedValues.push(_value);
-                                                    }
-                                                    );
-                        */
                         if (name == "power") { console.log(_timedValues) }
                         for (const _value of _timedValues) {
-                            if (name == "power")  console.log(_value)
+                            if (name == "power") console.log(_value)
                             values.push(...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)));
-                            if (name == "power")  console.log(values,utils.calculateEventEase(_value, RePhiEditEasing),...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)))
+                            if (name == "power") console.log(values, utils.calculateEventEase(_value, RePhiEditEasing), ...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)))
                         }
                         values.sort((a, b) => a.startTime - b.startTime || b.endTime - a.startTime);
                         vars[name] = values;
@@ -395,15 +380,6 @@ export class PrprExtra {
             );
 
         effectList.sort((a, b) => a.startTime - b.startTime);
-
-        //effectList.forEach((v) => {
-        //    for (const name in v.vars) {
-        //        const values = v.vars[name];
-        //        if (values.value) {
-        //            v.vars[name] = new Array().push(v.vars[name])
-        //        }
-        //    }
-        //})
         return effectList;
     }
 }

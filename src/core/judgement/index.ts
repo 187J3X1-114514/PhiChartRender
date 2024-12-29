@@ -99,7 +99,7 @@ export default class Judgement {
         this._hitsoundVolume = verify.number(params.hitsoundVolume, 1, 0, 1);
 
         this.score = new Score(this.chart.totalRealNotes, verify.bool(params.showAPStatus, true), verify.bool(params.challangeMode, false), this._autoPlay);
-        this.input = new Input({ canvas: params.canvas, autoPlay: this._autoPlay });
+        this.input = new Input({ canvas: params.canvas, autoPlay: this._autoPlay, record: this.game.settings.recordMode });
         this.input.onchange = () => this.calcInput
         /* ===== 判定用时间计算 ===== */
         this.judgeTimes = {
@@ -404,7 +404,7 @@ export default class Judgement {
                                 note.isScored = true;
                                 note.scoreTime = timeBetween;
 
-                                if (timeBetweenReal <= this.judgeTimes.perfect) note.score = 4;
+                                if (timeBetweenReal <= this.judgeTimes.perfect || this._autoPlay) note.score = 4;
                                 else if (timeBetweenReal <= this.judgeTimes.good) note.score = 3;
                                 else note.score = 2;
                             }
@@ -474,7 +474,7 @@ export default class Judgement {
                             note.isScored = true;
                             note.scoreTime = timeBetween;
 
-                            if (timeBetweenReal <= this.judgeTimes.perfect) note.score = 4;
+                            if (timeBetweenReal <= this.judgeTimes.perfect || this._autoPlay) note.score = 4;
                             else note.score = 3;
 
                             this.createClickAnimate(note);

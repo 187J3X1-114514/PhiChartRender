@@ -29,6 +29,12 @@ export class ResourceManager {
         this.srcFiles = {}
         this.charts = {}
     }
+    /**
+     * 添加文件
+     * 
+     * @param file - 文件
+     * @param __log - 是否开启日志输出
+     */
     async add(file: File, __log = true) {
         let loadFile: Texture | Audio | Chart | PrprExtra | undefined | string = undefined
         await fixType(file)
@@ -171,6 +177,11 @@ export class ResourceManager {
 
         return false
     }
+    /**
+     * 添加多个文件
+     * 
+     * @param files - 文件列表
+     */
     async addList(files: File[]) {
         new Promise(async (r) => {
             for (let a of files) {
@@ -186,6 +197,13 @@ export class ResourceManager {
     getAll() {
         return this.files
     }
+
+    /**
+     * 加载压缩包文件
+     * 
+     * @param name - 压缩包名称
+     * @param file - 压缩包
+     */
     async load(name: string, file: Blob | ArrayBuffer) {
         const zip = await loadZip(name, file)
         for (let f of zip.files) {
@@ -194,6 +212,11 @@ export class ResourceManager {
             await this.add(file)
         }
     }
+    /**
+     * 加载多个文件
+     * 
+     * @param file - 文件列表
+     */
     async loads(file: FileList | undefined | null) {
         if (file) {
             let random = generateRandomString(8)

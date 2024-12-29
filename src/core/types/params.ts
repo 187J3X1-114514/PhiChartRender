@@ -6,7 +6,7 @@ import { PrprExtra } from "../prpr/prpr"
 import { WebGLApplication } from "@/gl/WebGLApplication"
 
 export interface GameParams {
-    app: WebGLApplication
+    app: WebGLApplication<any>
     render: {
         width?: number,
         height?: number,
@@ -35,6 +35,7 @@ export interface GameParams {
         showAPStatus?: boolean,
         prprExtra?: boolean,
         antialias?: boolean,
+        recordMode?: boolean
         antialiasType?: number //1-fxaa 2-smaa
     }
 
@@ -52,6 +53,13 @@ export interface GameSettings {
     challengeMode: boolean,
     autoPlay: boolean,
     shader: boolean
+    audioOffset?: number,
+    hitsound?: boolean,
+    hitsoundVolume?: number,
+    prprExtra?: boolean,
+    antialias?: boolean,
+    recordMode?: boolean
+    antialiasType?: number //1-fxaa 2-smaa
 };
 
 export interface SizerData {
@@ -80,5 +88,4 @@ export interface SizerData {
 
     lineHeightScale: number
     lineWidthScale: number
-    note_max_size_half: number
 }

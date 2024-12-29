@@ -50,15 +50,6 @@ importers:
       '@tauri-apps/plugin-process':
         specifier: 2.0.0
         version: 2.0.0
-      '@types/howler':
-        specifier: ^2.2.12
-        version: 2.2.12
-      assist-worker:
-        specifier: ^1.1.0
-        version: 1.1.0
-      canvas-record:
-        specifier: ^5.1.0
-        version: 5.1.0
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
@@ -71,9 +62,6 @@ importers:
       git-revision-vite-plugin:
         specifier: ^0.0.11
         version: 0.0.11
-      howler:
-        specifier: ^2.2.4
-        version: 2.2.4
       io-ts:
         specifier: ^2.2.21
         version: 2.2.21(fp-ts@2.16.9)
@@ -98,6 +86,12 @@ importers:
       mdui:
         specifier: ^2.1.3
         version: 2.1.3
+      media-codecs:
+        specifier: ^2.0.2
+        version: 2.0.2
+      mp4-muxer:
+        specifier: ^5.1.5
+        version: 5.1.5
       pixi-filters:
         specifier: ^6.0.5
         version: 6.0.5(pixi.js@8.6.6)
@@ -936,14 +930,6 @@ packages:
   '@fastify/static@7.0.4':
     resolution: {integrity: sha512-p2uKtaf8BMOZWLs6wu+Ihg7bWNBdjNgCwDza4MJtTqg+5ovKmcbgbR9Xs5/smZ1YISfzKOCNYmZV8LaCj+eJ1Q==}
 
-  '@ffmpeg/core-mt@0.12.6':
-    resolution: {integrity: sha512-f7wrOeUk24VFRi2Gfsp/mwwkK1hbDV0ajgm2fOU/oRi+IDullyzAYdHOagAWfpSZXcTPAGZ1Ild7HmBwr3k2tg==}
-    engines: {node: '>=16.x'}
-
-  '@ffmpeg/core@0.12.6':
-    resolution: {integrity: sha512-PrjWBTfGn2WVn9T7wGnzfFwChbqWeZc7tM9vvJZVRadYFUDakfzy7W0LpYC0cvvK0xT82qlBsk38lQhJ/Hps5A==}
-    engines: {node: '>=16.x'}
-
   '@ffmpeg/ffmpeg@0.12.10':
     resolution: {integrity: sha512-lVtk8PW8e+NUzGZhPTWj2P1J4/NyuCrbDD3O9IGpSeLYtUZKBqZO8CNj1WYGghep/MXoM8e1qVY1GztTkf8YYQ==}
     engines: {node: '>=18.x'}
@@ -1734,9 +1720,6 @@ packages:
   '@types/gradient-parser@0.1.5':
     resolution: {integrity: sha512-r7K3NkJz3A95WkVVmjs0NcchhHstC2C/VIYNX4JC6tieviUNo774FFeOHjThr3Vw/WCeMP9kAT77MKbIRlO/4w==}
 
-  '@types/howler@2.2.12':
-    resolution: {integrity: sha512-hy769UICzOSdK0Kn1FBk4gN+lswcj1EKRkmiDtMkUGvFfYJzgaDXmVXkSShS2m89ERAatGIPnTUlp2HhfkVo5g==}
-
   '@types/http-cache-semantics@4.0.4':
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
 
@@ -2117,9 +2100,6 @@ packages:
   ascii-table@0.0.9:
     resolution: {integrity: sha512-xpkr6sCDIYTPqzvjG8M3ncw1YOTaloWZOyrUmicoEifBEKzQzt+ooUpRpQ/AbOoJfO/p2ZKiyp79qHThzJDulQ==}
 
-  assist-worker@1.1.0:
-    resolution: {integrity: sha512-iUYpS43NphrF0hppzPBJDTZEIfD/h4xUj3aFNfolQtxNW53cxaKW3qBYVMre4jZw7KvcWIMcBjNpTBV2yKIiMw==}
-
   ast-module-types@5.0.0:
     resolution: {integrity: sha512-JvqziE0Wc0rXQfma0HZC/aY7URXHFuZV84fJRtP8u+lhp0JYCNd5wJzVXP45t0PH0Mej3ynlzvdyITYIu0G4LQ==}
     engines: {node: '>=14'}
@@ -2301,14 +2281,6 @@ packages:
 
   caniuse-lite@1.0.30001680:
     resolution: {integrity: sha512-rPQy70G6AGUMnbwS1z6Xg+RkHYPAi18ihs47GH0jcxIG7wArmPgY3XbS2sRdBbxJljp3thdT8BIqv9ccCypiPA==}
-
-  canvas-record@5.1.0:
-    resolution: {integrity: sha512-9X4KOICWMnQktrjD5aBCZf8EMakDG7mbUKDIbBtDnTvJuQmJq6VEejImJi7+WSYRE+MNyoWnYhBMPUPVoMvzww==}
-    engines: {node: '>=22.0.0', npm: '>=10.5.1', snowdev: '>=2.2.x'}
-
-  canvas-screenshot@4.2.2:
-    resolution: {integrity: sha512-2bcsLb9oPjmbJV+8/gAF9UrfMpDTefQZx1b3vFU9PdNiId1Fo4tDn5qW2jZLjO4fsv9aXIZ75lu9Yv6NJ1j/YQ==}
-    engines: {node: '>=22.0.0', npm: '>=10.5.1', snowdev: '>=2.2.x'}
 
   chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -3086,10 +3058,6 @@ packages:
     resolution: {integrity: sha512-ej8ksPF4x6e5wvK9yevct0UCXh8TTFlWGVLlgjZuoBH1HwjIfKE/IdL5mq89sFA7zELi1VhKpmtDnrs7zWyeyg==}
     engines: {node: '>=14'}
 
-  file-extension@4.0.5:
-    resolution: {integrity: sha512-l0rOL3aKkoi6ea7MNZe6OHgqYYpn48Qfflr8Pe9G9JPPTx5A+sfboK91ZufzIs59/lPqh351l0eb6iKU9J5oGg==}
-    engines: {node: '>=4'}
-
   file-type@18.7.0:
     resolution: {integrity: sha512-ihHtXRzXEziMrQ56VSgU7wkxh55iNchFkosu7Y9/S+tXHdKyrGjVK0ujbqNnsxzea+78MaLhN6PGmfYSAv1ACw==}
     engines: {node: '>=14.16'}
@@ -3270,9 +3238,6 @@ packages:
     resolution: {integrity: sha512-TOiP1nwLsH5shG85Yt6v6Kjq5JU/44jXyEpbcfPgmj3C829yeXIlx9nAEwQRaxtRF3SJinn2lz7XUkfG9W/U4g==}
     engines: {node: ^14.18.0 || ^16.13.0 || >=18.0.0}
 
-  gifenc@1.0.3:
-    resolution: {integrity: sha512-xdr6AdrfGBcfzncONUOlXMBuc5wJDtOueE3c5rdG0oNgtINLD+f2iFZltrBRZYzACRbKr+mSVU/x98zv2u3jmw==}
-
   git-repo-info@2.1.1:
     resolution: {integrity: sha512-8aCohiDo4jwjOwma4FmYFd3i97urZulL8XL24nIPxuE+GZnfsAyy/g2Shqx6OjUiFKUXZM+Yy+KHnOmmA3FVcg==}
     engines: {node: '>= 4.0'}
@@ -3341,9 +3306,6 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  h264-mp4-encoder@1.0.12:
-    resolution: {integrity: sha512-xih3J+Go0o1RqGjhOt6TwXLWWGqLONRPyS8yoMu/RoS/S8WyEv4HuHp1KBsDDl8srZQ3gw9f95JYkCSjCuZbHQ==}
-
   h3@1.13.0:
     resolution: {integrity: sha512-vFEAu/yf8UMUcB4s43OaDaigcqpQd14yanmOsn+NcRX3/guSKncyE2rOYhq8RIchgJrPSs/QiIddnTTR1ddiAg==}
 
@@ -3403,9 +3365,6 @@ packages:
   hot-shots@10.1.1:
     resolution: {integrity: sha512-KTsH9hb+YZHH0IIRf22y0X8mPw8j521W5xRAUeaUlGNBDsf44ixE7ZeyXbUHd/nQ1n04UEhi2ja05/QVOS/CgQ==}
     engines: {node: '>=10.0.0'}
-
-  howler@2.2.4:
-    resolution: {integrity: sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==}
 
   html-tags@3.3.1:
     resolution: {integrity: sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==}
@@ -4151,8 +4110,8 @@ packages:
     resolution: {integrity: sha512-4aE3U7CCBWgrQlQDMq8da4woBWDGHioJFiOZ8Ie6Yq2uwYQ9V2kGhTz4x3u6Wc+OU17nw0yc3rJ/lQ4jIiPe3A==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  mp4-muxer@4.3.3:
-    resolution: {integrity: sha512-kuZWsEaZorpDAb3JTZmLeCoyDM+Jhf3QPZx7x3V7/zaxy5NC/j2tfWetVjaHG8cSJOMBrHed7p3cKHU6Lxcaxw==}
+  mp4-muxer@5.1.5:
+    resolution: {integrity: sha512-dRk4STKmR7sIx12kMBa21DaIxdMG0w4tYwOqi8+Z4NW03I1QloRBWSxU4kReztDGdz5gWp4jSwIKWOIaP9Ia+g==}
 
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
@@ -5583,9 +5542,6 @@ packages:
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
 
-  webm-muxer@4.0.1:
-    resolution: {integrity: sha512-qFMWhY9A+nYDGUIxoUT0EmZ2Z3Ls+5jP4zlEYPpppZRUHFFU70Hk2udfPxwdB4xiYnBDiDX8g1IfHXRsn0AwGw==}
-
   well-known-symbols@2.0.0:
     resolution: {integrity: sha512-ZMjC3ho+KXo0BfJb7JgtQ5IBuvnShdlACNkKkdsqBmYw3bPAaJfPeYUo6tLUaT5tG/Gkh7xkpBhKRQ9e7pyg9Q==}
     engines: {node: '>=6'}
@@ -6289,12 +6245,6 @@ snapshots:
       fastify-plugin: 4.5.1
       fastq: 1.17.1
       glob: 10.4.5
-
-  '@ffmpeg/core-mt@0.12.6':
-    optional: true
-
-  '@ffmpeg/core@0.12.6':
-    optional: true
 
   '@ffmpeg/ffmpeg@0.12.10':
     dependencies:
@@ -7102,8 +7052,6 @@ snapshots:
 
   '@types/gradient-parser@0.1.5': {}
 
-  '@types/howler@2.2.12': {}
-
   '@types/http-cache-semantics@4.0.4': {}
 
   '@types/http-proxy@1.17.15':
@@ -7567,8 +7515,6 @@ snapshots:
 
   ascii-table@0.0.9: {}
 
-  assist-worker@1.1.0: {}
-
   ast-module-types@5.0.0: {}
 
   async-sema@3.1.1: {}
@@ -7777,24 +7723,6 @@ snapshots:
   camelcase@8.0.0: {}
 
   caniuse-lite@1.0.30001680: {}
-
-  canvas-record@5.1.0:
-    dependencies:
-      '@ffmpeg/ffmpeg': 0.12.10
-      '@ffmpeg/util': 0.12.1
-      canvas-screenshot: 4.2.2
-      gifenc: 1.0.3
-      h264-mp4-encoder: 1.0.12
-      media-codecs: 2.0.2
-      mp4-muxer: 4.3.3
-      webm-muxer: 4.0.1
-    optionalDependencies:
-      '@ffmpeg/core': 0.12.6
-      '@ffmpeg/core-mt': 0.12.6
-
-  canvas-screenshot@4.2.2:
-    dependencies:
-      file-extension: 4.0.5
 
   chalk@2.4.2:
     dependencies:
@@ -8699,8 +8627,6 @@ snapshots:
       escape-string-regexp: 5.0.0
       is-unicode-supported: 1.3.0
 
-  file-extension@4.0.5: {}
-
   file-type@18.7.0:
     dependencies:
       readable-web-to-node-stream: 3.0.2
@@ -8873,8 +8799,6 @@ snapshots:
       node-fetch: 3.3.2
       semver: 7.6.3
 
-  gifenc@1.0.3: {}
-
   git-repo-info@2.1.1: {}
 
   git-revision-vite-plugin@0.0.11: {}
@@ -8969,8 +8893,6 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  h264-mp4-encoder@1.0.12: {}
-
   h3@1.13.0:
     dependencies:
       cookie-es: 1.2.2
@@ -9028,8 +8950,6 @@ snapshots:
   hot-shots@10.1.1:
     optionalDependencies:
       unix-dgram: 2.0.6
-
-  howler@2.2.4: {}
 
   html-tags@3.3.1: {}
 
@@ -9748,7 +9668,7 @@ snapshots:
     dependencies:
       path-exists: 5.0.0
 
-  mp4-muxer@4.3.3:
+  mp4-muxer@5.1.5:
     dependencies:
       '@types/dom-webcodecs': 0.1.13
       '@types/wicg-file-system-access': 2020.9.8
@@ -11340,11 +11260,6 @@ snapshots:
   web-streams-polyfill@3.3.3: {}
 
   webidl-conversions@3.0.1: {}
-
-  webm-muxer@4.0.1:
-    dependencies:
-      '@types/dom-webcodecs': 0.1.13
-      '@types/wicg-file-system-access': 2020.9.8
 
   well-known-symbols@2.0.0: {}
 

@@ -22,7 +22,7 @@ export class PauseScreen {
     }
 
     start() {
-        if (this.game._isPaused) {
+        if (this.game.isPaused) {
             this.game.pause()
         }
     }

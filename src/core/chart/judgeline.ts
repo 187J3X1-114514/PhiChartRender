@@ -410,16 +410,18 @@ export default class Judgeline {
         }
 
         if (this.textureName != null) {
-            let texsize = conimgsize(
-                this.sprite.texture.width,
-                this.sprite.texture.height,
-                size.width,
-                size.height
-            );
-            this.sprite.scale.set(
-                (texsize[0] / this.sprite.texture.width) * this.scaleX,
-                (texsize[1] / this.sprite.texture.height) * this.scaleY
-            )
+            if (!(this.sprite instanceof Text)) {
+                let texsize = conimgsize(
+                    this.sprite.texture.width,
+                    this.sprite.texture.height,
+                    size.width,
+                    size.height
+                );
+                this.sprite.scale.set(
+                    (texsize[0] / this.sprite.texture.width) * this.scaleX,
+                    (texsize[1] / this.sprite.texture.height) * this.scaleY
+                )
+            }
         } else if (this.isText) {
             this.spriteStyle!.fontSize = (size.width + size.height) / 75 * 1.35
             this.sprite.scale.x = this.scaleX * this.baseScaleX;

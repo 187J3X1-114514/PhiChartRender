@@ -7,9 +7,9 @@ import { PixiGlRenderTarget } from "@/gl/PixiGlRenderTarget";
 export class Antialiasing {
     public FXAA?: Filter
     public SMAA?: SMAAPass
-    public app: WebGLApplication
+    public app: WebGLApplication<any>
     private tempRenderTarget: RenderTarget = new RenderTarget()
-    constructor(app: WebGLApplication) {
+    constructor(app: WebGLApplication<any>) {
         this.app = app
     }
     async initFXAA() {

@@ -5,8 +5,8 @@
     <!--
     <span class="info" id="info">{{ verText }}</span>
     -->
-    <mdui-top-app-bar :class="{ 'tauri': ON_TAURI, 'windows': ON_WINDOWS }" ref="topAppBar" variant="hide"
-        id="top-app-bar" style="display: flex" class="left-all">
+    <mdui-top-app-bar :class="{ 'tauri': ON_TAURI, 'windows': ON_WINDOWS, 'flex-display': true }" ref="topAppBar" variant="hide"
+        id="top-app-bar" style="display: flex" class="left-all top-app-bar">
         <div class="top-app-bar-blur"></div>
         <LogoComponent style="width: 2em;height: 2em;padding-left: 1em;"></LogoComponent>
         <mdui-top-app-bar-title id="top-app-bar-title">
@@ -133,7 +133,7 @@
 </template>
 
 <script lang="ts">
-import { get_theme, MAINWINDOW_HWND, ON_TAURI, ON_WINDOWS, RUN_RS_FN, set_theme } from './tauri';
+import { get_theme, ON_TAURI, ON_WINDOWS, set_theme } from './tauri';
 import { onMounted, ref } from 'vue';
 import { I18N } from "./i18n"
 import { CircularProgress, Dropdown, getTheme, LinearProgress, MenuItem, setTheme, TopAppBar } from 'mdui';
@@ -206,7 +206,6 @@ try {
 }
 
 export const ResPack = __ResPack as ResourcePack
-console.log(ResPack)
 for (let e of document.getElementsByClassName("arrow")) {
     var el = (e as HTMLElement).parentElement as HTMLElement
     el.addEventListener("click", () => {

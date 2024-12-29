@@ -1,10 +1,9 @@
 //●REC
 
-/*
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import PhiGame from '../../core/game'
 import { loadZip } from '../../core/file';
-import { Recorder, Encoders } from "canvas-record";
+import PhiGame from '@/core/game';
+import { WebCodecsEncoder } from './WebCodecsEncoder';
 
 const _FFMPEG = new FFmpeg()
 export async function load_ffmpeg(m?: boolean) {
@@ -20,122 +19,49 @@ export async function load_ffmpeg(m?: boolean) {
     })
 }
 
-class record {
-    public fps: number
-    public maxFps: number
-    public images: Uint8Array[] = []
-    private isPause: boolean = false
-    constructor(fps: number, maxFps: number) {
-        this.fps = fps
-        this.maxFps = maxFps
+export interface GameRecorderConfig {
+    width: number
+    height: number
+    fps: number
+    game: PhiGame
+}
+
+export class GameRecorder {
+    private game: PhiGame
+    public config: GameRecorderConfig
+    public encoder: WebCodecsEncoder
+    public context: WebGL2RenderingContext | WebGLRenderingContext
+    public frameCount: number = 0
+    public time: number = 0
+    public totalFrame: number
+    public stepTime: number
+    constructor(config: GameRecorderConfig) {
+        this.game = config.game
+        this.config = config
+        this.totalFrame = config.fps * this.game.chart.music.duration
+        this.stepTime = 1 / config.fps
+        this.context = this.game.app.getGLContext()
+        this.encoder = new WebCodecsEncoder();
+        this.encoder.width = config.width
+        this.encoder.height = config.height
     }
-    add(image: Uint8Array) {
-        this.images.push(image)
+
+    async init() {
+        this.encoder.width = this.config.width
+        this.encoder.height = this.config.height
+        this.encoder.frameRate = this.config.fps
+        await this.encoder.init()
     }
-    start_record(canvas: HTMLCanvasElement, beforeFn: () => void) {
-        const fn = async () => {
-            if (!this.isPause) {
-                await beforeFn()
-                setTimeout(async () => { await fn() }, 1000 / this.maxFps)
-            }
-        }
-        fn()
+
+    async step() {
+        await this.encoder.encode(await this.getFrame(), this.frameCount)
+        this.frameCount++
+        this.time = this.time + this.stepTime
+        console.log(this)
     }
-    pause_record() {
-        this.isPause = !this.isPause
+    async getFrame() {
+        return new VideoFrame(this.context.canvas, {
+            timestamp: this.time * 1_000_000,
+        });
     }
 }
-export class RecordGame {
-    public fps: number
-    public game: PhiGame
-    public totalFrame: number
-    public recordedFrame: number = 0
-    public rec: record
-    public progress_: number[] = [0, 0]
-    public onend: () => void = () => { }
-    public images_chunks = 256
-
-    public chunks = 0
-    public tchunks = 0
-    constructor(fps: number, game: PhiGame) {
-        this.fps = fps
-        this.game = game;
-        this.totalFrame = parseInt((this.game.chart.music.duration * this.fps).toFixed())
-        this.tchunks = Math.ceil(this.totalFrame / this.images_chunks)
-        this.game.app.ticker.stop()
-        this.game.chart.music.volume = 0
-        this.rec = new record(fps, fps * 4)
-    }
-    private cbs: ((a: Blob) => void)[] = []
-    get_webm(callback: (a: Blob) => void) {
-        this.cbs.push(callback)
-    }
-    async start_record() {
-        const gl = (this.game.app.canvas.getContext("webgl") != null ? this.game.app.canvas.getContext("webgl") : this.game.app.canvas.getContext("webgl2"))!
-        let msg = ""
-        _FFMPEG.on("log", (a) => {
-            msg = msg + a.message + "\n"
-        })
-        _FFMPEG.on("progress", (a) => {
-            console.log(a.progress, a.time)
-        })
-        let isC = false
-        this.game.resize(true)
-        this.game.start()
-        this.game.app.ticker.stop()
-        let temp: Uint8Array[][] = new Array()
-        for (let i = 0, length = this.tchunks; i < length; i++) temp.push([])
-        const downloadBlob = (blobUrl: string, fileName: string) => {
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = fileName || 'file';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(blobUrl);
-        };
-        let rec = new Recorder(gl, {
-            duration: this.totalFrame * (1 / this.fps),
-            frameRate: this.fps,
-            encoder: new Encoders["WebCodecsEncoder"](),
-            encoderOptions: {
-                bitrate: 2_000_0000,
-                alpha: "discard", // "keep"
-                bitrateMode: "variable", // "constant"
-                latencyMode: "quality", // "realtime" (faster encoding)
-                hardwareAcceleration: "no-preference", // "prefer-hardware" "prefer-software"
-            },
-            extension: "mp4",
-            target: "in-browser",
-        })
-        await rec.start()
-        this.rec.start_record(this.game.app.canvas, async () => {
-            if (!isC) { ; isC = true }//; _FFMPEG.createDir("/" + this.images_path);
-            this.game.calcTickByCurrentTime(this.currentTime)
-            this.game.chart.music.volume = 0
-            this.game.app.render()
-            this.recordedFrame++
-            await rec.step()
-            if (this.recordedFrame >= this.totalFrame) {
-                this.onend()
-                let o = await rec.stop()
-                console.log(o)
-                if (o instanceof Blob) {
-                    downloadBlob(URL.createObjectURL(o), "test.mp4")
-                } else {
-                    downloadBlob(URL.createObjectURL(new Blob([o as any])), "test.mp4")
-                }
-                return
-            }
-        })
-    }
-    pause_record() {
-        this.rec.pause_record()
-    }
-    get currentTime() {
-        return this.progress * this.game.chart.music.duration
-    }
-    get progress() {
-        return this.recordedFrame / this.totalFrame
-    }
-}*/

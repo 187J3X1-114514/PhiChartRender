@@ -12,7 +12,7 @@ setInterval(async () => {
     id = await fpPromise.get()
 }, 15 * 60 * 60 * 1000)
 const DID = await genID()
-export default async function loginPage(t: Element): Promise<loginResult> {
+export default async function loginPage(targetElement: Element): Promise<loginResult> {
     const dialog = new Dialog()
     dialog.classList.add("close-on-overlay-click")
     dialog.headline = I18N.get("ui.screen.phira.login.text.login")
@@ -86,17 +86,33 @@ export default async function loginPage(t: Element): Promise<loginResult> {
     dialog.append(okButton)
     dialogInput.append(checkKeepPassword)
     dialog.append(dialogInput)
-    t.append(dialog)
+    targetElement.append(dialog)
     setTimeout(() => {
         dialog.open = true
     }, 100)
+    const remove = () => {
+        dialogInput.remove()
+        okButton.remove()
+        cancelButton.remove()
+        checkKeepPassword.remove()
+        okIcon.remove()
+        passwordInput.remove()
+        passwordInputHelp.remove()
+        emailInput.remove()
+        emailInputHelp.remove()
+        dialog.remove()
+    }
+    dialog.addEventListener("closed", () => {
+        targetElement.removeChild(dialog)
+        remove()
+    })
     return await new Promise<loginResult>(async (r) => {
         cancelButton.addEventListener("click", () => {
             dialog.open = false
             r({ api: undefined, ok: false, status: 200, error: I18N.get("ui.screen.phira.login.text.error.b") } as loginResult)
         })
         okButton.addEventListener("click", async () => {
-            let pr = await protocolPage(t)
+            let pr = await protocolPage(targetElement)
             if (!(pr.privacy_policy && pr.terms_of_use)) {
                 dialog.headline = I18N.get("ui.screen.phira.login.text.login_fail")
                 dialog.removeChild(okButton)
@@ -111,6 +127,7 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 dialog.append(newCancelButton)
                 newCancelButton.addEventListener("click", () => {
                     dialog.open = false
+                    newCancelButton.remove()
                     r({ api: undefined, ok: false, status: 200, error: I18N.get("ui.screen.phira.login.text.error.a") } as loginResult)
                 })
             } else {
@@ -118,17 +135,17 @@ export default async function loginPage(t: Element): Promise<loginResult> {
                 dialogInput.removeChild(emailInput)
                 dialogInput.removeChild(passwordInput)
                 dialogInput.removeChild(checkKeepPassword)
-                let p = new CircularProgress()
-                p.style.height = "100%"
+                let loadingSpinner = new CircularProgress()
+                loadingSpinner.style.height = "100%"
                 //dialogInput.style.display = "inline-block"
                 dialogInput.style.textAlign = "center"
                 dialogInput.style.height = document.documentElement.clientHeight * 0.05 + "px"
                 dialogInput.style.overflow = 'hidden';
-                dialogInput.append(p)
+                dialogInput.append(loadingSpinner)
                 dialog.removeChild(okButton)
                 let api = await PhiraAPI.login(emailInput.value, passwordInput.value)
                 dialog.headline = api.api ? I18N.get("ui.screen.phira.login.text.login.true") : I18N.get("ui.screen.phira.login.text.login_fail")
-                dialogInput.removeChild(p)
+                dialogInput.removeChild(loadingSpinner)
                 if (!api.ok) dialogInput.innerText = api.error
                 dialog.removeChild(cancelButton)
 
@@ -155,10 +172,10 @@ export default async function loginPage(t: Element): Promise<loginResult> {
         })
         if (await DB.checkInfoData("phira")) {
             try {
-                let p = getCookie(await DB.getInfoData("phira")! as string)
-                if (p.email != "" && p.password != "") {
-                    emailInput.value = p.email
-                    passwordInput.value = p.password
+                let userInfo = getCookie(await DB.getInfoData("phira")! as string)
+                if (userInfo.email != "" && userInfo.password != "") {
+                    emailInput.value = userInfo.email
+                    passwordInput.value = userInfo.password
                     checkKeepPassword.checked = true
                 }
             } catch { }

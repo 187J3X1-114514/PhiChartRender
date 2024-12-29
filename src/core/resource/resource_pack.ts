@@ -328,7 +328,7 @@ async function genBadNoteTex(src: pixi.Texture, colorHex: string) {
     let el = document.createElement("canvas")
     el.width = img.width
     el.height = img.height
-    const ctx = el.getContext("2d")!
+    const ctx = el.getContext("2d", { willReadFrequently: true })!
     ctx.drawImage(img, 0, 0);
     for (let dy = 0; dy < img.height; dy++) {
         for (let dx = 0; dx < img.width; dx++) {
