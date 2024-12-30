@@ -5,8 +5,8 @@
     <!--
     <span class="info" id="info">{{ verText }}</span>
     -->
-    <mdui-top-app-bar :class="{ 'tauri': ON_TAURI, 'windows': ON_WINDOWS, 'flex-display': true }" ref="topAppBar" variant="hide"
-        id="top-app-bar" style="display: flex" class="left-all top-app-bar">
+    <mdui-top-app-bar :class="{ 'tauri': ON_TAURI, 'windows': ON_WINDOWS, 'flex-display': true }" ref="topAppBar"
+        variant="hide" id="top-app-bar" style="display: flex" class="left-all top-app-bar">
         <div class="top-app-bar-blur"></div>
         <LogoComponent style="width: 2em;height: 2em;padding-left: 1em;"></LogoComponent>
         <mdui-top-app-bar-title id="top-app-bar-title">
@@ -72,6 +72,9 @@
         <mdui-navigation-rail-item @click="changeScreen('loc')" icon="insert_drive_file" value="loc" id="tab-local"
             class="black-font"><span>{{
                 I18N("html.tab.local") }}</span></mdui-navigation-rail-item>
+        <mdui-navigation-rail-item @click="changeScreen('test')" icon="bug_report" value="test" id="tab-test"
+            class="black-font"><span>test</span></mdui-navigation-rail-item>
+
         <mdui-navigation-rail-item ref="navigationRailItem_WEL" value="welcome"
             style="display: none;"></mdui-navigation-rail-item>
     </mdui-navigation-rail>
@@ -130,6 +133,7 @@
         <mdui-button id="protocolYES2" slot="action" disabled variant="tonal">{{
             I18N("html.protocol.yes") }}</mdui-button>
     </mdui-dialog>
+    <PauseOverlayComponent v-bind="__pauseOverlayData!"></PauseOverlayComponent>
 </template>
 
 <script lang="ts">
@@ -156,6 +160,7 @@ await loadFont();
 
 import { snackbar } from 'mdui/functions/snackbar.js';
 import { reqFullSc } from '.';
+import PauseOverlayComponent from './component/PauseOverlayComponent.vue';
 
 if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) document.body.addEventListener("click", () => {
     reqFullSc()
@@ -296,11 +301,55 @@ function uModeBtn() {
 if (Cookies.get("mode")) {
     setThemeP(Cookies.get("mode")!)
 }
+
+export interface PauseOverlayData {
+    open: boolean,
+    hide: boolean,
+    showCountdownTime: boolean,
+    callbacks: {
+        onNoCountdownTimeClosed: () => void;
+        onclosed: () => void;
+        clickBackButton: () => void;
+        clickRetryButton: () => void;
+        clickContinueButton: () => void;
+    }
+}
+
+const __pauseOverlayData = ref<PauseOverlayData>({
+    open: false,
+    hide: true,
+    showCountdownTime: true,
+    callbacks: {
+        onNoCountdownTimeClosed: () => { },
+        onclosed: () => { },
+        clickBackButton: () => { },
+        clickRetryButton: () => { },
+        clickContinueButton: () => { }
+    }
+})
+
+export function _setPauseOverlayData(data: PauseOverlayData) {
+    __pauseOverlayData.value = data
+}
+
+export function _shouldShowPauseOverlay(open: boolean) {
+    if (__pauseOverlayData.value) {
+        __pauseOverlayData.value.open = open
+    }
+}
+
+export function _getPauseOverlayData() {
+    return __pauseOverlayData
+}
+
+
+
 export default {
     name: 'Main',
     components: {
         ScreenComponent,
-        LogoComponent
+        LogoComponent,
+        PauseOverlayComponent
     },
     data() {
         return {
@@ -317,7 +366,8 @@ export default {
             screenName: "welcome",
             screenOtherData: {},
             ON_TAURI: ON_TAURI,
-            ON_WINDOWS: ON_WINDOWS
+            ON_WINDOWS: ON_WINDOWS,
+
         }
     },
     setup() {
@@ -344,7 +394,8 @@ export default {
             app,
             avatar,
             avatarName,
-            navigationRailItem_WEL
+            navigationRailItem_WEL,
+            __pauseOverlayData
         };
     },
     methods: {

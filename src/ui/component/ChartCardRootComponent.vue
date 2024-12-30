@@ -70,8 +70,6 @@ export default {
 </template>
 
 <style>
-.chart-card {
-}
 
 .chart-card-nothing {
     display: flex;
@@ -80,6 +78,7 @@ export default {
     margin-top: 7%;
     font-style: italic;
     color: rgba(112, 112, 112, 0.425);
+    
 
 }
 
@@ -89,7 +88,7 @@ export default {
     margin: 10px;
 }
 
-.chart-card-enter-active,
+.chart-card-enter-active,  
 .chart-card-leave-active {
     transition: all 0.2s ease;
 }

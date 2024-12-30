@@ -6,6 +6,7 @@ import { Application } from "pixi.js";
 import { topAppBar } from "../App.vue";
 import { reqFullSc } from "..";
 import { WebGLApplication } from "@/gl/WebGLApplication";
+import { PauseScreen } from "./pause";
 
 export class PlayScreen {
     private res: ResourceManager
@@ -15,6 +16,7 @@ export class PlayScreen {
     private file: File[]
     private resp: ResourcePack
     private chart_data?: ChartData
+    private pauseScreen?: PauseScreen
     private end: () => void
     constructor(file: File | File[] | ChartInfo, resp: ResourcePack, resm: ResourceManager = new ResourceManager()) {
         this.res = resm
@@ -74,6 +76,7 @@ export class PlayScreen {
                 audioOffset: this.chart!.type == "phira" ? this.chart!.src.offset : 0
             }
         })
+        this.pauseScreen = PauseScreen.bindGame(this.game)
         let r = new ResizeObserver(() => { this.game!.resize(true) })
         document.body.appendChild(this.app.canvas)
         r.observe(this.app!.canvas)

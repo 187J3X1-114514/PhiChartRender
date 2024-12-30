@@ -2,7 +2,7 @@ import * as verify from '../verify';
 import Input from './input';
 import Score from './score';
 import JudgePoint from './point';
-import { Container, AnimatedSprite, Texture, Sprite } from 'pixi.js';
+import { Container, AnimatedSprite, Texture, Sprite, Text } from 'pixi.js';
 import Chart from '../chart';
 import type { SizerData } from '../types/params';
 import Note from '../chart/note';
@@ -119,7 +119,10 @@ export default class Judgement {
         this.judgePoints = [];
         this.score.reset();
         this.input.reset();
-
+        for (let anim of this.anims) {
+            anim.destroy()
+        }
+        this.anims = []
         this.holdBetween = 0.15;
 
         if (this.clickParticleContainer) this.clickParticleContainer.removeChildren();
@@ -197,7 +200,7 @@ export default class Judgement {
                 animation.destroy();
                 this.anims.splice(this.anims.indexOf(animation), 1);
             } else {
-                animation.currentFrame = currentFrame;
+                if (animation.totalFrames >= currentFrame && currentFrame >= 0) animation.currentFrame = currentFrame;
             }
             animation.alpha = 1 - (animation.currentFrame / animation.totalFrames);
         });

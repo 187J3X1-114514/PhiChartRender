@@ -53,7 +53,11 @@ export default class UIManager implements baseUIManager {
         this.backgrounds.bigCover.rect(0, 0, this.backgrounds.small.texture.width, this.backgrounds.small.texture.height).fill({ color: 0x000 })
         this.backgrounds.smallCover.rect(0, 0, this.backgrounds.small.texture.width, this.backgrounds.small.texture.height).fill({ color: 0x000 })
     }
-    reset() { }
+    reset() {
+        //this.element?.Combo?.setText(' ',true)
+        //this.element?.ComboNumber?.setText(' ',true)
+        //this.element?.Score?.setText(' ',true)
+     }
     createElement() {
         this.element.Combo.create()
         this.element.ComboNumber.create()

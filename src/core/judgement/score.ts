@@ -81,6 +81,11 @@ export default class Score {
         this.judgeLevel = -1;
         this.APType = 2;
         this.levelPassed = false;
+        this.text = {
+            acc: "0%",
+            score: "0000000",
+            combo: "0"
+        }
     }
 
     createSprites(_stage: any) { }

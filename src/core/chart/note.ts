@@ -6,7 +6,6 @@ import { type PhiAssets, ResourceManager } from '../resource';
 import type { jsonNoteData, NoteParam } from './types/note';
 import { CONST } from '../types/const';
 import { GlobalSettings } from '../global_setting';
-import { noteCanRender } from './utils';
 import { SizerData } from '../types/params';
 
 
@@ -165,7 +164,7 @@ export default class Note {
     }
 
     calcTime(currentTime: number, size: SizerData) {
-        if (this.notCalc) return
+        if (this.notCalc || this.sprite.destroyed) return
         if (this.isScoreAnimated && this.isScored && !this.isFake && this.type != CONST.NoteType.Hold) {
             this.notCalc = true
             if (GlobalSettings.shouldDestroyNoteSprite!) {

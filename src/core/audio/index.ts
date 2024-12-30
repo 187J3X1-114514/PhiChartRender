@@ -36,6 +36,9 @@ export default class Audio {
     reset() {
         this.progress = 0
         this.currentTime = 0
+        this.seek(0)
+        this.pause(true)
+        
     }
 
     play(_withTimer = false) {

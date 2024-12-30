@@ -304,17 +304,17 @@ export default class PhiGame {
     }
 
     pause() {
-        this.isPaused = this.isPaused ? false : true;
+        this.isPaused = !this.isPaused;
         this.judgement.input._isPaused = this.isPaused;
 
         if (!this.isPaused) {
             this._animateStatus = 1
             this.chart.music.pause(false)
-            this.runCallback('pause');
         }
         else {
             this._animateStatus = 1
             this.chart.music.pause(true)
+            this.runCallback('pause');
         }
     }
 
@@ -327,16 +327,26 @@ export default class PhiGame {
     }
 
     restart() {
-        this.app.setTick(() => this.gameTick());
+        this.app.setTick(() => { });
         window.onblur = () => { this.autoPause() }
-        this.chart.music.reset();
-
-        this.chart.reset();
         this.judgement.reset();
+        this.chart.destroySprites()
+        this.chart.createSprites(
+            this.container.gameContainer,
+            this.renders.sizer,
+            this.assets,
+            this.container.UIContainer,
+            this.resource,
+            this.settings.speed,
+            this.settings.bgDim,
+            this.settings.multiNoteHL
+        );
+        this.ui.reset()
+        this.chart.music.reset();
+        this.chart.reset();
 
         this.resize();
         this.prprExtra.reset()
-
         this.isPaused = false;
         this.isEnded = false;
 
@@ -347,7 +357,6 @@ export default class PhiGame {
         this.fakeJudgeline.visible = true;
         for (const judgeline of this.chart.judgelines) {
             if (!judgeline.sprite) continue;
-
             judgeline.sprite.alpha = 0;
             if (this.settings.showAPStatus) judgeline.setColor(0xFFECA0, true)
         };
@@ -356,6 +365,10 @@ export default class PhiGame {
 
             note.sprite.alpha = 0;
         };
+        this.judgement.input._isPaused = this.isPaused;
+        this.chart.music.pause(true)
+
+        this.app.setTick(() => this.gameTick());
     }
 
     destroy() {
@@ -375,7 +388,7 @@ export default class PhiGame {
         (window as any).__PIXI_DEVTOOLS__ = undefined
     }
 
-    on(type: string, callback: () => any) {
+    on(type: "start" | "tick" | "pause" | "end", callback: () => any) {
         if (!this.functions[type]) return;
         if (!(callback instanceof Function)) return;
         this.functions[type].push(callback);
@@ -671,6 +684,11 @@ export default class PhiGame {
     }
     getAntialiasing() {
         return this.antialiasing
+    }
+    stop() {
+        if (!this.isPaused) this.pause();
+        this.runCallback('end');
+
     }
 }
 
