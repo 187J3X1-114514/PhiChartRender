@@ -143,12 +143,12 @@ Phira铺面搜索界面
 此项目中与Phira相关的api使用未经TeamFlos直接允许，若TeamFlos不允许此项目调用相关api接口可以通过issues联系我，我会立即删除有关代码。
 
 ## TODO
-* 迁移到Vue *(NO.1)*
-* 修复WebGPU着色器错误 shockwave.wgsl *(NO.2)*
+* 重写项目的核心部分 *(NO.1)* (因为BUG多，加新功能麻烦，RPE铺面播放有问题，依托稀释的代码)
+* 修复WebGPU着色器错误 shockwave.wgsl *(NO.?)*
 * 铺面缓存 *(已完成)*
 * 新的铺面格式 *(已完成)*
-* 录制铺面 *(NO.4)*
-* prpr的铺面拓展编辑 *(NO.3)*
+* 录制铺面 *(NO.?)*
+* prpr的铺面拓展编辑 *(NO.?)*
 
 ## 其它
 
