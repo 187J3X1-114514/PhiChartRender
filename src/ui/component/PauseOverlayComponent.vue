@@ -163,8 +163,8 @@ export default {
 
 .pause-overlay-button {
     display: inline-block;
-    margin-left: 60px;
-    margin-right: 60px;
+    margin-left: 6vmin;
+    margin-right: 6vmin;
 }
 
 .pause-overlay-buttons.open {
@@ -207,7 +207,7 @@ export default {
 
 .pause-overlay-button-img {
     user-select: none;
-    width: 55px;
+    width: 5.1vmin;
 }
 
 .pause-overlay-root {

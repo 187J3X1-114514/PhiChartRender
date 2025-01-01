@@ -333,16 +333,27 @@ export default class Judgeline {
         this.alpha = 0;
         this.deg = 0;
         let calcTextureSize = false
+        let __: {
+            alpha: boolean;
+            x: boolean;
+            y: boolean;
+            rotate: boolean;
+        }[] = []
+        for (let i = 0, length = this.eventLayers.length; i < length; i++) {
+            let eventLayer = this.eventLayers[i];
+            __.push(eventLayer.calcTime(currentTime))
+        }
         for (let i = 0, length = this.eventLayers.length; i < length; i++) {
             let eventLayer = this.eventLayers[i];
             eventLayer.calcTime(currentTime);
 
             this.speed += eventLayer._speed;
-            this.x += eventLayer._posX;
-            this.y += eventLayer._posY;
-            this.alpha += eventLayer._alpha;
-            this.deg += eventLayer._rotate;
+            if (__[i].x) this.x += eventLayer._posX;
+            if (__[i].y) this.y += eventLayer._posY;
+            if (__[i].alpha) this.alpha += eventLayer._alpha;
+            if (__[i].rotate) this.deg += eventLayer._rotate;
         }
+
 
         for (let i = 0, length = this.floorPositions.length; i < length; i++) {
             let event = this.floorPositions[i];

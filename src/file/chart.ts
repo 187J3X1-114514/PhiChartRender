@@ -330,13 +330,13 @@ export class ChartFile {
         chart.uiControls = otherJudgelines
         chart.notes = notes
         chart.judgelines.forEach((judgeline) => {
-            judgeline.eventLayers.forEach((eventLayer) => {
-                /* eventLayer.speed = utils.arrangeSameSingleValueEvent(eventLayer.speed); */
-                eventLayer.moveX.events = arrangeLineEvents(eventLayer.moveX.events);
-                eventLayer.moveY.events = arrangeLineEvents(eventLayer.moveY.events);
-                eventLayer.rotate.events = arrangeLineEvents(eventLayer.rotate.events);
-                eventLayer.alpha.events = arrangeLineEvents(eventLayer.alpha.events);
-            });
+            //judgeline.eventLayers.forEach((eventLayer) => {
+            //    /* eventLayer.speed = utils.arrangeSameSingleValueEvent(eventLayer.speed); */
+            //    eventLayer.moveX.events = arrangeLineEvents(eventLayer.moveX.events);
+            //    eventLayer.moveY.events = arrangeLineEvents(eventLayer.moveY.events);
+            //    eventLayer.rotate.events = arrangeLineEvents(eventLayer.rotate.events);
+            //    eventLayer.alpha.events = arrangeLineEvents(eventLayer.alpha.events);
+            //});
 
             for (const name in judgeline.extendEvent) {
                 if (name !== 'color' && name !== 'text')

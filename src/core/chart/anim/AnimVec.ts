@@ -11,6 +11,10 @@ export class AnimVecFloat implements BaseAnim<number, BaseEvent<number>> {
         this.animX = new AnimFloat([], this.noInterpolation)
         this.animY = new AnimFloat([], this.noInterpolation)
     }
+    do(callback: (events: BaseEvent<number>[]) => BaseEvent<number>[]): void {
+        this.animX.do(callback);
+        this.animY.do(callback);
+    }
     get time() {
         return this._time
     }

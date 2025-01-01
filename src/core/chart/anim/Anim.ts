@@ -11,6 +11,7 @@ export interface BaseAnim<V, _T extends BaseEvent<V>> extends Destroyable {
     time: number
     now(): any
     sort(): void
+    do(callback: (events: _T[]) => _T[]): void
 }
 export const EVENTSORTER = (a: BaseEvent<any>, b: BaseEvent<any>) => a.startTime - b.startTime;
 export type Event = BaseEvent<number>
@@ -27,6 +28,9 @@ export class Anim<V, T extends BaseEvent<V>> implements BaseAnim<V, T> {
         this.events = events
         this.noInterpolation = noInterpolation
         this.interpolationFunction = interpolationFunction
+    }
+    do(callback: (events: T[]) => T[]): void {
+        this.events = callback(this.events)
     }
     destory(): void {
         this.events = []
@@ -87,7 +91,8 @@ export const floatInterpolationFunction: InterpolationFunction<number> =
         let event = events[eventIndex];
         if (event.start === event.end) return event.start;
         let timePercent = (time - event.startTime) / (event.endTime - event.startTime);
-        return event.start + (event.end - event.start) * timePercent;
+        let timePercentStart = 1 - timePercent;
+        return event.start * timePercentStart + event.end * timePercent;
     }
 export const valueInterpolationFunction: InterpolationFunction<number> =
     (events: BaseEvent<number>[], eventIndex: number, time: number) => {

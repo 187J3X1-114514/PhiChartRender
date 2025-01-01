@@ -15,15 +15,6 @@ export default class EventLayer {
     _posY: number = 0;
     _alpha: number = 0;
     _rotate: number = 0;
-
-    public speedIndex: number = 0;
-    public moveXIndex: number = 0;
-    public moveYIndex: number = 0;
-    public alphaIndex: number = 0;
-    public rotateIndex: number = 0;
-    public moveYOriginValue?: number
-    public alphaOriginValue?: number
-    public rotateOriginValue?: number
     sort() {
         this.speed.sort();
         this.moveX.sort();
@@ -32,11 +23,12 @@ export default class EventLayer {
         this.rotate.sort();
     }
 
-    set speedOriginValue(value: number) {
-
-    }
-    set moveXOriginValue(value: number) {
-
+    constructor() {
+        this.speed.originValue = 1
+        this.moveX.originValue = 0
+        this.moveY.originValue = 0
+        this.rotate.originValue = 0
+        this.alpha.originValue = 1
     }
 
     calcTime(currentTime: number) {

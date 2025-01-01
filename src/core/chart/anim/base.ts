@@ -8,7 +8,8 @@ export interface calculateResult<T> {
 
 export abstract class BaseAnim {
     public events: BaseEvent[] = []
-
+    public eventIndex: number = 0
+    private _time: number = 0
     protected valueCalculator(events: Event[], currentTime: number, originValue: number = 0, _eventIndex: number = 0): calculateResult<number> {
         for (let i = _eventIndex, length = events.length; i < length; i++) {
             let event = events[i];
@@ -43,6 +44,15 @@ export abstract class BaseAnim {
     sort() {
         const sorter = (a: { startTime: number }, b: { startTime: number }) => a.startTime - b.startTime;
         this.events.sort(sorter);
+    }
+    protected updateTime(time: number) {
+        if (this.events.length === 0) return;
+        while (this.eventIndex < this.events.length - 1 && this.events[this.eventIndex + 1].startTime <= time) {
+            this.eventIndex++;
+        }
+        while (this.eventIndex > 0 && this.events[this.eventIndex].startTime > time) {
+            this.eventIndex--;
+        }
     }
 
 }

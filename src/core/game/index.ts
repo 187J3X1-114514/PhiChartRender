@@ -604,7 +604,7 @@ export default class PhiGame {
                 this.isEnded = true;
                 this.prprExtra.cleanShader()
                 this.runCallback('end');
-                this.renders.performanceInfoText.alpha = 0
+                if (this.renders.performanceInfoText) this.renders.performanceInfoText.alpha = 0
                 this.container.mainContainer.alpha = 0
                 this.app.setTick(() => { });
                 window.onblur = null

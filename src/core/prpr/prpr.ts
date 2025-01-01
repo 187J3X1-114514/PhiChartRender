@@ -354,11 +354,8 @@ export class PrprExtra {
                         let _timedValues: RPEEvent[] = utils.calculateEventsBeat(_values)
                             .sort((a: any, b: any) => a.startTime - b.startTime || b.endTime - a.startTime);
                         let values: Event[] = [];
-                        if (name == "power") { console.log(_timedValues) }
                         for (const _value of _timedValues) {
-                            if (name == "power") console.log(_value)
                             values.push(...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)));
-                            if (name == "power") console.log(values, utils.calculateEventEase(_value, RePhiEditEasing), ...utils.calculateRealTime(bpmList, utils.calculateEventEase(_value, RePhiEditEasing)))
                         }
                         values.sort((a, b) => a.startTime - b.startTime || b.endTime - a.startTime);
                         vars[name] = values;

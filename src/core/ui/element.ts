@@ -96,10 +96,10 @@ export class UIElement {
             e.eventLayers = judgeLine.eventLayers
             e.extendEvent = { ...judgeLine.extendEvent }
             e.eventLayers.forEach((v) => {
-                v.moveXOriginValue = 0
-                v.moveYOriginValue = 0
-                v.alphaOriginValue = 0
-                v.rotateOriginValue = 0
+                v.alpha.originValue = 1
+                v.moveX.originValue = 0
+                v.moveY.originValue = 0
+                v.rotate.originValue = 0
             })
         }
 
