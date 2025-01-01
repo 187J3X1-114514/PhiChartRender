@@ -4,7 +4,7 @@ import type { Event, ValueEvent } from '../chart/anim/type';
 import { Graphics, Sprite, Text, TextStyle } from 'pixi.js';
 import { type SizerData } from '../types/params';
 import { pauseButton } from './tex';
-import Judgeline from '../chart/judgeline';
+import Judgeline from '../chart/object/judgeline';
 import { attachUI, type UIElementSettings, baseUIManager } from "../types/ui"
 
 export class UIElement {

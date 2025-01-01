@@ -1,15 +1,15 @@
-import * as verify from '../verify';
-import utils from './convert/utils';
+import * as verify from '../../verify';
+import utils from '../convert/utils';
 import { Sprite, Text, TextStyle, Texture } from 'pixi.js';
-import EventLayer from './eventlayer';
-import * as font from '../font'
-import type { floorPositionEvent, Event, ValueEvent } from './anim/type';
-import { type PhiAssets, ResourceManager } from '../resource';
-import type { SizerData } from '../types/params';
-import { chart_log } from './convert';
-import type { jsonEventLayer, jsonJudgeLineData } from './types/judgeLine';
+import EventLayer from '../eventlayer';
+import * as font from '../../font'
+import type { floorPositionEvent, Event, ValueEvent } from '../anim/type';
+import { type PhiAssets, ResourceManager } from '../../resource';
+import type { SizerData } from '../../types/params';
+import { chart_log } from '../convert';
+import type { jsonEventLayer, jsonJudgeLineData } from '../types/json/judgeLine';
 import { AnimatedGIF } from '@pixi/gif';
-import { conimgsize } from './utils';
+import { conimgsize } from '../utils';
 
 const blackJudgeLine = (() => {
     const canvas = document.createElement('canvas');

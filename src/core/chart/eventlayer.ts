@@ -1,7 +1,7 @@
 import { FloatAnim } from "./anim/float";
-import type { Event, ValueEvent } from "./anim/type";
+import type { Event } from "./anim/type";
 import { ValueAnim } from "./anim/value";
-import type { jsonEventLayer } from "./types/judgeLine";
+import { jsonEventLayer } from "./types/json/judgeLine";
 
 export default class EventLayer {
     public speed: ValueAnim = new ValueAnim()

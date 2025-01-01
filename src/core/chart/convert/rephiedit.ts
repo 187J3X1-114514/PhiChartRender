@@ -1,15 +1,27 @@
 import Chart from '../index';
-import Judgeline from '../judgeline';
+import Judgeline from '../object/judgeline.js';
 import EventLayer from '../eventlayer';
-import Note from '../note';
+import Note from '../object/note.js';
 import utils from './utils';
 import { RePhiEditEasing as Easing } from '../easing'
-import { RePhiEdit as utils2 } from './otherUtils'
+import { RePhiEdit as utils2 } from './utils/index.js'
 import { chart_log } from './index.js';
 import type { Event } from '../anim/type.js';
 import { CONST } from '@/core/types/const';
-export default function RePhiEditChartConverter(_chart: any) {
-    let notes: any[] = [];
+import { RPEChart, RPEEventLayer, RPEJudgeLine, RPENote } from '../types/rpe/index';
+
+interface TempNote extends RPENote {
+    startTime: any
+    isMulti: boolean
+    holdLength: number
+    floorPosition: number
+    judgeline: Judgeline
+    id: number
+    endTime: any
+}
+
+export default function RePhiEditChartConverter(_chart: RPEChart) {
+    let notes: TempNote[] = [];
     let sameTimeNoteCount = {};
     let ___ = performance.now()
     let rawChart = convertChartFormat(_chart);
@@ -29,16 +41,12 @@ export default function RePhiEditChartConverter(_chart: any) {
 
         rawChart.BPMList.forEach((bpm: any, index: number) => {
             bpm.endTime = rawChart.BPMList[index + 1] ? rawChart.BPMList[index + 1].startTime : [1e4, 0, 1];
-
             bpm.startBeat = bpm.startTime[0] + bpm.startTime[1] / bpm.startTime[2];
             bpm.endBeat = bpm.endTime[0] + bpm.endTime[1] / bpm.endTime[2];
-
             bpmChangedTime += currentBeatRealTime * (bpm.startBeat - bpmChangedBeat);
             bpm.startTime = bpmChangedTime;
             bpm.endTime = currentBeatRealTime * (bpm.endBeat - bpmChangedBeat);
-
             bpmChangedBeat += (bpm.startBeat - bpmChangedBeat);
-
             currentBeatRealTime = 60 / bpm.bpm;
             bpm.beatTime = 60 / bpm.bpm;
         });
@@ -46,7 +54,7 @@ export default function RePhiEditChartConverter(_chart: any) {
         rawChart.BPMList.sort((a: any, b: any) => b.startBeat - a.startBeat);
     }
 
-    rawChart.judgeLineList.forEach((_judgeline: any, judgelineIndex: any) => {
+    rawChart.judgeLineList.forEach((_judgeline: RPEJudgeLine, judgelineIndex: any) => {
         let judgeline = new Judgeline({
             id: judgelineIndex,
             texture: _judgeline.Texture != 'line.png' ? _judgeline.Texture : null,
@@ -55,14 +63,14 @@ export default function RePhiEditChartConverter(_chart: any) {
             isCover: _judgeline.isCover == 1
         });
 
-        if (_judgeline.attachUI && _judgeline.attachUI != '') {
+        if (_judgeline.attachUI) {
             judgeline.attachUI = _judgeline.attachUI
         }
 
         // 处理 EventLayer
-        _judgeline.eventLayers.forEach((_eventLayer: any) => {
+        _judgeline.eventLayers.forEach((_eventLayer: RPEEventLayer | null) => {
+            if (_eventLayer == null) return
             let eventLayer = new EventLayer();
-
             for (const eventName in _eventLayer) {
                 // 拍数数组转小数
                 _eventLayer[eventName] = utils.calculateEventsBeat(_eventLayer[eventName] ? _eventLayer[eventName] : []);
@@ -271,16 +279,8 @@ export default function RePhiEditChartConverter(_chart: any) {
 
             notes.push(note);
         });;
-        // _judgeline.notes = utils.calculateRealTime(rawChart.BPMList, _judgeline.notes);
-
-        /*
-        _judgeline.notes.forEach((_note, noteIndex) =>
-        {
-            
-        });
-        */
-        if (_judgeline.attachUI && _judgeline.attachUI != '') {
-            chart.othersJudgeLine.push(judgeline);
+        if (_judgeline.attachUI) {
+            chart.uiControls.push(judgeline);
         } else {
             chart.judgelines.push(judgeline);
         }
@@ -342,14 +342,13 @@ export default function RePhiEditChartConverter(_chart: any) {
         }
     });
 
-    chart.judgelines.sort((a: any, b: any) => a.id - b.id);
-    chart.notes.sort((a: any, b: any) => a.time - b.time);
+    chart.judgelines.sort((a: Judgeline, b: Judgeline) => a.id - b.id);
+    chart.notes.sort((a: Note, b: Note) => a.time - b.time);
 
-    chart.judgelines.forEach((judgeline: any, _judgelineIndex: any, judgelines: any) => {
+    chart.judgelines.forEach((judgeline: any, _judgelineIndex: number, judgelines: Judgeline[]) => {
         if (!isNaN(judgeline.parentLine) && judgeline.parentLine >= 0) {
             let parentLineId = judgeline.parentLine;
             judgeline.parentLine = null;
-
             for (const parentLine of judgelines) {
                 if (parentLine.id == parentLineId) {
                     judgeline.parentLine = parentLine;
@@ -365,7 +364,7 @@ export default function RePhiEditChartConverter(_chart: any) {
     return chart;
 }
 
-function convertChartFormat(rawChart: any) {
+function convertChartFormat(rawChart: RPEChart): RPEChart {
     let chart = JSON.parse(JSON.stringify(rawChart));
 
     if (chart.META.RPEVersion <= 100) {

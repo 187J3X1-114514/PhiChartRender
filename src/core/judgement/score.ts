@@ -1,5 +1,5 @@
 import type { SizerData } from '../types/params';
-import Judgeline from '../chart/judgeline';
+import Judgeline from '../chart/object/judgeline';
 export default class Score {
     _notesCount: number;
     _showAPStatus: boolean;

@@ -1,7 +1,7 @@
-import { number as verifyNum } from '../../verify';
-import { BezierEasing } from '../bezier-easing';
+import { number as verifyNum } from '../../../verify';
+import { BezierEasing } from '../../bezier-easing';
 
-const calcBetweenTime = 0.125; // 1/32
+export const calcBetweenTime = 0.125; // 1/32
 
 /**
  * 将一个事件的拍数数组转换为拍数小数
@@ -263,9 +263,7 @@ function arrangeSameSingleValueEvent(events: any[]) {
     return newEvents.slice();
 }
 
-export default {
-    CalcBetweenTime: calcBetweenTime,
-
+export {
     calculateEventBeat,
     calculateEventsBeat,
 

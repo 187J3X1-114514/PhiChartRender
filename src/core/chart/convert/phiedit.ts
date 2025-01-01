@@ -1,10 +1,10 @@
 import Chart from '../index';
-import Judgeline from '../judgeline';
+import Judgeline from '../object/judgeline.js';
 import EventLayer from '../eventlayer';
-import Note from '../note';
+import Note from '../object/note.js';
 import utils from './utils';
 import { PhiEditEasing as Easing } from '../easing'
-import { PhiEdit as utils2 } from './otherUtils'
+import { PhiEdit as utils2 } from './utils/index.js'
 import { chart_log } from './index.js';
 import { CONST } from '@/core/types/const';
 import { FloatAnim } from '../anim/float.js';
@@ -333,8 +333,8 @@ export default function PhiEditChartConverter(_chart: any) {
             if (event.start == -1) event.start = -255;
             else if (event.start == -2) event.start = -510;
             else if (event.start < -100 && event.start >= -1000) {
-                for (let eventCountIndex = 0, eventCountLength = Math.ceil((event.endTime - event.startTime) / utils.CalcBetweenTime); eventCountIndex < eventCountLength; eventCountIndex++) {
-                    let currentTime = (event.startTime + (eventCountIndex * utils.CalcBetweenTime)) >= event.endTime ? event.endTime : (event.startTime + (eventCountIndex * utils.CalcBetweenTime));
+                for (let eventCountIndex = 0, eventCountLength = Math.ceil((event.endTime - event.startTime) / utils.calcBetweenTime); eventCountIndex < eventCountLength; eventCountIndex++) {
+                    let currentTime = (event.startTime + (eventCountIndex * utils.calcBetweenTime)) >= event.endTime ? event.endTime : (event.startTime + (eventCountIndex * utils.calcBetweenTime));
                     let currentEventValue = utils.valueCalculator(event, Easing, currentTime);
                     let visibleBeat = ((currentEventValue + 100) * -1) / 10;
 

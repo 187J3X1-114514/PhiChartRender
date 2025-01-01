@@ -1,12 +1,12 @@
-import * as verify from '../verify';
+import * as verify from '../../verify';
 import { Container, Sprite, Texture } from 'pixi.js';
 import Judgeline from './judgeline';
-import Audio from '../audio';
-import { type PhiAssets, ResourceManager } from '../resource';
-import type { jsonNoteData, NoteParam } from './types/note';
-import { CONST } from '../types/const';
-import { GlobalSettings } from '../global_setting';
-import { SizerData } from '../types/params';
+import Audio from '../../audio';
+import { type PhiAssets, ResourceManager } from '../../resource';
+import { CONST } from '../../types/const';
+import { GlobalSettings } from '../../global_setting';
+import { SizerData } from '../../types/params';
+import { NoteParam, jsonNoteData } from '../types/json/note';
 
 
 export default class Note {

@@ -50,12 +50,7 @@ export default class Effect {
                 values.originValue = this._currentValue![name];
                 _currentValue![name] = values.calculate(currentTime).value;
             } else if (values instanceof ValueAnim) {
-                let result = values.calculate(currentTime, this._currentValue![name])
-                if (result.notDefault) {
-                    _currentValue![name] = result.value
-                } else if (values.lastResult) {
-                    _currentValue![name] = values.lastResult.value
-                };
+                _currentValue![name] = values.calculate(currentTime).value
             }
         }
         (shader as Shader).update({ ..._currentValue, time: currentTime, screenSize: this.isGlobal ? screenSizeG : screenSize });

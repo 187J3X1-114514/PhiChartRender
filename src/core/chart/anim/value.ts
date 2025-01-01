@@ -6,7 +6,7 @@ export class ValueAnim extends BaseAnim {
     public originValue: number = 0
     public eventIndex: number = 0
     public lastResult?: calculateResult<any>
-     calculate(currentTime: number, defaultValue: number = 1): calculateResult<any> {
+    calculate(currentTime: number, defaultValue: number = 1): calculateResult<any> {
         let result: calculateResult<any> = {
             value: defaultValue,
             notDefault: false,
@@ -24,7 +24,7 @@ export class ValueAnim extends BaseAnim {
         }
         this.eventIndex = result.eventIndex
         return result
-        
+
     }
     push(event: ValueEvent) {
         this.events.push(event)

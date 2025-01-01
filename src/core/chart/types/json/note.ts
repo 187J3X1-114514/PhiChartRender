@@ -1,4 +1,5 @@
-import Judgeline from "../judgeline";
+import Judgeline from "../../object/judgeline"
+
 
 export interface noteData {
     type: number
@@ -17,7 +18,6 @@ export interface extendNoteData extends noteData {
     holdLength?: number
     floorPosition?: number
     lineId?: number
-
 }
 export interface jsonNoteData {
     id: number,

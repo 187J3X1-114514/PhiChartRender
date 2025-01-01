@@ -1,24 +1,23 @@
 import Chart from '../index';
-import Judgeline from '../judgeline';
-import EventLayer from '../eventlayer.js';
-import Note from '../note';
-
+import Judgeline from '../object/judgeline';
+import EventLayer from '../eventlayer';
+import Note from '../object/note';
 import utils from './utils';
-import type { Event, OfficialChartEvent, BpmEvent, ValueEvent } from '../anim/type';
-import type { officialChartData } from '../types/index.js';
-import type { extendNoteData } from '../types/note.js';
-import { chart_log } from './index.js';
+import type { Event, BpmEvent, ValueEvent } from '../anim/type';
+import { chart_log } from './index';
 import { CONST } from '@/core/types/const';
+import { PhigrosOfficialChart } from '../types/phigros/phigros';
+import { judgeLineDisappearEvent, judgeLineMoveEvent, judgeLineRotateEvent } from '../types/phigros/event';
 
-export default function OfficialChartConverter(_chart: officialChartData) {
+export default function OfficialChartConverter(_chart: PhigrosOfficialChart) {
     let chart = new Chart();
     let ___ = performance.now()
-    chart_log.info("加载官方格式的铺面中,版本",_chart.formatVersion)
+    chart_log.info("加载官方格式的铺面中,版本", _chart.formatVersion)
     let rawChart = convertOfficialVersion(_chart);
-    let notes: extendNoteData[] = [];
+    let notes: any[] = [];
     let sameTimeNoteCount = {};
     let bpmList: BpmEvent[] = [];
-    
+
     chart.offset = rawChart.offset;
 
     rawChart.judgeLineList.forEach((_judgeline, index: number) => {
@@ -33,7 +32,7 @@ export default function OfficialChartConverter(_chart: officialChartData) {
                 value: e.value
             });
         });
-        _judgeline.judgeLineMoveEvents.forEach((e: OfficialChartEvent) => {
+        _judgeline.judgeLineMoveEvents.forEach((e: judgeLineMoveEvent) => {
             events.moveX.push({
                 startTime: calcRealTime(e.startTime, _judgeline.bpm),
                 endTime: calcRealTime(e.endTime, _judgeline.bpm),
@@ -47,7 +46,7 @@ export default function OfficialChartConverter(_chart: officialChartData) {
                 end: e.end2 - 0.5
             });
         });
-        _judgeline.judgeLineRotateEvents.forEach((e: Event) => {
+        _judgeline.judgeLineRotateEvents.forEach((e: judgeLineRotateEvent) => {
             events.rotate.push({
                 startTime: calcRealTime(e.startTime, _judgeline.bpm),
                 endTime: calcRealTime(e.endTime, _judgeline.bpm),
@@ -55,7 +54,7 @@ export default function OfficialChartConverter(_chart: officialChartData) {
                 end: -(Math.PI / 180) * e.end
             });
         });
-        _judgeline.judgeLineDisappearEvents.forEach((e: Event) => {
+        _judgeline.judgeLineDisappearEvents.forEach((e: judgeLineDisappearEvent) => {
             events.alpha.push({
                 startTime: calcRealTime(e.startTime, _judgeline.bpm),
                 endTime: calcRealTime(e.endTime, _judgeline.bpm),
@@ -66,7 +65,6 @@ export default function OfficialChartConverter(_chart: officialChartData) {
 
         judgeline.eventLayers.push(events);
         judgeline.sortEvent();
-
         judgeline.eventLayers[0].moveX.events = utils.arrangeSameValueEvent(judgeline.eventLayers[0].moveX.events);
         judgeline.eventLayers[0].moveY.events = utils.arrangeSameValueEvent(judgeline.eventLayers[0].moveY.events);
         judgeline.eventLayers[0].rotate.events = utils.arrangeSameValueEvent(judgeline.eventLayers[0].rotate.events);
@@ -74,20 +72,18 @@ export default function OfficialChartConverter(_chart: officialChartData) {
 
         judgeline.calcFloorPosition();
 
-        _judgeline.notesAbove.forEach((rawNote, rawNoteIndex) => {
+        _judgeline.notesAbove.forEach((rawNote: any, rawNoteIndex) => {
             rawNote.judgeline = judgeline;
             rawNote.id = rawNoteIndex;
             rawNote.bpm = _judgeline.bpm;
             rawNote.isAbove = true;
-            // let note = pushNote(rawNote, judgeline, rawNoteIndex, _judgeline.bpm, true);
             judgelineNotes.push(rawNote);
         });
-        _judgeline.notesBelow.forEach((rawNote, rawNoteIndex) => {
+        _judgeline.notesBelow.forEach((rawNote: any, rawNoteIndex) => {
             rawNote.judgeline = judgeline;
             rawNote.id = rawNoteIndex;
             rawNote.bpm = _judgeline.bpm;
             rawNote.isAbove = false;
-            // let note = pushNote(rawNote, judgeline, rawNoteIndex, _judgeline.bpm, false);
             judgelineNotes.push(rawNote);
         });
 
@@ -148,10 +144,10 @@ export default function OfficialChartConverter(_chart: officialChartData) {
     }
 
     chart.bpmList = bpmList.slice();
-    chart_log.info("铺面加载完成","用时",(performance.now()-___).toFixed(0)+"ms","总计note:",chart.notes.length,"个","判定线",chart.judgelines.length,"条")
+    chart_log.info("铺面加载完成", "用时", (performance.now() - ___).toFixed(0) + "ms", "总计note:", chart.notes.length, "个", "判定线", chart.judgelines.length, "条")
     return chart;
 
-    function pushNote(rawNote: extendNoteData) {
+    function pushNote(rawNote: any) {
         rawNote.time = calcRealTime(rawNote.time, rawNote.bpm);
         rawNote.holdTime = calcRealTime(rawNote.holdTime, rawNote.bpm);
         rawNote.holdEndTime = rawNote.time + rawNote.holdTime;
@@ -188,8 +184,8 @@ export default function OfficialChartConverter(_chart: officialChartData) {
 };
 
 
-function convertOfficialVersion(chart: officialChartData) {
-    let newChart: officialChartData = JSON.parse(JSON.stringify(chart));
+function convertOfficialVersion(chart: PhigrosOfficialChart) {
+    let newChart: PhigrosOfficialChart = JSON.parse(JSON.stringify(chart));
 
     switch (newChart.formatVersion) {
         case 1:
@@ -200,7 +196,7 @@ function convertOfficialVersion(chart: officialChartData) {
 
                     for (const x of i.speedEvents) {
                         if (x.startTime < 0) x.startTime = 0;
-                        x.floorPosition = floorPosition;
+                        (x as any).floorPosition = floorPosition;
                         floorPosition += (x.endTime - x.startTime) * x.value / i.bpm * 1.875;
                     }
 

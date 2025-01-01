@@ -1,8 +1,8 @@
 import { number as verifyNum } from '../verify';
-import * as Convert from './convert';
+import autoParseChart, * as Convert from './convert';
 import { Sprite, Graphics, Text, Texture } from 'pixi.js';
-import Judgeline from './judgeline';
-import Note from './note';
+import Judgeline from './object/judgeline';
+import Note from './object/note';
 import type { BpmEvent } from './anim/type';
 import Audio from '../audio';
 import { type PhiAssets, ResourceManager } from '../resource';
@@ -28,7 +28,7 @@ export default class Chart {
     bgCover?: Graphics
     renderSize: SizerData = {} as any
     public rootPath: string = ""
-    public othersJudgeLine: Judgeline[] = []
+    public uiControls: Judgeline[] = []
     noteJudgeCallback?: (currentTime: any, note: any) => void
     constructor(params: any = {}) {
         this.judgelines = [];
@@ -52,30 +52,13 @@ export default class Chart {
         this.sprites = {};
     }
 
-    static async from(rawChart: any, music?: Audio, _chartInfo = {}, _chartLineTexture = []) {
-        let chart: Chart | null = null;
+    static async from(rawChart: any, music?: Audio, _chartInfo?: any, _chartLineTexture = []) {
+        let { chart, type } = autoParseChart(rawChart);
         let chartInfo: any = _chartInfo;
-        if (typeof rawChart == 'object') {
-            if (!isNaN(Number(rawChart.formatVersion))) {
-                chart = await new Promise<Chart>((r) => {
-                    r(Convert.Official(rawChart))
-                })
-            }
-            else if (rawChart.META && !isNaN(Number(rawChart.META.RPEVersion))) {
-                chart = await new Promise<Chart>((r) => {
-                    r(Convert.RePhiEdit(rawChart))
-                })
-                chartInfo = chart.info;
-            }
+        if (chart == undefined) throw new Error('加载铺面时出现未知错误');
+        if (_chartInfo == undefined) {
+            chartInfo = type === 'rpe' ? chart.info : {}
         }
-        else if (typeof rawChart == 'string') {
-            chart = await new Promise<Chart | null>((r) => {
-                r(Convert.PhiEdit(rawChart))
-            }) as any
-        }
-
-        if (chart == null) throw new Error('Unsupported chart format');
-
         chart.info = {
             name: chartInfo.name,
             artist: chartInfo.artist,

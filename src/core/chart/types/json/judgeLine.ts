@@ -1,4 +1,4 @@
-import type { Event, OfficialChartEvent, floorPositionEvent, SpeedEvent, ValueEvent } from "../anim/type"
+import type { Event, OfficialChartEvent, floorPositionEvent, SpeedEvent, ValueEvent } from "../../anim/type"
 import type { extendNoteData } from "./note"
 
 export interface judgeLineData {

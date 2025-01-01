@@ -63,7 +63,7 @@ export default {
                         } else {
                             this.countdownTime += 1
                         }
-                    }, 1000)
+                    }, 1250)
                 }
             }
 

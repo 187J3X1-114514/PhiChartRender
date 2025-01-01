@@ -1,7 +1,8 @@
-import type { jsonEventLayer } from "../core/chart/types/judgeLine";
+
 import { number } from "../core/verify";
 import type { BpmEvent, Event, floorPositionEvent, RPEEvent, ValueEvent } from "../core/chart/anim/type";
 import { ReadBufferDataView, WriteBufferDataView } from "./data_view";
+import { jsonEventLayer } from "@/core/chart/types/json/judgeLine";
 
 export function buildEventData(view: WriteBufferDataView, data: Event) {
     view.setFloat64(data.startTime)

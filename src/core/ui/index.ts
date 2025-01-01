@@ -36,7 +36,7 @@ export default class UIManager implements baseUIManager {
         this.reset();
         this.settings = settings
         let hasAttachUIJL: { [key: string]: UIElement } = {}
-        chart.othersJudgeLine.forEach((judgeline) => {
+        chart.uiControls.forEach((judgeline) => {
             hasAttachUIJL[judgeline.attachUI!] = UIElement.from(judgeline, this)
         });
         this.element = {
@@ -57,7 +57,7 @@ export default class UIManager implements baseUIManager {
         //this.element?.Combo?.setText(' ',true)
         //this.element?.ComboNumber?.setText(' ',true)
         //this.element?.Score?.setText(' ',true)
-     }
+    }
     createElement() {
         this.element.Combo.create()
         this.element.ComboNumber.create()
@@ -120,6 +120,7 @@ export default class UIManager implements baseUIManager {
         this.backgrounds.small.position.set(0, 0)
         this.backgrounds.smallCover.position.set(0, 0)
         if (this.game.chart.bg) {
+            /*
             let bgScaleWidth = size.width / this.backgrounds.small.texture.width;
             let bgScaleHeight = size.height / this.backgrounds.small.texture.height;
             let bgScale = bgScaleWidth > bgScaleHeight ? bgScaleWidth : bgScaleHeight;
@@ -127,20 +128,23 @@ export default class UIManager implements baseUIManager {
             this.backgrounds.smallCover.scale.set(bgScale);
             this.backgrounds.small.visible = true
             this.backgrounds.smallCover.visible = true
-            if (size.widerScreen) {
-                let bgScaleWidth = this.game.app.renderer.screen.width / this.backgrounds.small.texture.width;
-                let bgScaleHeight = this.game.app.renderer.screen.height / this.backgrounds.small.texture.height;
-                let bgScale = bgScaleWidth > bgScaleHeight ? bgScaleWidth : bgScaleHeight;
+            */
 
-                this.backgrounds.big.scale.set(bgScale);
-                this.backgrounds.bigCover.scale.set(bgScale);
-                this.backgrounds.big.visible = true
-                this.backgrounds.bigCover.visible = true
-            }
-            else {
-                this.backgrounds.big.visible = false
-                this.backgrounds.bigCover.visible = false
-            }
+            let bgScaleWidth = this.game.app.renderer.screen.width / this.backgrounds.small.texture.width;
+            let bgScaleHeight = this.game.app.renderer.screen.height / this.backgrounds.small.texture.height;
+            let bgScale = bgScaleWidth > bgScaleHeight ? bgScaleWidth : bgScaleHeight;
+
+            this.backgrounds.big.scale.set(bgScale);
+            this.backgrounds.bigCover.scale.set(bgScale);
+            this.backgrounds.big.visible = true
+            this.backgrounds.bigCover.visible = true
+            this.backgrounds.small.scale.set(bgScale);
+            this.backgrounds.smallCover.scale.set(bgScale);
+            this.backgrounds.small.visible = true
+            this.backgrounds.smallCover.visible = true
+            this.backgrounds.small.position.set(-size.widthOffset, 0)
+            this.backgrounds.smallCover.position.set(-size.widthOffset, 0)
+
         } else {
             this.backgrounds.small.visible = false
             this.backgrounds.smallCover.visible = false
@@ -149,7 +153,7 @@ export default class UIManager implements baseUIManager {
 
         }
     }
-    destroy() { 
+    destroy() {
         this.element.Combo.destroy()
         this.element.ComboNumber.destroy()
         this.element.Score.destroy()

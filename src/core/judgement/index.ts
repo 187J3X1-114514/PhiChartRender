@@ -5,7 +5,7 @@ import JudgePoint from './point';
 import { Container, AnimatedSprite, Texture, Sprite, Text } from 'pixi.js';
 import Chart from '../chart';
 import type { SizerData } from '../types/params';
-import Note from '../chart/note';
+import Note from '../chart/object/note';
 import Audio from '../audio';
 import { CONST } from '../types/const';
 import { PhiNoteSound } from '../resource/resource_pack';
