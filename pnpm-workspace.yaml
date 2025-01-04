@@ -1,0 +1,5 @@
+packages:
+  - packages/mdui
+  - packages/mdui-jq
+  - packages/mdui-shared
+  - packages/phigros

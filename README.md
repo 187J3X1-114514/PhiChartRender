@@ -96,18 +96,21 @@ Phira铺面搜索界面
 * 等等 *~~懒得写了~~*
 
 ## 使用
-### 本地使用
-#### 开发
-1. `git clone https://github.com/187J3X1-114514/PhiChartRender`
-2. `pnpm install`
-3. `pnpm run dev`
-#### 构建
-1. `git clone https://github.com/187J3X1-114514/PhiChartRender`
-2. `pnpm install`
-3. `pnpm run build`
 
 ### 在线使用
 网址 [Cloudflare](https://phichartrender.pages.dev) *(尽量别用)* 或 [Netlify](https://phisimplus.netlify.app/)
+
+### 本地使用(网页)
+#### 开发
+`pnpm run dev:web`
+#### 构建
+`pnpm run build:web`
+
+### 本地使用(Tauri)
+#### 开发
+`pnpm run dev:tauri`
+#### 构建
+`pnpm run build:tauri`
 
 ## 感谢
 
