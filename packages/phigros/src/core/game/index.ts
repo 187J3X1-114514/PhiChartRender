@@ -157,7 +157,8 @@ export default class PhiGame {
             start: [],
             tick: [],
             pause: [],
-            end: []
+            end: [],
+            togglePause: []
         };
         this.renderTarget = new RenderTarget()
         this.antialiasing = new Antialiasing(this.app)
@@ -306,7 +307,7 @@ export default class PhiGame {
     pause() {
         this.isPaused = !this.isPaused;
         this.judgement.input._isPaused = this.isPaused;
-
+        this.runCallback('togglePause');
         if (!this.isPaused) {
             this._animateStatus = 1
             this.chart.music.pause(false)
@@ -383,12 +384,11 @@ export default class PhiGame {
         window.onblur = null
         this.chart.destroySprites()
         this.renderTarget.destroy()
-        this.ui.destroy()
-        this.prprExtra.destroy();
+        this.ui.destroy();
         (window as any).__PIXI_DEVTOOLS__ = undefined
     }
 
-    on(type: "start" | "tick" | "pause" | "end", callback: () => any) {
+    on(type: "start" | "tick" | "pause" | "end" | "togglePause", callback: () => any) {
         if (!this.functions[type]) return;
         if (!(callback instanceof Function)) return;
         this.functions[type].push(callback);

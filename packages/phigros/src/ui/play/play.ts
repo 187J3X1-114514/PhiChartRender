@@ -7,6 +7,7 @@ import { topAppBar } from "../App.vue";
 import { reqFullSc } from "..";
 import { WebGLApplication } from "@/gl/WebGLApplication";
 import { PauseScreen } from "./pause";
+import { appWindow, ON_PC } from "../tauri";
 
 export class PlayScreen {
     private res: ResourceManager
@@ -34,7 +35,7 @@ export class PlayScreen {
 
         this.app = await WebGLApplication.create(document.createElement("canvas"))
         globalThis.addEventListener("resize", () => {
-            this.app!.resize(window.innerWidth, window.innerHeight)
+            this.app?.resize(window.innerWidth, window.innerHeight)
         })
         this.app?.start()
 
@@ -95,6 +96,7 @@ export class PlayScreen {
         this.app!.canvas.classList.add("push-in")
         this.app!.canvas.classList.add("game")
         //BACKGROUND.pause()
+        if (ON_PC) appWindow.setDecorations(true)
         setTimeout(() => {
             this.game!.start()
             this.app!.canvas.classList.remove("push-in")
@@ -106,6 +108,7 @@ export class PlayScreen {
         document.body.style.paddingTop = "64px"
         this.app!.canvas.classList.add("push-out")
         this.end()
+        if (ON_PC) appWindow.setDecorations(false)
         setTimeout(() => {
             this.game!.destroy()
             this.app!.destroy()

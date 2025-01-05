@@ -38,6 +38,7 @@ canvas.game {
     font-size: clamp(0.625rem, 0.625rem + 0.28vw, 0.813rem);
     /*color: rgb(25, 0, 255);*/
     background: rgb(var(--color--s), var(--color--s), var(--color--s));
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -48,6 +49,7 @@ body {
     margin: 0;
     font-weight: bold;
     overflow-x: hidden;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -440,6 +442,7 @@ mdui-navigation-rail {
 }
 
 .phira-text {
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -510,6 +513,7 @@ html {
     top: 0px;
     left: 0px;
     z-index: -1;
+    -webkit-backdrop-filter: blur(30px);
     backdrop-filter: blur(30px);
 }
 
@@ -521,6 +525,7 @@ html {
 
 .chart-illustration mdui-chip {
     background-color: rgba(var(--color--s), var(--color--s), var(--color--s), 0.1) !important;
+    -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
 }
 
@@ -570,6 +575,7 @@ mdui-navigation-drawer mdui-list mdui-collapse mdui-list-item {
 }
 
 .dev-text {
+    -webkit-user-select: none;
     user-select: none;
     text-align: center;
 }
@@ -591,6 +597,7 @@ mdui-navigation-drawer {
     top: 0px;
     left: 0px;
     z-index: -1;
+    -webkit-backdrop-filter: blur(30px);
     backdrop-filter: blur(30px);
 }
 
@@ -717,6 +724,7 @@ mdui-navigation-drawer {
     font-size: clamp(0.625rem, 0.625rem + 0.28vw, 0.813rem);
     color: rgb(255, 255, 255);
     background: unset;
+    -webkit-user-select: none;
     user-select: none;
     font-size: medium;
     font-weight: bolder;
@@ -751,8 +759,6 @@ mdui-navigation-drawer {
     text-align: left;
 }
 
-.game-pause-root {}
-
 .chart-illustration mdui-chip span {
     mix-blend-mode: difference;
     color: rgb(255, 255, 255)
@@ -763,6 +769,7 @@ mdui-navigation-drawer {
 }
 
 mdui-dialog::part(overlay) {
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
 }
 
@@ -800,3 +807,39 @@ mdui-dialog::part(panel) {
     max-width: 100% !important;
 }
 
+#top-app-bar-other {
+    display: flex;
+    align-items: center;
+}
+
+#titlebar {
+    position: fixed;
+    top: 0;
+    height: 64px;
+    z-index: 99999999;
+}
+
+.titlebar-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 25px;
+    -webkit-user-select: none;
+    user-select: none;
+    clip-path: circle(35%);
+    cursor: pointer;
+}
+
+#titlebar-minimize {
+    background-color: #fff34c;
+}
+
+#titlebar-maximize {
+    background-color: #3fe71d;
+}
+
+#titlebar-close {
+    background-color: #ea3333;
+    margin-right: 10px;
+}

@@ -105,12 +105,13 @@ export default {
 
 <style>
 .pause-overlay-texts {
-    width: 3.8em;
+    width: 6.1vmin;
     min-height: 91px;
 }
 
 .pause-overlay-texts.open {
     opacity: 0;
+    display: none;
 }
 
 .pause-overlay-texts.close {
@@ -141,7 +142,7 @@ export default {
     position: absolute;
     font-family: 'phi';
     font-weight: lighter;
-    font-size: 3.8em;
+    font-size: 6.1vmin;
 }
 
 .countdown-time-text-enter-active,

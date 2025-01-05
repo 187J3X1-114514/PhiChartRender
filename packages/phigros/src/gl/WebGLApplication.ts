@@ -53,7 +53,6 @@ export class WebGLApplication<T extends BaseCanvas> {
         this.canvas.width = width * window.devicePixelRatio
         this.canvas.height = height * window.devicePixelRatio
         this.renderer.resize(width * window.devicePixelRatio, height * window.devicePixelRatio, 1)
-        console.log(this)
     }
 
     start() {

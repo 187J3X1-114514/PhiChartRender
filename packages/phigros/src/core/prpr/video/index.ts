@@ -15,7 +15,7 @@ export class PrprVideo {
     public dimSprite: Graphics = {} as any
     public start: number = 0
     public end: number = 0
-    public paused:boolean = true
+    public paused: boolean = true
     private _currentTime: number = 0
     static from(tex: Texture, data: PrPrExtraVideo) {
         let pv = new this()
@@ -47,7 +47,6 @@ export class PrprVideo {
     calcTime(currentTime: number) {
         this._alpha = 1
         this._dim = 1
-        //同步
         this._currentTime = currentTime
         for (let i = 0, length = this.alpha.length; i < length; i++) {
             let event = this.alpha[i];
@@ -73,7 +72,6 @@ export class PrprVideo {
         this.dimSprite.alpha = 1 - this._dim
     }
     pause() {
-        this.video.currentTime = Math.min(Math.max((this._currentTime) - this.start, 0), this.video.duration)
         this.video.pause()
         this.paused = true
     }

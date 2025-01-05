@@ -22,6 +22,7 @@ export class PrprExtra {
     public hasShader: boolean = true
     public src: PrPrExtraJSON = {} as any
     private sizer: SizerData = {} as any
+    private firstInit: boolean = true
     static from(json: PrPrExtraJSON) {
         let prpr = new this()
         if (json.effects) prpr.effects = this.PrprEffectReader(json);
@@ -33,6 +34,9 @@ export class PrprExtra {
 
     setGame(game: PhiGame) {
         this.game = game
+        this.game.on("togglePause", () => {
+            this.updatePause()
+        })
     }
 
     resize(size: SizerData) {
@@ -43,15 +47,9 @@ export class PrprExtra {
             v.resize(size)
         })
     }
-    private lastTime: number = 0
+
     private paused: boolean = false
     calcTime(currentTime: number) {
-        if (+currentTime.toFixed(3) != +this.lastTime.toFixed(3)) {
-            this.lastTime = currentTime
-            this.paused = false
-        } else {
-            this.paused = true
-        }
         this.cleanShader()
         let effects = this.effects
         let { container, rootContainer, renders } = this.game!;
@@ -93,18 +91,23 @@ export class PrprExtra {
                 video.video.currentTime = 0
                 this.game!.container.videoContainer.addChild(video.sprite)
             }
-            if (video.start < currentTime && video.end > currentTime) {
-                if (this.paused) {
-                    if (!video.video.paused) video.pause()
-                } else {
-                    if (video.video.paused) video.play()
-                    continue
-                }
-            }
 
             video.calcTime(currentTime)
         }
 
+    }
+
+    updatePause() {
+        this.paused = this.game!.isPaused
+        console.log(this.paused)
+        for (let i = 0, length = this.videos.length; i < length; i++) {
+            const video = this.videos[i] as PrprVideo
+            if (this.paused) {
+                if (!video.video.paused) video.pause()
+            } else {
+                if (video.video.paused) video.play()
+            }
+        }
     }
 
     cleanShader() {
@@ -112,14 +115,14 @@ export class PrprExtra {
         this.game!.rootContainer.filters = [DefaultShader.filter];
     }
 
-    destroy(){
+    destroy() {
         this.src = null as any
         this.videos = null as any
         this.effects = null as any
     }
 
     init() {
-        if (this.game == undefined) return
+        if (this.game == undefined || !this.firstInit) return
         let game = this.game!
         let tempEffects = this.effects.slice()
         for (let e of tempEffects) {
@@ -147,6 +150,7 @@ export class PrprExtra {
             }
 
         }
+        this.firstInit = false
 
     }
     reset() {

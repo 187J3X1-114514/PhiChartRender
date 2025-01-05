@@ -1,4 +1,5 @@
 <template>
+    <div id="titlebar" v-show="ON_PC" data-tauri-drag-region ref="titlebar"></div>
     <div ref="app">
         <ScreenComponent :screen-name="screenName" :other-data="screenOtherData"></ScreenComponent>
     </div>
@@ -13,7 +14,7 @@
             Phigros Simulator Plus {{ 'V' + PACKAGE_JSON.version.split('v').pop() }}</mdui-top-app-bar-title>
         <div style="flex-grow: 1" id="top-app-bar-other">
         </div>
-        <div style="margin: auto 0;height: 100%;white-space:nowrap" id="top-app-bar-other">
+        <div style="margin: auto 0;height: 100%;white-space:nowrap" id="top-app-bar-other" ref="topAppBarOther">
             <mdui-dropdown trigger="hover" id="theme-dropdown" placement="bottom">
                 <mdui-button-icon variant="tonal" icon="auto_mode" id="mode" ref="modeBtn" slot="trigger"
                     class="modeBtn" @click="modeBtnClick()"></mdui-button-icon>
@@ -50,6 +51,9 @@
                 </mdui-menu>
             </mdui-dropdown>
             <h4 style="display:inline;" id="avatar-name" ref="avatarName">{{ I18N("ui.text.not_login") }}</h4>
+            <div v-show="ON_PC" @click="clickMinimize()" class="titlebar-button" id="titlebar-minimize"></div>
+            <div v-show="ON_PC" @click="clickMaximize()" class="titlebar-button" id="titlebar-maximize"></div>
+            <div v-show="ON_PC" @click="clickClose()" class="titlebar-button" id="titlebar-close"></div>
         </div>
     </mdui-top-app-bar>
 
@@ -137,7 +141,7 @@
 </template>
 
 <script lang="ts">
-import { get_theme, ON_TAURI, ON_WINDOWS, set_theme } from './tauri';
+import { appWindow, get_theme, ON_PC, ON_TAURI, ON_WINDOWS, set_theme } from './tauri';
 import { onMounted, ref } from 'vue';
 import { I18N } from "./i18n"
 import { CircularProgress, Dropdown, getTheme, LinearProgress, MenuItem, setTheme, TopAppBar } from 'mdui';
@@ -264,6 +268,8 @@ export async function reqLogout() {
     avatar.value.src = undefined
     avatarName.value.innerText = I18N.get("ui.text.not_login")
 }
+const topAppBarOther = ref(null as any);
+const titlebar = ref<HTMLDivElement>(null as any);
 const modeBtn = ref(null as any);
 const navigationRail = ref(null as any)
 const navigationDrawer = ref(null as any)
@@ -272,11 +278,11 @@ async function setThemeP(a: string) {
     if (a != "auto") {
         document.body.style.setProperty("--color", a == "light" ? "#000000" : "#FFFFFF")
         document.body.style.setProperty("--color--s", a == "light" ? "255" : "0")
-        background.setTintColor(a == "dark" ? [0, 0, 0, 0.4] : [1, 1, 1, 0.8])
+        background.setTintColor(a == "dark" ? [0, 0, 0, 0.4] : [1, 1, 1, 0.7])
     } else {
         document.body.style.setProperty("--color", window.matchMedia("(prefers-color-scheme: light)").matches ? "#000000" : "#FFFFFF")
         document.body.style.setProperty("--color--s", window.matchMedia("(prefers-color-scheme: light)").matches ? "255" : "0")
-        background.setTintColor(!window.matchMedia("(prefers-color-scheme: light)").matches ? [0, 0, 0, 0.4] : [1, 1, 1, 0.65])
+        background.setTintColor(!window.matchMedia("(prefers-color-scheme: light)").matches ? [0, 0, 0, 0.4] : [1, 1, 1, 0.7])
     }
     THEME.value = a as any
     if (ON_TAURI) {
@@ -303,6 +309,11 @@ function uModeBtn() {
 export const background = await Background.init()
 if (Cookies.get("mode")) {
     setThemeP(Cookies.get("mode")!)
+}
+async function resizeTitleBar() {
+    if (!ON_TAURI) return
+    if (titlebar.value == null || topAppBarOther.value == null) return
+    titlebar.value.style.width = await appWindow.isDecorated() ? "0px" : `${topAppBarOther.value.offsetLeft - 80}px`
 }
 
 export interface PauseOverlayData {
@@ -368,13 +379,16 @@ export default {
             screenOtherData: {},
             ON_TAURI: ON_TAURI,
             ON_WINDOWS: ON_WINDOWS,
+            ON_PC: ON_PC
 
         }
     },
     setup() {
-        onMounted(() => {
+        onMounted(async () => {
             (document.getElementById("src-text-tooltip")! as any).content = I18N.get('html.src')
             uModeBtn()
+            setInterval(async () => { await resizeTitleBar() }, 10)
+            await resizeTitleBar()
             setTimeout(() => {
                 load.classList.add("hide")
                 document.getElementById("start-o")?.classList.remove("black");
@@ -396,7 +410,9 @@ export default {
             avatar,
             avatarName,
             navigationRailItem_WEL,
-            __pauseOverlayData
+            __pauseOverlayData,
+            titlebar,
+            topAppBarOther
         };
     },
     methods: {
@@ -448,6 +464,30 @@ export default {
                 this.screenName = s
                 navigationRail.value.value = s
             }
+        },
+        clickClose() {
+            if (ON_TAURI) {
+                MDUI.dialog({
+                    headline: "确定关闭？",
+                    actions: [
+                        {
+                            text: "取消",
+                        },
+                        {
+                            text: "确定",
+                            onClick: () => {
+                                appWindow.close()
+                            },
+                        }
+                    ]
+                })
+            }
+        },
+        clickMinimize() {
+            if (ON_TAURI) appWindow.minimize()
+        },
+        clickMaximize() {
+            if (ON_TAURI) appWindow.toggleMaximize()
         }
     }
 }

@@ -6,6 +6,8 @@
     "dev:cors": "netlify dev --filter phigros_sim_plus",
     "dev:web": "cd packages/phigros/ && vite dev",
     "build:web": "cd packages/phigros/ && run-p type-check \"build-only {@}\" --",
+    "build:tauri": "tauri build",
+    "build:tauri.android": "tauri android build",
     "preview:web": "cd packages/phigros/ vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
