@@ -24,7 +24,8 @@ export enum BACKGROUND_STYLE {
     COLOR
 }
 if (ON_TAURI) {
-    appWindow = getCurrentWebviewWindow()
+    appWindow = getCurrentWebviewWindow();
+    (window as any).appWindow = appWindow
     await main()
 }
 

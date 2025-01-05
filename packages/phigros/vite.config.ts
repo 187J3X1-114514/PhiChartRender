@@ -44,15 +44,20 @@ export default defineConfig(async () => ({
     ],
     clearScreen: false,
     build: {
-        sourcemap: false,
-        /*
+        sourcemap: true,
+        
         rollupOptions: {
             output: {
-                chunkFileNames: 'o.O.js',
-                entryFileNames: 'o.O.js',
-                assetFileNames: (chunkInfo: any) => assetFileName(chunkInfo),
-            },
-        },*/
+                entryFileNames: '[name]-[hash].js',
+                chunkFileNames: '[name]-[hash].js',
+                manualChunks:(id:string)=>{
+                    if(id.includes("node_modules")){
+                        return "modules";
+                    }
+                }
+            }
+        }
+        
     },
     server: {
         strictPort: true,
@@ -71,9 +76,6 @@ export default defineConfig(async () => ({
         "VES": pj.version,
         "ENV": process,
         "BUILD_TIME": Date.now()
-    },
-    optimizeDeps: {
-        exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
     },
     resolve: {
         alias: {

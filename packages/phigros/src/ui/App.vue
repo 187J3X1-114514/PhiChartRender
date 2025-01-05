@@ -193,7 +193,6 @@ export var account: undefined | PhiraAPI = undefined;
 export const app = ref<HTMLElement>(null as any)
 export const avatar = ref(null as any)
 export const avatarName = ref(null as any);
-export const background = await Background.init()
 export const topAppBar = ref<TopAppBar>(null as any)
 export const load = document.getElementById("load-stage")! as LinearProgress
 const THEME = ref(getTheme())
@@ -273,7 +272,7 @@ async function setThemeP(a: string) {
     if (a != "auto") {
         document.body.style.setProperty("--color", a == "light" ? "#000000" : "#FFFFFF")
         document.body.style.setProperty("--color--s", a == "light" ? "255" : "0")
-        background.setTintColor(a == "dark" ? [0, 0, 0, 0.4] : [1, 1, 1, 0.65])
+        background.setTintColor(a == "dark" ? [0, 0, 0, 0.4] : [1, 1, 1, 0.8])
     } else {
         document.body.style.setProperty("--color", window.matchMedia("(prefers-color-scheme: light)").matches ? "#000000" : "#FFFFFF")
         document.body.style.setProperty("--color--s", window.matchMedia("(prefers-color-scheme: light)").matches ? "255" : "0")
@@ -301,6 +300,7 @@ function uModeBtn() {
     if (m == "auto") m_ = "auto_mode"
     modeBtn.value.icon = m_
 }
+export const background = await Background.init()
 if (Cookies.get("mode")) {
     setThemeP(Cookies.get("mode")!)
 }
@@ -344,8 +344,6 @@ export function _shouldShowPauseOverlay(open: boolean) {
 export function _getPauseOverlayData() {
     return __pauseOverlayData
 }
-
-
 
 export default {
     name: 'Main',

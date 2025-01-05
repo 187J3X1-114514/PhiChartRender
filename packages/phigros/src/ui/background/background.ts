@@ -81,7 +81,7 @@ export class Background {
 
     async getWindowPos() {
         if (ON_TAURI) {
-            let _ = await appWindow.position()
+            let _ = await appWindow.outerPosition()
             return {
                 x: _.x,
                 y: _.y
